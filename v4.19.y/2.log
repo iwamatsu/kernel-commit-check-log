@@ -3,6 +3,49 @@ checking 8ef305fbc50d93cc7e2f594abcf9546f3afbd435 ......
 	 orig commit -> 22083c028d0b3ee419232d25ce90367e5b25df8f ......
 	 orig commit -> 4abb951b73ff0a8a979113ef185651aa3c8da19b ......
 		 4abb951b73ff0a8a979113ef185651aa3c8da19b has problem. Fixes commit -> c5781ffbbd4f742a58263458145fe7f0ac01d9e0
+commit d4b4aeea5506349a68adc9d2c372c8fa2416d790
+Author: Erik Schmauss <erik.schmauss@intel.com>
+Date:   Mon Apr 8 13:42:26 2019 -0700
+
+    ACPICA: Namespace: remove address node from global list after method termination
+    
+    commit c5781ffbbd4f742a58263458145fe7f0ac01d9e0 upstream.
+    
+    ACPICA commit b233720031a480abd438f2e9c643080929d144c3
+    
+    ASL operation_regions declare a range of addresses that it uses. In a
+    perfect world, the range of addresses should be used exclusively by
+    the AML interpreter. The OS can use this information to decide which
+    drivers to load so that the AML interpreter and device drivers use
+    different regions of memory.
+    
+    During table load, the address information is added to a global
+    address range list. Each node in this list contains an address range
+    as well as a namespace node of the operation_region. This list is
+    deleted at ACPI shutdown.
+    
+    Unfortunately, ASL operation_regions can be declared inside of control
+    methods. Although this is not recommended, modern firmware contains
+    such code. New module level code changes unintentionally removed the
+    functionality of adding and removing nodes to the global address
+    range list.
+    
+    A few months ago, support for adding addresses has been re-
+    implemented. However, the removal of the address range list was
+    missed and resulted in some systems to crash due to the address list
+    containing bogus namespace nodes from operation_regions declared in
+    control methods. In order to fix the crash, this change removes
+    dynamic operation_regions after control method termination.
+    
+    Link: https://github.com/acpica/acpica/commit/b2337200
+    Link: https://bugzilla.kernel.org/show_bug.cgi?id=202475
+    Fixes: 4abb951b73ff ("ACPICA: AML interpreter: add region addresses in global list during initialization")
+    Reported-by: Michael J Gruber <mjg@fedoraproject.org>
+    Signed-off-by: Erik Schmauss <erik.schmauss@intel.com>
+    Signed-off-by: Bob Moore <robert.moore@intel.com>
+    Cc: 4.20+ <stable@vger.kernel.org> # 4.20+
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking 491636a88c1182000cf710e01cbee88d5d658b46 ......
 	 orig commit -> f9005571701920551bcf54a500973fb61f2e1eda ......
 checking 32bd1336061df0b420d295fe2d0b6b4e9f19a307 ......
@@ -23,80 +66,6 @@ checking b4aa9db0b24f8504ee8e4de36bc84eae4f9fad63 ......
 	 orig commit -> 085603287452fc96376ed4888bf29f8c095d2b40 ......
 checking a46a7350b1e85fe78580f6a4c809a876867a9df8 ......
 	 orig commit -> df5e31c204b34e8d9e5ec33f5b28e960c4f25e14 ......
-	 orig commit -> b6b178a77210 ......
-		 b6b178a77210 has problem. Fixes commit -> df5e31c204b34e8d9e5ec33f5b28e960c4f25e14
-a748faea3bfd7fd1d1485bc1c426c7d460cc6503
-556fe36d09da5f82879e92bafa0371b4b79f7d6f
-commit df5e31c204b34e8d9e5ec33f5b28e960c4f25e14
-Author: Ville Syrjälä <ville.syrjala@linux.intel.com>
-Date:   Thu Oct 25 16:05:36 2018 +0300
-
-    drm/i915: Fix ilk+ watermarks when disabling pipes
-    
-    We're no longer programming any watermarks when we're disabling
-    a pipe. That means ilk_wm_merge() & co. will keep considering
-    the any pipe that is getting disabled as still enabled. Thus we
-    either get no LP1+ watermakrs (ilk-ivb), or we get suboptimal
-    ones (hsw-bdw).
-    
-    This seems to have been broken by commit b6b178a77210 ("drm/i915:
-    Calculate ironlake intermediate watermarks correctly, v2."). Before
-    that we apparently had some difference between the intermediate
-    and optimal watermarks and so we would program the optiomal ones.
-    Now intermediate and optimal are identical for disabled pipes
-    and so we don't program either.
-    
-    Fix this by programming the intermediate watermarks even for
-    disabled pipes. We were already doing that for skl+. We'll
-    leave out gmch platforms for now since those do the merging
-    in a different manner and should work as is. We'll want to
-    unify this eventually, but play it safe for now and just put
-    in a FIXME.
-    
-    Cc: stable@vger.kernel.org
-    Cc: Matt Roper <matthew.d.roper@intel.com>
-    Cc: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
-    Fixes: b6b178a77210 ("drm/i915: Calculate ironlake intermediate watermarks correctly, v2.")
-    Signed-off-by: Ville Syrjälä <ville.syrjala@linux.intel.com>
-    Link: https://patchwork.freedesktop.org/patch/msgid/20181025130536.29024-1-ville.syrjala@linux.intel.com
-    Reviewed-by: Maarten Lankhorst <maarten.lankhorst@linux.intel.com> #irc
-    (cherry picked from commit a748faea3bfd7fd1d1485bc1c426c7d460cc6503)
-    Signed-off-by: Joonas Lahtinen <joonas.lahtinen@linux.intel.com>
-commit df5e31c204b34e8d9e5ec33f5b28e960c4f25e14
-Author: Ville Syrjälä <ville.syrjala@linux.intel.com>
-Date:   Thu Oct 25 16:05:36 2018 +0300
-
-    drm/i915: Fix ilk+ watermarks when disabling pipes
-    
-    We're no longer programming any watermarks when we're disabling
-    a pipe. That means ilk_wm_merge() & co. will keep considering
-    the any pipe that is getting disabled as still enabled. Thus we
-    either get no LP1+ watermakrs (ilk-ivb), or we get suboptimal
-    ones (hsw-bdw).
-    
-    This seems to have been broken by commit b6b178a77210 ("drm/i915:
-    Calculate ironlake intermediate watermarks correctly, v2."). Before
-    that we apparently had some difference between the intermediate
-    and optimal watermarks and so we would program the optiomal ones.
-    Now intermediate and optimal are identical for disabled pipes
-    and so we don't program either.
-    
-    Fix this by programming the intermediate watermarks even for
-    disabled pipes. We were already doing that for skl+. We'll
-    leave out gmch platforms for now since those do the merging
-    in a different manner and should work as is. We'll want to
-    unify this eventually, but play it safe for now and just put
-    in a FIXME.
-    
-    Cc: stable@vger.kernel.org
-    Cc: Matt Roper <matthew.d.roper@intel.com>
-    Cc: Maarten Lankhorst <maarten.lankhorst@linux.intel.com>
-    Fixes: b6b178a77210 ("drm/i915: Calculate ironlake intermediate watermarks correctly, v2.")
-    Signed-off-by: Ville Syrjälä <ville.syrjala@linux.intel.com>
-    Link: https://patchwork.freedesktop.org/patch/msgid/20181025130536.29024-1-ville.syrjala@linux.intel.com
-    Reviewed-by: Maarten Lankhorst <maarten.lankhorst@linux.intel.com> #irc
-    (cherry picked from commit a748faea3bfd7fd1d1485bc1c426c7d460cc6503)
-    Signed-off-by: Joonas Lahtinen <joonas.lahtinen@linux.intel.com>
 checking 6d6e718e454b65448bbb50c876e5040f5d05db6d ......
 	 orig commit -> f42f343887016330b321dd40eebc68c7292e4f1b ......
 checking 1a25e1a1be71a49ee7f34fb14b5a26191e6cf501 ......
@@ -142,14 +111,141 @@ checking 633322afae62694598610be604bbea5199b257f6 ......
 checking d56cc4f14bf2d253cb0749e983de899601922504 ......
 	 orig commit -> 7f3ef5dedb146e3d5063b6845781ad1bb59b92b5 ......
 		 7f3ef5dedb146e3d5063b6845781ad1bb59b92b5 has problem. Fixes commit -> 63238173b2faf3d6b85a416f1c69af6c7be2413f
+commit 683ef526234f0c228530e58dea699758b6346149
+Author: Brian Norris <briannorris@chromium.org>
+Date:   Wed Dec 5 10:16:57 2018 -0800
+
+    Revert "drm/rockchip: Allow driver to be shutdown on reboot/kexec"
+    
+    commit 63238173b2faf3d6b85a416f1c69af6c7be2413f upstream.
+    
+    This reverts commit 7f3ef5dedb146e3d5063b6845781ad1bb59b92b5.
+    
+    It causes new warnings [1] on shutdown when running the Google Kevin or
+    Scarlet (RK3399) boards under Chrome OS. Presumably our usage of DRM is
+    different than what Marc and Heiko test.
+    
+    We're looking at a different approach (e.g., [2]) to replace this, but
+    IMO the revert should be taken first, as it already propagated to
+    -stable.
+    
+    [1] Report here:
+    http://lkml.kernel.org/lkml/20181205030127.GA200921@google.com
+    
+    WARNING: CPU: 4 PID: 2035 at drivers/gpu/drm/drm_mode_config.c:477 drm_mode_config_cleanup+0x1c4/0x294
+    ...
+     Call trace:
+      drm_mode_config_cleanup+0x1c4/0x294
+      rockchip_drm_unbind+0x4c/0x8c
+      component_master_del+0x88/0xb8
+      rockchip_drm_platform_remove+0x2c/0x44
+      rockchip_drm_platform_shutdown+0x20/0x2c
+      platform_drv_shutdown+0x2c/0x38
+      device_shutdown+0x164/0x1b8
+      kernel_restart_prepare+0x40/0x48
+      kernel_restart+0x20/0x68
+    ...
+     Memory manager not clean during takedown.
+     WARNING: CPU: 4 PID: 2035 at drivers/gpu/drm/drm_mm.c:950 drm_mm_takedown+0x34/0x44
+    ...
+      drm_mm_takedown+0x34/0x44
+      rockchip_drm_unbind+0x64/0x8c
+      component_master_del+0x88/0xb8
+      rockchip_drm_platform_remove+0x2c/0x44
+      rockchip_drm_platform_shutdown+0x20/0x2c
+      platform_drv_shutdown+0x2c/0x38
+      device_shutdown+0x164/0x1b8
+      kernel_restart_prepare+0x40/0x48
+      kernel_restart+0x20/0x68
+    ...
+    
+    [2] https://patchwork.kernel.org/patch/10556151/
+        https://www.spinics.net/lists/linux-rockchip/msg21342.html
+        [PATCH] drm/rockchip: shutdown drm subsystem on shutdown
+    
+    Fixes: 7f3ef5dedb14 ("drm/rockchip: Allow driver to be shutdown on reboot/kexec")
+    Cc: Jeffy Chen <jeffy.chen@rock-chips.com>
+    Cc: Robin Murphy <robin.murphy@arm.com>
+    Cc: Vicente Bergas <vicencb@gmail.com>
+    Cc: Marc Zyngier <marc.zyngier@arm.com>
+    Cc: Heiko Stuebner <heiko@sntech.de>
+    Cc: stable@vger.kernel.org
+    Signed-off-by: Brian Norris <briannorris@chromium.org>
+    Signed-off-by: Heiko Stuebner <heiko@sntech.de>
+    Link: https://patchwork.freedesktop.org/patch/msgid/20181205181657.177703-1-briannorris@chromium.org
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking ccbc11b384e37426e80c85789a285558d36613be ......
 	 orig commit -> 6f4d29df66acd49303a99025046b85cabe7aa17a ......
 		 6f4d29df66acd49303a99025046b85cabe7aa17a has problem. Fixes commit -> 3a6ab5c7dc114057fd67750e308e1745dafc0e6a
+commit b11d5c025d8e483de0c00e7a99c0cef8608d1f73
+Author: Thierry Reding <treding@nvidia.com>
+Date:   Fri Dec 14 14:17:24 2018 -0800
+
+    scripts/spdxcheck.py: always open files in binary mode
+    
+    commit 3a6ab5c7dc114057fd67750e308e1745dafc0e6a upstream.
+    
+    The spdxcheck script currently falls over when confronted with a binary
+    file (such as Documentation/logo.gif).  To avoid that, always open files
+    in binary mode and decode line-by-line, ignoring encoding errors.
+    
+    One tricky case is when piping data into the script and reading it from
+    standard input.  By default, standard input will be opened in text mode,
+    so we need to reopen it in binary mode.
+    
+    The breakage only happens with python3 and results in a
+    UnicodeDecodeError (according to Uwe).
+    
+    Link: http://lkml.kernel.org/r/20181212131210.28024-1-thierry.reding@gmail.com
+    Fixes: 6f4d29df66ac ("scripts/spdxcheck.py: make python3 compliant")
+    Signed-off-by: Thierry Reding <treding@nvidia.com>
+    Reviewed-by: Jeremy Cline <jcline@redhat.com>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Cc: Jonathan Corbet <corbet@lwn.net>
+    Cc: Joe Perches <joe@perches.com>
+    Cc: Uwe Kleine-König <u.kleine-koenig@pengutronix.de>
+    Cc: <stable@vger.kernel.org>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking 5ebac3b957a91c921d2f1a7953caafca18aa6260 ......
 	 orig commit -> a76cf1a474d7dbcd9336b5f5afb0162baa142cf0 ......
 		 a76cf1a474d7dbcd9336b5f5afb0162baa142cf0 has problem. Fixes commit -> 69056ee6a8a3d576ed31e38b3b14c70d6c74edcc
-	 orig commit -> 172b06c32b94 ......
-		 172b06c32b94 has problem. Fixes commit -> a9a238e83fbb0df31c3b9b67003f8f9d1d1b6c96
+commit 8d485d3a628bb46a86f232d9960ef64533aaf29d
+Author: Dave Chinner <dchinner@redhat.com>
+Date:   Tue Feb 12 15:35:51 2019 -0800
+
+    Revert "mm: don't reclaim inodes with many attached pages"
+    
+    commit 69056ee6a8a3d576ed31e38b3b14c70d6c74edcc upstream.
+    
+    This reverts commit a76cf1a474d7d ("mm: don't reclaim inodes with many
+    attached pages").
+    
+    This change causes serious changes to page cache and inode cache
+    behaviour and balance, resulting in major performance regressions when
+    combining worklaods such as large file copies and kernel compiles.
+    
+      https://bugzilla.kernel.org/show_bug.cgi?id=202441
+    
+    This change is a hack to work around the problems introduced by changing
+    how agressive shrinkers are on small caches in commit 172b06c32b94 ("mm:
+    slowly shrink slabs with a relatively small number of objects").  It
+    creates more problems than it solves, wasn't adequately reviewed or
+    tested, so it needs to be reverted.
+    
+    Link: http://lkml.kernel.org/r/20190130041707.27750-2-david@fromorbit.com
+    Fixes: a76cf1a474d7d ("mm: don't reclaim inodes with many attached pages")
+    Signed-off-by: Dave Chinner <dchinner@redhat.com>
+    Cc: Wolfgang Walter <linux@stwm.de>
+    Cc: Roman Gushchin <guro@fb.com>
+    Cc: Spock <dairinin@gmail.com>
+    Cc: Rik van Riel <riel@surriel.com>
+    Cc: Michal Hocko <mhocko@kernel.org>
+    Cc: <stable@vger.kernel.org>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking d1cbbc39d6f38f91e404b529d721ffd0d8e5fa8e ......
 	 orig commit -> 72a58a63a164b4e9d2d914e65caeb551846883f1 ......
 checking 113737cc318036e99ce33d7a26ac0e3d76b829ee ......
@@ -184,25 +280,6 @@ checking 03c91663c0935fd1c7df5539ff6df65db8f57278 ......
 	 orig commit -> 5d7a5bcb67c70cbc904057ef52d3fcfeb24420bb ......
 checking 401182ae096bfb16693bcfb8fcab1bc128a5c6bc ......
 	 orig commit -> 568fb6f42ac6851320adaea25f8f1b94de14e40a ......
-	 orig commit -> ad67b74d2469 ......
-		 ad67b74d2469 has problem. Fixes commit -> b929a500d68479163c48739d809cbf4c1335db6f
-9bf3d3c4e4fd82c7174f4856df372ab2a71005b9
-568fb6f42ac6851320adaea25f8f1b94de14e40a
-dded2e159208a9edc21dd5c5f583afa28d378d39
-431bca24308c5a82575571023a7128a881f716b2
-ec12bc2909f9759747ab5ad3709472353c43a750
-ce041c43f22298485122bab15c14d062383fbc67
-85f4f12d51397f1648e1f4350f77e24039b82d61
-bcbd385b61bbdef3491d662203ac2e8186e5be59
-0862ca422b79cb5aa70823ee0f07f6b468f86070
-0e4d819d0893dc043ea7b7cb6baf4be1e310bd96
-4f5e838605c264fcf16c3ff9495bd83da99acc6a
-28df2f83c39554d9e64cd9d2a93b8e28e24df5b7
-04903c06b4854d2e85f6e3c368d5d48c4ce55f09
-63b2c373137b16d948b08cffacc6abfcf4cffea6
-0ae60d0c4f191c4241377cc3fc5931dc90ca3bbd
-10a7e9d849150a2879efc0b04d8a51068c9dd0c5
-85c3e4a5a185f22649c6bf33bdce7bb1ac890921
 checking 47052af2372038e6d05672c37d2831318c96c4be ......
 	 orig commit -> dded2e159208a9edc21dd5c5f583afa28d378d39 ......
 checking 110e9082dc64e152b845d910276a60be617bf9ca ......
@@ -211,8 +288,6 @@ checking 0d406e7972dd47c54959281782e05f52c8a10c95 ......
 	 orig commit -> aba118389a6fb2ad7958de0f37b5869852bd38cf ......
 checking 83eec9ad8130b78fddd76a2b280e4d1a18a79923 ......
 	 orig commit -> 1e9c75fb9c47a75a9aec0cd17db5f6dc36b58e00 ......
-	 orig commit -> ff17fa561a04 ......
-		 ff17fa561a04 has problem. Fixes commit -> 1e9c75fb9c47a75a9aec0cd17db5f6dc36b58e00
 checking a7861ef8995702dbeec86938232b95b367cfed41 ......
 	 orig commit -> 9c8e0a1b683525464a2abe9fb4b54404a50ed2b4 ......
 checking 14e4bec183e5e522817165b9b21c97f54ba5b7b5 ......
@@ -250,6 +325,24 @@ checking 20dd2c4e7ffb1928c0d783673c678c1fadea107c ......
 checking 2aa79d317c21e86ec8e312963ccb74bfed28438a ......
 	 orig commit -> 61a9c11e5e7a0dab5381afa5d9d4dd5ebf18f7a0 ......
 		 61a9c11e5e7a0dab5381afa5d9d4dd5ebf18f7a0 has problem. Fixes commit -> d64264d6218e6892edd832dc3a5a5857c2856c53
+commit f5a94fd3b375f44bcb27b81595b22f2f464a47d2
+Author: Lukas Czerner <lczerner@redhat.com>
+Date:   Fri Mar 15 00:15:32 2019 -0400
+
+    ext4: add missing brelse() in add_new_gdb_meta_bg()
+    
+    [ Upstream commit d64264d6218e6892edd832dc3a5a5857c2856c53 ]
+    
+    Currently in add_new_gdb_meta_bg() there is a missing brelse of gdb_bh
+    in case ext4_journal_get_write_access() fails.
+    Additionally kvfree() is missing in the same error path. Fix it by
+    moving the ext4_journal_get_write_access() before the ext4 sb update as
+    Ted suggested and release n_group_desc and gdb_bh in case it fails.
+    
+    Fixes: 61a9c11e5e7a ("ext4: add missing brelse() add_new_gdb_meta_bg()'s error path")
+    Signed-off-by: Lukas Czerner <lczerner@redhat.com>
+    Signed-off-by: Theodore Ts'o <tytso@mit.edu>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
 checking cd18d6e0c11dd36ce1b1d27582ae8314f016e4b0 ......
 	 orig commit -> cea5794122125bf67559906a0762186cf417099c ......
 checking f7b6459e5144a789ab6365a63da2fca6dfd38c12 ......
@@ -260,14 +353,8 @@ checking f2589f9a3e53e203fdb5c393d3892d8b358e376c ......
 	 orig commit -> 761333f2f50ccc887aa9957ae829300262c0d15b ......
 checking ec6d90a4b7f3453ea8be6195fe17963fef6ddf36 ......
 	 orig commit -> ac765f83f1397646c11092a032d4f62c3d478b81 ......
-	 orig commit -> de02b9f6bb65 ......
-		 de02b9f6bb65 has problem. Fixes commit -> 11023d3f5fdf89bba5e1142127701ca6e6014587
-	 orig commit -> 07d19dc9fbe9 ......
 checking bafd5b78011131cf4047f7724117efa70c5d5b0a ......
 	 orig commit -> 11023d3f5fdf89bba5e1142127701ca6e6014587 ......
-	 orig commit -> de02b9f6bb65 ......
-		 de02b9f6bb65 has problem. Fixes commit -> 11023d3f5fdf89bba5e1142127701ca6e6014587
-	 orig commit -> ccccf3d67294 ......
 checking db39065cb24064838622076fbc239214c148e4f3 ......
 	 orig commit -> 506481b20e818db40b6198815904ecd2d6daee64 ......
 checking fa625a480cefe265e16dbcf35f389f4e1f5862f8 ......
@@ -295,10 +382,62 @@ checking 1b91345326b8863c98d3b14e7cfbf6f7b330b313 ......
 checking 7b0131a022e22fa11eecda9e481e397ffd4fa171 ......
 	 orig commit -> ea1fa48c055f833eb25f0c33188feecb7002ada5 ......
 		 ea1fa48c055f833eb25f0c33188feecb7002ada5 has problem. Fixes commit -> e94d6b7f615e6dfbaf9fba7db6011db561461d0c
+commit 5f9366330950b4e180c973155b855d218b605dfb
+Author: Kan Liang <kan.liang@linux.intel.com>
+Date:   Fri Mar 15 11:00:14 2019 -0700
+
+    perf pmu: Fix parser error for uncore event alias
+    
+    commit e94d6b7f615e6dfbaf9fba7db6011db561461d0c upstream.
+    
+    Perf fails to parse uncore event alias, for example:
+    
+      # perf stat -e unc_m_clockticks -a --no-merge sleep 1
+      event syntax error: 'unc_m_clockticks'
+                           \___ parser error
+    
+    Current code assumes that the event alias is from one specific PMU.
+    
+    To find the PMU, perf strcmps the PMU name of event alias with the real
+    PMU name on the system.
+    
+    However, the uncore event alias may be from multiple PMUs with common
+    prefix. The PMU name of uncore event alias is the common prefix.
+    
+    For example, UNC_M_CLOCKTICKS is clock event for iMC, which include 6
+    PMUs with the same prefix "uncore_imc" on a skylake server.
+    
+    The real PMU names on the system for iMC are uncore_imc_0 ...
+    uncore_imc_5.
+    
+    The strncmp is used to only check the common prefix for uncore event
+    alias.
+    
+    With the patch:
+    
+      # perf stat -e unc_m_clockticks -a --no-merge sleep 1
+      Performance counter stats for 'system wide':
+    
+           723,594,722      unc_m_clockticks [uncore_imc_5]
+           724,001,954      unc_m_clockticks [uncore_imc_3]
+           724,042,655      unc_m_clockticks [uncore_imc_1]
+           724,161,001      unc_m_clockticks [uncore_imc_4]
+           724,293,713      unc_m_clockticks [uncore_imc_2]
+           724,340,901      unc_m_clockticks [uncore_imc_0]
+    
+           1.002090060 seconds time elapsed
+    
+    Signed-off-by: Kan Liang <kan.liang@linux.intel.com>
+    Acked-by: Jiri Olsa <jolsa@kernel.org>
+    Cc: Andi Kleen <ak@linux.intel.com>
+    Cc: Thomas Richter <tmricht@linux.ibm.com>
+    Cc: stable@vger.kernel.org
+    Fixes: ea1fa48c055f ("perf stat: Handle different PMU names with common prefix")
+    Link: http://lkml.kernel.org/r/1552672814-156173-1-git-send-email-kan.liang@linux.intel.com
+    Signed-off-by: Arnaldo Carvalho de Melo <acme@redhat.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking 29414ff37072d5f3005b63726ce9a921b25a6e84 ......
 	 orig commit -> d6c9c05fe1eb4b213b183d8a1e79416256dc833a ......
-	 orig commit -> edeb0c90df35 ......
-	 orig commit -> edeb0c90df35 ......
 checking a63fffbd90f64d2e4981a440963a2c5aa0d77d83 ......
 	 orig commit -> 74e3512731bd5c9673176425a76a7cc5efa8ddb6 ......
 checking 14e58f9d1a5a13ca21022fe0ebe10311bfb8b60e ......
@@ -378,8 +517,6 @@ checking 5d55ba0ffec1272940a616a562af9e37fcc05281 ......
 checking 0a825f0b441a08dd2d303dccb79b3f7544f18128 ......
 	 orig commit -> d06f8a2f1befb5a3d0aa660ab1c05e9b744456ea ......
 checking 9e07f4e243791e00a4086ad86e573705cf7b2c65 ......
-	 orig commit -> fef912bf860e ......
-	 orig commit -> 98af4d4df889 ......
 checking 52cad794b4ea2fdea94a6551ad4690dbad2a92e2 ......
 	 orig commit -> d6ee1e7e9004d3d246cdfa14196989e0a9466c16 ......
 checking a98af72325dcec4d1756cf3c2556db4933e3fafc ......
@@ -390,11 +527,36 @@ e2576c8bdfd462c34b8a46c0084e7c30b0851bf4
 c987ac6f1f088663b6dad39281071aeb31d450a8
 72e1f2302040398dafb64bbb93abdde78c1f2267
 b251e4c88fb443b3a44c3d04268f70e2260f1f8a
-commit e2576c8bdfd462c34b8a46c0084e7c30b0851bf4
+commit 52cad794b4ea2fdea94a6551ad4690dbad2a92e2
+Author: Jerome Brunet <jbrunet@baylibre.com>
+Date:   Thu Nov 8 10:31:23 2018 +0100
+
+    clk: meson: axg: mark fdiv2 and fdiv3 as critical
+    
+    [ Upstream commit d6ee1e7e9004d3d246cdfa14196989e0a9466c16 ]
+    
+    Similar to gxbb and gxl platforms, axg SCPI Cortex-M co-processor
+    uses the fdiv2 and fdiv3 to, among other things, provide the cpu
+    clock.
+    
+    Until clock hand-off mechanism makes its way to CCF and the generic
+    SCPI claims platform specific clocks, these clocks must be marked as
+    critical to make sure they are never disabled when needed by the
+    co-processor.
+    
+    Fixes: 05f814402d61 ("clk: meson: add fdiv clock gates")
+    Signed-off-by: Jerome Brunet <jbrunet@baylibre.com>
+    Acked-by: Neil Armstrong <narmstrong@baylibre.com>
+    Signed-off-by: Stephen Boyd <sboyd@kernel.org>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit a98af72325dcec4d1756cf3c2556db4933e3fafc
 Author: Christian Hewitt <christianshewitt@gmail.com>
 Date:   Tue Nov 6 00:08:20 2018 +0100
 
     clk: meson-gxbb: set fclk_div3 as CLK_IS_CRITICAL
+    
+    [ Upstream commit e2576c8bdfd462c34b8a46c0084e7c30b0851bf4 ]
     
     On the Khadas VIM2 (GXM) and LePotato (GXL) board there are problems
     with reboot; e.g. a ~60 second delay between issuing reboot and the
@@ -422,11 +584,37 @@ Date:   Tue Nov 6 00:08:20 2018 +0100
     Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
     Signed-off-by: Jerome Brunet <jbrunet@baylibre.com>
     Signed-off-by: Stephen Boyd <sboyd@kernel.org>
-commit e2576c8bdfd462c34b8a46c0084e7c30b0851bf4
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+commit 52cad794b4ea2fdea94a6551ad4690dbad2a92e2
+Author: Jerome Brunet <jbrunet@baylibre.com>
+Date:   Thu Nov 8 10:31:23 2018 +0100
+
+    clk: meson: axg: mark fdiv2 and fdiv3 as critical
+    
+    [ Upstream commit d6ee1e7e9004d3d246cdfa14196989e0a9466c16 ]
+    
+    Similar to gxbb and gxl platforms, axg SCPI Cortex-M co-processor
+    uses the fdiv2 and fdiv3 to, among other things, provide the cpu
+    clock.
+    
+    Until clock hand-off mechanism makes its way to CCF and the generic
+    SCPI claims platform specific clocks, these clocks must be marked as
+    critical to make sure they are never disabled when needed by the
+    co-processor.
+    
+    Fixes: 05f814402d61 ("clk: meson: add fdiv clock gates")
+    Signed-off-by: Jerome Brunet <jbrunet@baylibre.com>
+    Acked-by: Neil Armstrong <narmstrong@baylibre.com>
+    Signed-off-by: Stephen Boyd <sboyd@kernel.org>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit a98af72325dcec4d1756cf3c2556db4933e3fafc
 Author: Christian Hewitt <christianshewitt@gmail.com>
 Date:   Tue Nov 6 00:08:20 2018 +0100
 
     clk: meson-gxbb: set fclk_div3 as CLK_IS_CRITICAL
+    
+    [ Upstream commit e2576c8bdfd462c34b8a46c0084e7c30b0851bf4 ]
     
     On the Khadas VIM2 (GXM) and LePotato (GXL) board there are problems
     with reboot; e.g. a ~60 second delay between issuing reboot and the
@@ -454,6 +642,7 @@ Date:   Tue Nov 6 00:08:20 2018 +0100
     Signed-off-by: Christian Hewitt <christianshewitt@gmail.com>
     Signed-off-by: Jerome Brunet <jbrunet@baylibre.com>
     Signed-off-by: Stephen Boyd <sboyd@kernel.org>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
 checking 347d88036255b0afd3e616cfad674637e9e1c510 ......
 	 orig commit -> fd5ba6ee3187617287fb9cb187e3d6b3631210a3 ......
 checking 8f49fe42dd74bbabf89617b8b204c6e6abdb4723 ......
@@ -538,8 +727,6 @@ checking c50363ded3c10b5b319016def6dcecd0032bfd25 ......
 	 orig commit -> 8344498721059754e09d30fe255a12dab8fb03ef ......
 checking ff8bf85228082c3e8d2dbb0f2f302a75c9a3f3b2 ......
 	 orig commit -> a27d938251ef40c43db81af16fc26b2cec181d4d ......
-	 orig commit -> c58caaab3bf8 ......
-		 c58caaab3bf8 has problem. Fixes commit -> a27d938251ef40c43db81af16fc26b2cec181d4d
 checking 19527c628c90386371a9b72417fa4de6c6f62f43 ......
 	 orig commit -> 37ec35a6cc2b99eb7fd6b85b7d7b75dff46bc353 ......
 checking 92db94fa518f8892cc967f13a41715c96e4fa9e5 ......
@@ -586,8 +773,6 @@ checking 234bee8bb3a44fa1088543f42cb5e6be5614d8ec ......
 	 orig commit -> f9bc28aedfb5bbd572d2d365f3095c1becd7209b ......
 checking 32f2674c7c06e3772959847745264cbc037f6951 ......
 	 orig commit -> 960e30029863db95ec79a71009272d4661db5991 ......
-	 orig commit -> 15a3204d24a3 ......
-		 15a3204d24a3 has problem. Fixes commit -> b6f534d1a642a9b6263fd52df30806171fbc331e
 checking d7dba42c381039013d0308ebedf11c3e6bdc278c ......
 	 orig commit -> a3f7c3fcf60868c1e90671df5d0cf9be5900a09b ......
 checking 139dde1e967d3aa64d4fc4d10fced9ba5d95431a ......
@@ -601,7 +786,21 @@ checking 63880b2f99747c04e12fba6588d0222dd90323f9 ......
 checking 54de3d7d55dc70fe7ce8ccd1b7e09831881a730a ......
 	 orig commit -> daf00ae71dad8aa05965713c62558aeebf2df48e ......
 		 daf00ae71dad8aa05965713c62558aeebf2df48e has problem. Fixes commit -> 0bbea75c476b77fa7d7811d6be911cc7583e640f
-	 orig commit -> b96672dd840f ......
-		 b96672dd840f has problem. Fixes commit -> 0bbea75c476b77fa7d7811d6be911cc7583e640f
-daf00ae71dad8aa05965713c62558aeebf2df48e
-94675cceacaec27a30eefb142c4c59a9d3131742
+commit 461a52a448937271cad6ba857f17d25f1685339d
+Author: Christophe Leroy <christophe.leroy@c-s.fr>
+Date:   Tue Jan 22 14:11:24 2019 +0000
+
+    powerpc/traps: fix recoverability of machine check handling on book3s/32
+    
+    commit 0bbea75c476b77fa7d7811d6be911cc7583e640f upstream.
+    
+    Looks like book3s/32 doesn't set RI on machine check, so
+    checking RI before calling die() will always be fatal
+    allthought this is not an issue in most cases.
+    
+    Fixes: b96672dd840f ("powerpc: Machine check interrupt is a non-maskable interrupt")
+    Fixes: daf00ae71dad ("powerpc/traps: restore recoverability of machine_check interrupts")
+    Signed-off-by: Christophe Leroy <christophe.leroy@c-s.fr>
+    Cc: stable@vger.kernel.org
+    Signed-off-by: Michael Ellerman <mpe@ellerman.id.au>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>

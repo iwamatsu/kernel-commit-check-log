@@ -20,6 +20,37 @@ checking bb80ad0dc3924f193eaa752e9da2e9384f58e627 ......
 checking da38a1b47b02b01f96976bbf75466bc1ae519d76 ......
 	 orig commit -> ad211f3e94b314a910d4af03178a0b52a7d1ee0a ......
 		 ad211f3e94b314a910d4af03178a0b52a7d1ee0a has problem. Fixes commit -> 8fdd60f2ae3682caf2a7258626abc21eb4711892
+commit 28f49e768d212445dc8d5964df6f37df8d73c70d
+Author: Theodore Ts'o <tytso@mit.edu>
+Date:   Thu Jan 31 23:41:11 2019 -0500
+
+    Revert "ext4: use ext4_write_inode() when fsyncing w/o a journal"
+    
+    commit 8fdd60f2ae3682caf2a7258626abc21eb4711892 upstream.
+    
+    This reverts commit ad211f3e94b314a910d4af03178a0b52a7d1ee0a.
+    
+    As Jan Kara pointed out, this change was unsafe since it means we lose
+    the call to sync_mapping_buffers() in the nojournal case.  The
+    original point of the commit was avoid taking the inode mutex (since
+    it causes a lockdep warning in generic/113); but we need the mutex in
+    order to call sync_mapping_buffers().
+    
+    The real fix to this problem was discussed here:
+    
+    https://lore.kernel.org/lkml/20181025150540.259281-4-bvanassche@acm.org
+    
+    The proposed patch was to fix a syzbot complaint, but the problem can
+    also demonstrated via "kvm-xfstests -c nojournal generic/113".
+    Multiple solutions were discused in the e-mail thread, but none have
+    landed in the kernel as of this writing.  Anyway, commit
+    ad211f3e94b314 is absolutely the wrong way to suppress the lockdep, so
+    revert it.
+    
+    Fixes: ad211f3e94b314a910d4af03178a0b52a7d1ee0a ("ext4: use ext4_write_inode() when fsyncing w/o a journal")
+    Signed-off-by: Theodore Ts'o <tytso@mit.edu>
+    Reported: Jan Kara <jack@suse.cz>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking 01db6e5cf81f905028de903f2290c10172226043 ......
 	 orig commit -> e86807862e6880809f191c4cea7f88a489f0ed34 ......
 checking 926cdac10439eda9ab7a11fd5f28eda203ccbb26 ......

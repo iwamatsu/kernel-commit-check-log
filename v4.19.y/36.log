@@ -30,7 +30,6 @@ checking 7de43cb71116ab13adaf1f57a72edb6757ca57d0 ......
 	 orig commit -> f880eea68fe593342fa6e09be9bb661f3c297aec ......
 checking aa0e8cc9d7a89bb0c23435ec1b62eac46b1f4984 ......
 	 orig commit -> ec91e78d378cc5d4b43805a1227d8e04e5dfa17d ......
-	 orig commit -> dd2a3acaecd7 ......
 checking 87eadc0b8c2a574c3e48aa0d15e1318a6a24f654 ......
 	 orig commit -> af849c86109d79222e549826068bbf4e7f9a2472 ......
 checking ba8a6c055677ef22c43fd31b6ac0b27998be36f9 ......
@@ -47,8 +46,6 @@ checking 82a13a006ed5412fd817419e60113b7c922b21ff ......
 	 orig commit -> 317a992ab9266b86b774b9f6b0f87eb4f59879a1 ......
 checking cd37fd46b4857a787571c3153bfa64d0ae28a407 ......
 	 orig commit -> 3f2552f7e9c5abef2775c53f7af66532f8bf65bc ......
-	 orig commit -> 124cf9117c5f ......
-		 124cf9117c5f has problem. Fixes commit -> 3f2552f7e9c5abef2775c53f7af66532f8bf65bc
 checking 5680b0635cdab1a1afb4f2078226584e008008b0 ......
 	 orig commit -> 2f5fb19341883bb6e37da351bc3700489d8506a7 ......
 checking 90e17512f1e43a67008082d0380bdc8a689c6c9b ......
@@ -81,7 +78,6 @@ checking 6ff17bc5936e5fab33de8064dc0690f6c8c789ca ......
 	 orig commit -> 04f5866e41fb70690e28397487d8bd8eea7d712a ......
 checking 3e1b3e4d3c83a925e9c6fcd5aeed8713225b4a37 ......
 	 orig commit -> 4a58038b9e420276157785afa0a0bbb4b9bc2265 ......
-	 orig commit -> bb218fbcfaaa ......
 checking ee4b8e266229b061ff8d03f0ed8764ac5f8098b6 ......
 	 orig commit -> 0228034d8e5915b98c33db35a98f5e909e848ae9 ......
 checking 1aa2682d0a98bb025f8dd29df11f978a249a81ba ......
@@ -98,6 +94,7 @@ checking b50e435df2d8b9a1d3e956e1c767dfc7e30a441b ......
 	 orig commit -> 2a3f7221acddfe1caa9ff09b3a8158c39b2fdeac ......
 checking 4171b6ee932828ad2c8258f4a0a84a2d1c05c896 ......
 	 orig commit -> b26e36b7ef36a8a3a147b1609b2505f8a4ecf511 ......
+		 b26e36b7ef36a8a3a147b1609b2505f8a4ecf511 has problem. Fixes commit -> 0a29c57b76624723b6b00c027e0e992d130ace49
 checking 4e78a1fb8d1d0948aafac07465779e821d9dda2e ......
 	 orig commit -> af4b54a2e5ba18259ff9aac445bf546dd60d037e ......
 checking 09f9bacae11874c6abe368fab7b093dd33ef11ea ......
@@ -116,7 +113,6 @@ checking 98171e1947b6ce06fb7a439c0d8c599e0c090fcd ......
 	 orig commit -> 09c6bdee51183a575bf7546890c8c137a75a2b44 ......
 checking 36971130bb2f815fddae17cfe02ae5fed9b3ff56 ......
 	 orig commit -> 20ea39ef9f2f911bd01c69519e7d69cfec79fde3 ......
-	 orig commit -> 057ac1acdfc4 ......
 checking 0e47edde91325efde88e937e1ccc5883c32b5a31 ......
 	 orig commit -> 06003531502d06bc89d32528f6ec96bf978790f9 ......
 checking 5ad173ea6c3a906c80c9e1afb3960c859d9ab037 ......
@@ -149,10 +145,8 @@ checking 8092ecc306d81186a64cda42411121f4d35aaff4 ......
 	 orig commit -> b98749cac4a695f084a5ff076f4510b23e353ecd ......
 checking 6e2081f29392f878aa9e1bd19b976c7c8b82bad3 ......
 	 orig commit -> 997dd96471641e147cb2c33ad54284000d0f5e35 ......
-	 orig commit -> 0ed4229b08c1 ......
 checking 684685326ab0cf8d71ae83ff614c748876f24938 ......
 	 orig commit -> d4289fcc9b16b89619ee1c54f829e05e56de8b9a ......
-	 orig commit -> 0ed4229b08c1 ......
 checking 702ddf862d9d74e670849df659b8706fd6878205 ......
 	 orig commit -> c23f35d19db3b36ffb9e04b08f1d91565d15f84f ......
 checking e24be8e38cd7fcc85174595690b20d153f8e204d ......
@@ -183,7 +177,259 @@ checking 8a430e56a6485267a1b2d3747209d26c54d1a34b ......
 	 orig commit -> ed0de45a1008991fdaa27a0152befcb74d126a8b ......
 		 ed0de45a1008991fdaa27a0152befcb74d126a8b has problem. Fixes commit -> 20ff83f10f113c88d0bb74589389b05250994c16
 c543cb4a5f07e09237ec0fc2c60c9f131b2c79ad
-	 orig commit -> 3da1ed7ac398 ......
+commit 98eac8b90e18ccf18fb68481d72614f864233e95
+Author: Eric Dumazet <edumazet@google.com>
+Date:   Wed Apr 24 08:04:05 2019 -0700
+
+    ipv4: add sanity checks in ipv4_link_failure()
+    
+    [ Upstream commit 20ff83f10f113c88d0bb74589389b05250994c16 ]
+    
+    Before calling __ip_options_compile(), we need to ensure the network
+    header is a an IPv4 one, and that it is already pulled in skb->head.
+    
+    RAW sockets going through a tunnel can end up calling ipv4_link_failure()
+    with total garbage in the skb, or arbitrary lengthes.
+    
+    syzbot report :
+    
+    BUG: KASAN: stack-out-of-bounds in memcpy include/linux/string.h:355 [inline]
+    BUG: KASAN: stack-out-of-bounds in __ip_options_echo+0x294/0x1120 net/ipv4/ip_options.c:123
+    Write of size 69 at addr ffff888096abf068 by task syz-executor.4/9204
+    
+    CPU: 0 PID: 9204 Comm: syz-executor.4 Not tainted 5.1.0-rc5+ #77
+    Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+    Call Trace:
+     __dump_stack lib/dump_stack.c:77 [inline]
+     dump_stack+0x172/0x1f0 lib/dump_stack.c:113
+     print_address_description.cold+0x7c/0x20d mm/kasan/report.c:187
+     kasan_report.cold+0x1b/0x40 mm/kasan/report.c:317
+     check_memory_region_inline mm/kasan/generic.c:185 [inline]
+     check_memory_region+0x123/0x190 mm/kasan/generic.c:191
+     memcpy+0x38/0x50 mm/kasan/common.c:133
+     memcpy include/linux/string.h:355 [inline]
+     __ip_options_echo+0x294/0x1120 net/ipv4/ip_options.c:123
+     __icmp_send+0x725/0x1400 net/ipv4/icmp.c:695
+     ipv4_link_failure+0x29f/0x550 net/ipv4/route.c:1204
+     dst_link_failure include/net/dst.h:427 [inline]
+     vti6_xmit net/ipv6/ip6_vti.c:514 [inline]
+     vti6_tnl_xmit+0x10d4/0x1c0c net/ipv6/ip6_vti.c:553
+     __netdev_start_xmit include/linux/netdevice.h:4414 [inline]
+     netdev_start_xmit include/linux/netdevice.h:4423 [inline]
+     xmit_one net/core/dev.c:3292 [inline]
+     dev_hard_start_xmit+0x1b2/0x980 net/core/dev.c:3308
+     __dev_queue_xmit+0x271d/0x3060 net/core/dev.c:3878
+     dev_queue_xmit+0x18/0x20 net/core/dev.c:3911
+     neigh_direct_output+0x16/0x20 net/core/neighbour.c:1527
+     neigh_output include/net/neighbour.h:508 [inline]
+     ip_finish_output2+0x949/0x1740 net/ipv4/ip_output.c:229
+     ip_finish_output+0x73c/0xd50 net/ipv4/ip_output.c:317
+     NF_HOOK_COND include/linux/netfilter.h:278 [inline]
+     ip_output+0x21f/0x670 net/ipv4/ip_output.c:405
+     dst_output include/net/dst.h:444 [inline]
+     NF_HOOK include/linux/netfilter.h:289 [inline]
+     raw_send_hdrinc net/ipv4/raw.c:432 [inline]
+     raw_sendmsg+0x1d2b/0x2f20 net/ipv4/raw.c:663
+     inet_sendmsg+0x147/0x5d0 net/ipv4/af_inet.c:798
+     sock_sendmsg_nosec net/socket.c:651 [inline]
+     sock_sendmsg+0xdd/0x130 net/socket.c:661
+     sock_write_iter+0x27c/0x3e0 net/socket.c:988
+     call_write_iter include/linux/fs.h:1866 [inline]
+     new_sync_write+0x4c7/0x760 fs/read_write.c:474
+     __vfs_write+0xe4/0x110 fs/read_write.c:487
+     vfs_write+0x20c/0x580 fs/read_write.c:549
+     ksys_write+0x14f/0x2d0 fs/read_write.c:599
+     __do_sys_write fs/read_write.c:611 [inline]
+     __se_sys_write fs/read_write.c:608 [inline]
+     __x64_sys_write+0x73/0xb0 fs/read_write.c:608
+     do_syscall_64+0x103/0x610 arch/x86/entry/common.c:290
+     entry_SYSCALL_64_after_hwframe+0x49/0xbe
+    RIP: 0033:0x458c29
+    Code: ad b8 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 7b b8 fb ff c3 66 2e 0f 1f 84 00 00 00 00
+    RSP: 002b:00007f293b44bc78 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+    RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 0000000000458c29
+    RDX: 0000000000000014 RSI: 00000000200002c0 RDI: 0000000000000003
+    RBP: 000000000073bf00 R08: 0000000000000000 R09: 0000000000000000
+    R10: 0000000000000000 R11: 0000000000000246 R12: 00007f293b44c6d4
+    R13: 00000000004c8623 R14: 00000000004ded68 R15: 00000000ffffffff
+    
+    The buggy address belongs to the page:
+    page:ffffea00025aafc0 count:0 mapcount:0 mapping:0000000000000000 index:0x0
+    flags: 0x1fffc0000000000()
+    raw: 01fffc0000000000 0000000000000000 ffffffff025a0101 0000000000000000
+    raw: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000
+    page dumped because: kasan: bad access detected
+    
+    Memory state around the buggy address:
+     ffff888096abef80: 00 00 00 f2 f2 f2 f2 f2 00 00 00 00 00 00 00 f2
+     ffff888096abf000: f2 f2 f2 f2 00 00 00 00 00 00 00 00 00 00 00 00
+    >ffff888096abf080: 00 00 f3 f3 f3 f3 00 00 00 00 00 00 00 00 00 00
+                             ^
+     ffff888096abf100: 00 00 00 00 f1 f1 f1 f1 00 00 f3 f3 00 00 00 00
+     ffff888096abf180: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    
+    Fixes: ed0de45a1008 ("ipv4: recompile ip options in ipv4_link_failure")
+    Signed-off-by: Eric Dumazet <edumazet@google.com>
+    Cc: Stephen Suryaputra <ssuryaextr@gmail.com>
+    Acked-by: Willem de Bruijn <willemb@google.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 7ba5ec69e1a7ecfc662050b55e77078208dea9cc
+Author: Eric Dumazet <edumazet@google.com>
+Date:   Sat Apr 13 17:32:21 2019 -0700
+
+    ipv4: ensure rcu_read_lock() in ipv4_link_failure()
+    
+    [ Upstream commit c543cb4a5f07e09237ec0fc2c60c9f131b2c79ad ]
+    
+    fib_compute_spec_dst() needs to be called under rcu protection.
+    
+    syzbot reported :
+    
+    WARNING: suspicious RCU usage
+    5.1.0-rc4+ #165 Not tainted
+    include/linux/inetdevice.h:220 suspicious rcu_dereference_check() usage!
+    
+    other info that might help us debug this:
+    
+    rcu_scheduler_active = 2, debug_locks = 1
+    1 lock held by swapper/0/0:
+     #0: 0000000051b67925 ((&n->timer)){+.-.}, at: lockdep_copy_map include/linux/lockdep.h:170 [inline]
+     #0: 0000000051b67925 ((&n->timer)){+.-.}, at: call_timer_fn+0xda/0x720 kernel/time/timer.c:1315
+    
+    stack backtrace:
+    CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.1.0-rc4+ #165
+    Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+    Call Trace:
+     <IRQ>
+     __dump_stack lib/dump_stack.c:77 [inline]
+     dump_stack+0x172/0x1f0 lib/dump_stack.c:113
+     lockdep_rcu_suspicious+0x153/0x15d kernel/locking/lockdep.c:5162
+     __in_dev_get_rcu include/linux/inetdevice.h:220 [inline]
+     fib_compute_spec_dst+0xbbd/0x1030 net/ipv4/fib_frontend.c:294
+     spec_dst_fill net/ipv4/ip_options.c:245 [inline]
+     __ip_options_compile+0x15a7/0x1a10 net/ipv4/ip_options.c:343
+     ipv4_link_failure+0x172/0x400 net/ipv4/route.c:1195
+     dst_link_failure include/net/dst.h:427 [inline]
+     arp_error_report+0xd1/0x1c0 net/ipv4/arp.c:297
+     neigh_invalidate+0x24b/0x570 net/core/neighbour.c:995
+     neigh_timer_handler+0xc35/0xf30 net/core/neighbour.c:1081
+     call_timer_fn+0x190/0x720 kernel/time/timer.c:1325
+     expire_timers kernel/time/timer.c:1362 [inline]
+     __run_timers kernel/time/timer.c:1681 [inline]
+     __run_timers kernel/time/timer.c:1649 [inline]
+     run_timer_softirq+0x652/0x1700 kernel/time/timer.c:1694
+     __do_softirq+0x266/0x95a kernel/softirq.c:293
+     invoke_softirq kernel/softirq.c:374 [inline]
+     irq_exit+0x180/0x1d0 kernel/softirq.c:414
+     exiting_irq arch/x86/include/asm/apic.h:536 [inline]
+     smp_apic_timer_interrupt+0x14a/0x570 arch/x86/kernel/apic/apic.c:1062
+     apic_timer_interrupt+0xf/0x20 arch/x86/entry/entry_64.S:807
+    
+    Fixes: ed0de45a1008 ("ipv4: recompile ip options in ipv4_link_failure")
+    Signed-off-by: Eric Dumazet <edumazet@google.com>
+    Reported-by: syzbot <syzkaller@googlegroups.com>
+    Cc: Stephen Suryaputra <ssuryaextr@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+commit 98eac8b90e18ccf18fb68481d72614f864233e95
+Author: Eric Dumazet <edumazet@google.com>
+Date:   Wed Apr 24 08:04:05 2019 -0700
+
+    ipv4: add sanity checks in ipv4_link_failure()
+    
+    [ Upstream commit 20ff83f10f113c88d0bb74589389b05250994c16 ]
+    
+    Before calling __ip_options_compile(), we need to ensure the network
+    header is a an IPv4 one, and that it is already pulled in skb->head.
+    
+    RAW sockets going through a tunnel can end up calling ipv4_link_failure()
+    with total garbage in the skb, or arbitrary lengthes.
+    
+    syzbot report :
+    
+    BUG: KASAN: stack-out-of-bounds in memcpy include/linux/string.h:355 [inline]
+    BUG: KASAN: stack-out-of-bounds in __ip_options_echo+0x294/0x1120 net/ipv4/ip_options.c:123
+    Write of size 69 at addr ffff888096abf068 by task syz-executor.4/9204
+    
+    CPU: 0 PID: 9204 Comm: syz-executor.4 Not tainted 5.1.0-rc5+ #77
+    Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+    Call Trace:
+     __dump_stack lib/dump_stack.c:77 [inline]
+     dump_stack+0x172/0x1f0 lib/dump_stack.c:113
+     print_address_description.cold+0x7c/0x20d mm/kasan/report.c:187
+     kasan_report.cold+0x1b/0x40 mm/kasan/report.c:317
+     check_memory_region_inline mm/kasan/generic.c:185 [inline]
+     check_memory_region+0x123/0x190 mm/kasan/generic.c:191
+     memcpy+0x38/0x50 mm/kasan/common.c:133
+     memcpy include/linux/string.h:355 [inline]
+     __ip_options_echo+0x294/0x1120 net/ipv4/ip_options.c:123
+     __icmp_send+0x725/0x1400 net/ipv4/icmp.c:695
+     ipv4_link_failure+0x29f/0x550 net/ipv4/route.c:1204
+     dst_link_failure include/net/dst.h:427 [inline]
+     vti6_xmit net/ipv6/ip6_vti.c:514 [inline]
+     vti6_tnl_xmit+0x10d4/0x1c0c net/ipv6/ip6_vti.c:553
+     __netdev_start_xmit include/linux/netdevice.h:4414 [inline]
+     netdev_start_xmit include/linux/netdevice.h:4423 [inline]
+     xmit_one net/core/dev.c:3292 [inline]
+     dev_hard_start_xmit+0x1b2/0x980 net/core/dev.c:3308
+     __dev_queue_xmit+0x271d/0x3060 net/core/dev.c:3878
+     dev_queue_xmit+0x18/0x20 net/core/dev.c:3911
+     neigh_direct_output+0x16/0x20 net/core/neighbour.c:1527
+     neigh_output include/net/neighbour.h:508 [inline]
+     ip_finish_output2+0x949/0x1740 net/ipv4/ip_output.c:229
+     ip_finish_output+0x73c/0xd50 net/ipv4/ip_output.c:317
+     NF_HOOK_COND include/linux/netfilter.h:278 [inline]
+     ip_output+0x21f/0x670 net/ipv4/ip_output.c:405
+     dst_output include/net/dst.h:444 [inline]
+     NF_HOOK include/linux/netfilter.h:289 [inline]
+     raw_send_hdrinc net/ipv4/raw.c:432 [inline]
+     raw_sendmsg+0x1d2b/0x2f20 net/ipv4/raw.c:663
+     inet_sendmsg+0x147/0x5d0 net/ipv4/af_inet.c:798
+     sock_sendmsg_nosec net/socket.c:651 [inline]
+     sock_sendmsg+0xdd/0x130 net/socket.c:661
+     sock_write_iter+0x27c/0x3e0 net/socket.c:988
+     call_write_iter include/linux/fs.h:1866 [inline]
+     new_sync_write+0x4c7/0x760 fs/read_write.c:474
+     __vfs_write+0xe4/0x110 fs/read_write.c:487
+     vfs_write+0x20c/0x580 fs/read_write.c:549
+     ksys_write+0x14f/0x2d0 fs/read_write.c:599
+     __do_sys_write fs/read_write.c:611 [inline]
+     __se_sys_write fs/read_write.c:608 [inline]
+     __x64_sys_write+0x73/0xb0 fs/read_write.c:608
+     do_syscall_64+0x103/0x610 arch/x86/entry/common.c:290
+     entry_SYSCALL_64_after_hwframe+0x49/0xbe
+    RIP: 0033:0x458c29
+    Code: ad b8 fb ff c3 66 2e 0f 1f 84 00 00 00 00 00 66 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 0f 83 7b b8 fb ff c3 66 2e 0f 1f 84 00 00 00 00
+    RSP: 002b:00007f293b44bc78 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+    RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 0000000000458c29
+    RDX: 0000000000000014 RSI: 00000000200002c0 RDI: 0000000000000003
+    RBP: 000000000073bf00 R08: 0000000000000000 R09: 0000000000000000
+    R10: 0000000000000000 R11: 0000000000000246 R12: 00007f293b44c6d4
+    R13: 00000000004c8623 R14: 00000000004ded68 R15: 00000000ffffffff
+    
+    The buggy address belongs to the page:
+    page:ffffea00025aafc0 count:0 mapcount:0 mapping:0000000000000000 index:0x0
+    flags: 0x1fffc0000000000()
+    raw: 01fffc0000000000 0000000000000000 ffffffff025a0101 0000000000000000
+    raw: 0000000000000000 0000000000000000 00000000ffffffff 0000000000000000
+    page dumped because: kasan: bad access detected
+    
+    Memory state around the buggy address:
+     ffff888096abef80: 00 00 00 f2 f2 f2 f2 f2 00 00 00 00 00 00 00 f2
+     ffff888096abf000: f2 f2 f2 f2 00 00 00 00 00 00 00 00 00 00 00 00
+    >ffff888096abf080: 00 00 f3 f3 f3 f3 00 00 00 00 00 00 00 00 00 00
+                             ^
+     ffff888096abf100: 00 00 00 00 f1 f1 f1 f1 00 00 f3 f3 00 00 00 00
+     ffff888096abf180: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    
+    Fixes: ed0de45a1008 ("ipv4: recompile ip options in ipv4_link_failure")
+    Signed-off-by: Eric Dumazet <edumazet@google.com>
+    Cc: Stephen Suryaputra <ssuryaextr@gmail.com>
+    Acked-by: Willem de Bruijn <willemb@google.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking b82df42059fb90862505eb071dd0dd225a2791df ......
 	 orig commit -> 813dbeb656d6c90266f251d8bd2b02d445afa63f ......
 checking 242e5746cb477bdb4c59d0f2d3c5a3e1c0a10629 ......

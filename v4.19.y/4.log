@@ -38,6 +38,26 @@ checking 667bd202c5aa10d62afabd5b748bd6709227e88b ......
 checking a0d5745e5a1c03650bb9f8012afda790e7910c07 ......
 	 orig commit -> d99501b8575dc1248bacf1b58d2241cb4b265d49 ......
 		 d99501b8575dc1248bacf1b58d2241cb4b265d49 has problem. Fixes commit -> 1e73359a24fad529b0794515b46cbfff99e5fbe6
+commit c8e91d756703b06c707b4355a3603e4e2fd2790a
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Mon Dec 10 21:54:25 2018 +0100
+
+    ALSA: hda/ca0132 - make pci_iounmap() call conditional
+    
+    commit 1e73359a24fad529b0794515b46cbfff99e5fbe6 upstream.
+    
+    When building without CONFIG_PCI, we can (depending on the architecture)
+    get a link failure:
+    
+    ERROR: "pci_iounmap" [sound/pci/hda/snd-hda-codec-ca0132.ko] undefined!
+    
+    Adding a compile-time check for PCI gets it to work correctly on
+    32-bit ARM.
+    
+    Fixes: d99501b8575d ("ALSA: hda/ca0132 - Call pci_iounmap() instead of iounmap()")
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+    Signed-off-by: Takashi Iwai <tiwai@suse.de>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking e4d1784e1445409b264d6d2b756289144bfd4143 ......
 	 orig commit -> 563785edfcef02b566e64fb5292c74c1600808aa ......
 checking 8600660ce149b32961d0f298eb6cd1c22a161fb1 ......
@@ -56,17 +76,139 @@ checking 4074ca7d8a1832921c865d250bbd08f3441b3657 ......
 	 orig commit -> d52888aa2753e3063a9d3a0c9f72f94aa9809c15 ......
 		 d52888aa2753e3063a9d3a0c9f72f94aa9809c15 has problem. Fixes commit -> 254eb5505ca0ca749d3a491fc6668b6c16647a99
 16877a5570e0c5f4270d5b17f9bab427bcae9514
+commit 56769ef90b83a803ece304d57c397eb74c9bf50a
+Author: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Date:   Fri Nov 30 23:23:28 2018 +0300
+
+    x86/dump_pagetables: Fix LDT remap address marker
+    
+    [ Upstream commit 254eb5505ca0ca749d3a491fc6668b6c16647a99 ]
+    
+    The LDT remap placement has been changed. It's now placed before the direct
+    mapping in the kernel virtual address space for both paging modes.
+    
+    Change address markers order accordingly.
+    
+    Fixes: d52888aa2753 ("x86/mm: Move LDT remap out of KASLR region on 5-level paging")
+    Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Cc: bp@alien8.de
+    Cc: hpa@zytor.com
+    Cc: dave.hansen@linux.intel.com
+    Cc: luto@kernel.org
+    Cc: peterz@infradead.org
+    Cc: boris.ostrovsky@oracle.com
+    Cc: jgross@suse.com
+    Cc: bhe@redhat.com
+    Cc: hans.van.kranenburg@mendix.com
+    Cc: linux-mm@kvack.org
+    Cc: xen-devel@lists.xenproject.org
+    Link: https://lkml.kernel.org/r/20181130202328.65359-3-kirill.shutemov@linux.intel.com
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit 62075c982bf702949af59bd902bc0faaf20f38b0
+Author: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Date:   Fri Nov 30 23:23:27 2018 +0300
+
+    x86/mm: Fix guard hole handling
+    
+    [ Upstream commit 16877a5570e0c5f4270d5b17f9bab427bcae9514 ]
+    
+    There is a guard hole at the beginning of the kernel address space, also
+    used by hypervisors. It occupies 16 PGD entries.
+    
+    This reserved range is not defined explicitely, it is calculated relative
+    to other entities: direct mapping and user space ranges.
+    
+    The calculation got broken by recent changes of the kernel memory layout:
+    LDT remap range is now mapped before direct mapping and makes the
+    calculation invalid.
+    
+    The breakage leads to crash on Xen dom0 boot[1].
+    
+    Define the reserved range explicitely. It's part of kernel ABI (hypervisors
+    expect it to be stable) and must not depend on changes in the rest of
+    kernel memory layout.
+    
+    [1] https://lists.xenproject.org/archives/html/xen-devel/2018-11/msg03313.html
+    
+    Fixes: d52888aa2753 ("x86/mm: Move LDT remap out of KASLR region on 5-level paging")
+    Reported-by: Hans van Kranenburg <hans.van.kranenburg@mendix.com>
+    Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Tested-by: Hans van Kranenburg <hans.van.kranenburg@mendix.com>
+    Reviewed-by: Juergen Gross <jgross@suse.com>
+    Cc: bp@alien8.de
+    Cc: hpa@zytor.com
+    Cc: dave.hansen@linux.intel.com
+    Cc: luto@kernel.org
+    Cc: peterz@infradead.org
+    Cc: boris.ostrovsky@oracle.com
+    Cc: bhe@redhat.com
+    Cc: linux-mm@kvack.org
+    Cc: xen-devel@lists.xenproject.org
+    Link: https://lkml.kernel.org/r/20181130202328.65359-2-kirill.shutemov@linux.intel.com
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+commit 56769ef90b83a803ece304d57c397eb74c9bf50a
+Author: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+Date:   Fri Nov 30 23:23:28 2018 +0300
+
+    x86/dump_pagetables: Fix LDT remap address marker
+    
+    [ Upstream commit 254eb5505ca0ca749d3a491fc6668b6c16647a99 ]
+    
+    The LDT remap placement has been changed. It's now placed before the direct
+    mapping in the kernel virtual address space for both paging modes.
+    
+    Change address markers order accordingly.
+    
+    Fixes: d52888aa2753 ("x86/mm: Move LDT remap out of KASLR region on 5-level paging")
+    Signed-off-by: Kirill A. Shutemov <kirill.shutemov@linux.intel.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Cc: bp@alien8.de
+    Cc: hpa@zytor.com
+    Cc: dave.hansen@linux.intel.com
+    Cc: luto@kernel.org
+    Cc: peterz@infradead.org
+    Cc: boris.ostrovsky@oracle.com
+    Cc: jgross@suse.com
+    Cc: bhe@redhat.com
+    Cc: hans.van.kranenburg@mendix.com
+    Cc: linux-mm@kvack.org
+    Cc: xen-devel@lists.xenproject.org
+    Link: https://lkml.kernel.org/r/20181130202328.65359-3-kirill.shutemov@linux.intel.com
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
 checking 7818cf3d9aeab4374fa55f54a9da987381f807ff ......
 	 orig commit -> 025911a5f4e36955498ed50806ad1b02f0f76288 ......
 checking 62b5dea3ac936be3c6b268dcce6fcdb3d906f164 ......
 	 orig commit -> 8ef14c2c41d962756d314f1d7dc972b0ea7a180f ......
 checking 4d17f22eb16ed539f6162ea566e89acf6f44354a ......
 	 orig commit -> bbcde0a7241261cd0ca8d8e6b94a4113a4b71443 ......
-	 orig commit -> b41d920acff8 ......
-		 b41d920acff8 has problem. Fixes commit -> bbcde0a7241261cd0ca8d8e6b94a4113a4b71443
 checking 30fc828c1e1d86a7e151d8a44ed66ed6e8c79016 ......
 	 orig commit -> ad703c2b9127f9acdef697ec4755f6da4beaa266 ......
 		 ad703c2b9127f9acdef697ec4755f6da4beaa266 has problem. Fixes commit -> 37c4b91f955fdd5f4ad771956b97d35f1321098e
+commit 43f5afa3eaae85126c8aa9140b89c88849337dbd
+Author: Dmitry Bogdanov <dmitry.bogdanov@aquantia.com>
+Date:   Tue Nov 27 14:51:17 2018 +0000
+
+    net: aquantia: fix rx checksum offload bits
+    
+    [ Upstream commit 37c4b91f955fdd5f4ad771956b97d35f1321098e ]
+    
+    The last set of csum offload fixes had a leak:
+    
+    Checksum enabled status bits from rx descriptor were incorrectly
+    interpreted. Consequently all the other valid logic worked on zero bits.
+    That caused rx checksum offloads never to trigger.
+    
+    Tested by dumping rx descriptors and validating resulting csum_level.
+    
+    Reported-by: Igor Russkikh <igor.russkikh@aquantia.com>
+    Signed-off-by: Dmitry Bogdanov <dmitry.bogdanov@aquantia.com>
+    Signed-off-by: Igor Russkikh <igor.russkikh@aquantia.com>
+    Fixes: ad703c2b9127f ("net: aquantia: invalid checksumm offload implementation")
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
 checking fb7c179f018110ee450d3a7f7bbb85863f2a4f0a ......
 	 orig commit -> bfaa9f8553d5c20703781e63f4fc8cb4792f18fd ......
 checking 0d70766b98307ca9e10a94e89043c3001fb5a10e ......
@@ -83,10 +225,6 @@ checking 66473b0ac3afe9ccd4126424aa3054c95050dfdc ......
 	 orig commit -> 39477551df940ddb1339203817de04f5caaacf7a ......
 checking 1c87c27ac49f2f5b16015240f96507bfdbc3a61c ......
 	 orig commit -> ba766b8b99c30ad3c55ed8cf224d1185ecff1476 ......
-	 orig commit -> bacd75cfac8a ......
-	 orig commit -> 7e13318daa4a ......
-		 7e13318daa4a has problem. Fixes commit -> 11bafd547712ebff79636d0cc008e9335d8ec75b
-	 orig commit -> bf2d1df39502 ......
 checking 06f5a1f3ea90f21bb16bef83e56cf7d495137124 ......
 	 orig commit -> ffe498237b36ee42624e139b21efa05da4ff1f48 ......
 checking 86927afbe9138f8483b44b705585ddb70e407cb9 ......
@@ -99,8 +237,6 @@ checking 1d6ab5f595b0da3a6f3cc2966e6081b66410b6b4 ......
 	 orig commit -> 6ac2226229d931153331a93d90655a3de05b9290 ......
 checking b1e814e4826635211cb020b767d374f01ba1679b ......
 	 orig commit -> 40fa3780bac2b654edf23f6b13f4e2dd550aea10 ......
-	 orig commit -> cb538267ea1e ......
-		 cb538267ea1e has problem. Fixes commit -> cb92173d1f0474784c6171a9d3fdbbca0ee53554
 checking 1fac2f4f2faed9524d420f74c205f2fb65c72349 ......
 	 orig commit -> 848bd3f3de9d44950c00eda6c115e8e9785440da ......
 checking 7d5019ed49df80cc43f4bdd4edfe600160b709ee ......
@@ -120,6 +256,25 @@ checking b3db5d74b933a39267004bcb4c6bc619b9c96d3d ......
 checking a4da95ea101b2741488c6d84d3ce6e3d0cdffd62 ......
 	 orig commit -> f3587d76da05f68098ddb1cb3c98cc6a9e8a402c ......
 		 f3587d76da05f68098ddb1cb3c98cc6a9e8a402c has problem. Fixes commit -> f55adad601c6a97c8c9628195453e0fb23b4a0ae
+commit 7290c71ded83bad817ed7b4827afd725e81f20d0
+Author: Keith Busch <keith.busch@intel.com>
+Date:   Mon Dec 10 08:44:42 2018 -0700
+
+    block/bio: Do not zero user pages
+    
+    commit f55adad601c6a97c8c9628195453e0fb23b4a0ae upstream.
+    
+    We don't need to zero fill the bio if not using kernel allocated pages.
+    
+    Fixes: f3587d76da05 ("block: Clear kernel memory before copying to user") # v4.20-rc2
+    Reported-by: Todd Aiken <taiken@mvtech.ca>
+    Cc: Laurence Oberman <loberman@redhat.com>
+    Cc: stable@vger.kernel.org
+    Cc: Bart Van Assche <bvanassche@acm.org>
+    Tested-by: Laurence Oberman <loberman@redhat.com>
+    Signed-off-by: Keith Busch <keith.busch@intel.com>
+    Signed-off-by: Jens Axboe <axboe@kernel.dk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking b352afaac108d9d6c10cd1d9cd6155b83b779b65 ......
 	 orig commit -> 02680efbb10be0d2c867fe722ae23d588f6bebef ......
 checking 365b1b122406ca26331fc48ab53dfbf5a9b0889c ......
@@ -149,14 +304,6 @@ checking 99b9de47a8b64d534582d26c80f4220e6189df60 ......
 	 orig commit -> 30356d08159d7899438e94503ae322a8b881e205 ......
 checking d005b563ae0cef9712077ba4407d771c75bd4194 ......
 	 orig commit -> bd74a7f9cc033cf4d405788f80292268987dc0c5 ......
-	 orig commit -> 5f78e29ceebf ......
-		 5f78e29ceebf has problem. Fixes commit -> bd74a7f9cc033cf4d405788f80292268987dc0c5
-c5c48c58b259bb8f0482398370ee539d7a12df3e
-14d066c3531a87f727968cacd85bd95c75f59843
-98d823ab1fbdcb13abc25b420f9bb71bade42056
-8a03a3692b100d84785ee7a834e9215e304c9e00
-bc3ab70584696cb798b9e1e0ac8e6ced5fd4c3b8
-ebccc7397e4a49ff64c8f44a54895de9d32fe742
 checking 1cf11e7ca034919f242a855b1a52c018b3cba911 ......
 	 orig commit -> e4844c9c62a0fe47980d6c3d4b7a096a5d755925 ......
 checking 2f6bf7917f55f9dae913193e49672b3598620eab ......
@@ -167,8 +314,6 @@ checking e395c9d2d9c3d4986b2d79e23efb0d2a7b14e465 ......
 	 orig commit -> 17b8b74c0f8dbf9b9e3301f9ca5b65dd1c079951 ......
 checking 1a7ccf42cb03cd9976134eea111cfc5168a0ea31 ......
 	 orig commit -> 28c2fae726bf5003cd209b0d5910a642af98316f ......
-	 orig commit -> 815581c11cc2 ......
-		 815581c11cc2 has problem. Fixes commit -> 28c2fae726bf5003cd209b0d5910a642af98316f
 checking 5e4ad7cec8f81ce022d51e6e2d4059d45cc3ac12 ......
 	 orig commit -> a541f0ebcc08ed8bc0cc492eec9a86cb280a9f24 ......
 checking 4136161d676a93fc8df6bdb80d720c15522d6c24 ......
@@ -193,8 +338,6 @@ checking 9b2d5118f74fede5a989ef8747d8fdfca84771dd ......
 	 orig commit -> ef5febae1543f35a45f01614123e829d77326d0f ......
 checking a3123502b84f33e743507a5e613c3363c16dc525 ......
 	 orig commit -> 5a8de47b3c250521dd632cdedaac6db88367defa ......
-	 orig commit -> 94276fa8a2a4 ......
-		 94276fa8a2a4 has problem. Fixes commit -> 5a8de47b3c250521dd632cdedaac6db88367defa
 checking 84ed07d9577ec3965c6747ac3cd154844777060e ......
 	 orig commit -> 61792b677415b77c8db04991c22966bb8de7603e ......
 checking c2c72619cce2461203bab86984b92d6923882b8e ......
@@ -253,8 +396,6 @@ checking 0987d5a67bc726e99136f623b09ae9e207f50e16 ......
 	 orig commit -> 153fcd5f6d93b8e1e4040b1337f564a10f8d93af ......
 checking 262522ccef74e5f1a74f9f5591834f2a97a458fd ......
 	 orig commit -> 966866892cf89d606544bca22d584ba2ef9ec208 ......
-	 orig commit -> 63fef14fc98a ......
-		 63fef14fc98a has problem. Fixes commit -> 43a1b0cb4cd6dbfd3cd9c10da663368394d299d8
 checking e4ed4e68c6d8aba1e4cd63979e7ac7f42075e21a ......
 	 orig commit -> 0c5d6cb6643f48ad3775322f3ebab6c7eb67484e ......
 checking ad1834fd8a479f499918107e1f97591eb0a4b39f ......

@@ -37,6 +37,71 @@ checking 5eede3d09625f12385be732300fb1b8146fcdd77 ......
 	 orig commit -> 2dd453168643d9475028cd867c57e65956a0f7f9 ......
 		 2dd453168643d9475028cd867c57e65956a0f7f9 has problem. Fixes commit -> 3ec8002951ea173e24b466df1ea98c56b7920e63
 1cd25cbb2fedbc777f3a8c3cb1ba69b645aeaa64
+commit e762e1407bc85ae45a6d42267cb8af468b61d891
+Author: Laura Abbott <labbott@redhat.com>
+Date:   Wed Sep 19 18:59:01 2018 -0700
+
+    kgdboc: Fix warning with module build
+    
+    commit 1cd25cbb2fedbc777f3a8c3cb1ba69b645aeaa64 upstream.
+    
+    After 2dd453168643 ("kgdboc: Fix restrict error"), kgdboc_option_setup is
+    now only used when built in, resulting in a warning when compiled as a
+    module:
+    
+    drivers/tty/serial/kgdboc.c:134:12: warning: 'kgdboc_option_setup' defined but not used [-Wunused-function]
+     static int kgdboc_option_setup(char *opt)
+                ^~~~~~~~~~~~~~~~~~~
+    
+    Move the function under the appropriate ifdef for builtin only.
+    
+    Fixes: 2dd453168643 ("kgdboc: Fix restrict error")
+    Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+    Signed-off-by: Laura Abbott <labbott@redhat.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+commit c956914f1efa6d4771881d49d3d08850048b3fec
+Author: Wentao Wang <witallwang@gmail.com>
+Date:   Wed Mar 20 15:30:39 2019 +0000
+
+    Disable kgdboc failed by echo space to /sys/module/kgdboc/parameters/kgdboc
+    
+    commit 3ec8002951ea173e24b466df1ea98c56b7920e63 upstream.
+    
+    Echo "" to /sys/module/kgdboc/parameters/kgdboc will fail with "No such
+    device” error.
+    
+    This is caused by function "configure_kgdboc" who init err to ENODEV
+    when the config is empty (legal input) the code go out with ENODEV
+    returned.
+    
+    Fixes: 2dd453168643 ("kgdboc: Fix restrict error")
+    Signed-off-by: Wentao Wang <witallwang@gmail.com>
+    Cc: stable <stable@vger.kernel.org>
+    Acked-by: Daniel Thompson <daniel.thompson@linaro.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit e762e1407bc85ae45a6d42267cb8af468b61d891
+Author: Laura Abbott <labbott@redhat.com>
+Date:   Wed Sep 19 18:59:01 2018 -0700
+
+    kgdboc: Fix warning with module build
+    
+    commit 1cd25cbb2fedbc777f3a8c3cb1ba69b645aeaa64 upstream.
+    
+    After 2dd453168643 ("kgdboc: Fix restrict error"), kgdboc_option_setup is
+    now only used when built in, resulting in a warning when compiled as a
+    module:
+    
+    drivers/tty/serial/kgdboc.c:134:12: warning: 'kgdboc_option_setup' defined but not used [-Wunused-function]
+     static int kgdboc_option_setup(char *opt)
+                ^~~~~~~~~~~~~~~~~~~
+    
+    Move the function under the appropriate ifdef for builtin only.
+    
+    Fixes: 2dd453168643 ("kgdboc: Fix restrict error")
+    Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+    Signed-off-by: Laura Abbott <labbott@redhat.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking 8f193a716e56f30e36a4c851e59bf6fa74af8d9f ......
 	 orig commit -> dcf7fe9d89763a28e0f43975b422ff141fe79e43 ......
 checking 4ce337622f2bbc0df61b0b76aa60388f5def5646 ......
@@ -52,6 +117,31 @@ checking ea6bb077bff27b94d2d612ace7d015fe8dba560a ......
 checking 736f04212a28d9e14b6a22f7218fb4892e1c18fe ......
 	 orig commit -> 2bcd3ecab773f73211c45bb1430bb52ac641f271 ......
 		 2bcd3ecab773f73211c45bb1430bb52ac641f271 has problem. Fixes commit -> ce0210c12433031aba3bbacd75f4c02ab77f2004
+commit ce8d0581ae33b64b86fb6cd30d4385f90ddf19d8
+Author: Neil Armstrong <narmstrong@baylibre.com>
+Date:   Mon Jan 14 16:31:18 2019 +0100
+
+    drm/meson: Fix atomic mode switching regression
+    
+    commit ce0210c12433031aba3bbacd75f4c02ab77f2004 upstream.
+    
+    Since commit 2bcd3ecab773 when switching mode from X11 (ubuntu mate for
+    example) the display gets blurry, looking like an invalid framebuffer width.
+    
+    This commit fixed atomic crtc modesetting in a totally wrong way and
+    introduced a local unnecessary ->enabled crtc state.
+    
+    This commit reverts the crctc _begin() and _enable() changes and simply
+    adds drm_atomic_helper_commit_tail_rpm as helper.
+    
+    Reported-by: Tony McKahan <tonymckahan@gmail.com>
+    Suggested-by: Daniel Vetter <daniel@ffwll.ch>
+    Fixes: 2bcd3ecab773 ("drm/meson: Fixes for drm_crtc_vblank_on/off support")
+    Signed-off-by: Neil Armstrong <narmstrong@baylibre.com>
+    Acked-by: Daniel Vetter <daniel.vetter@ffwll.ch>
+    [narmstrong: fixed blank line issue from checkpatch]
+    Link: https://patchwork.freedesktop.org/patch/msgid/20190114153118.8024-1-narmstrong@baylibre.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking c952979ad95bb1be30d3e65187d74034bd49c9e8 ......
 	 orig commit -> 23a336b34258aba3b50ea6863cca4e81b5ef6384 ......
 checking 8a8effbe56b1b99c3376bf78882be11c35c9c6be ......
@@ -68,26 +158,12 @@ checking 8e847e8c745696fc403412d03382e51f8524758f ......
 	 orig commit -> 7d35baa4e9ec4b717bc0e58a39cdb6a1c50f5465 ......
 checking d49297b5c77ae818f33b6ee63e418097e0ff98e8 ......
 	 orig commit -> 0c7a52e4d4b5c4d35b31f3c3ad32af814f1bf491 ......
-	 orig commit -> e6753f23d961 ......
-		 e6753f23d961 has problem. Fixes commit -> 0c7a52e4d4b5c4d35b31f3c3ad32af814f1bf491
-865e63b04e9b2a658d7f26bd13a71dcd964a9118
-f8a79d5c7ef47c62d97a30e16064caf2ef91f648
-e0a568dcd18bdaa77877d558700ce4d3bbbb12b8
-da5b3ebb4527733299661229a8d035d64a4f0b1a
-da25a672cf0e2c143bffb40acb507a342e25b4f4
 checking fd8152818f11435557a18311603220d8bbdf7272 ......
 	 orig commit -> 3054426dc68e5d63aa6a6e9b91ac4ec78e3f3805 ......
-	 orig commit -> 3f5fe9fef5b2 ......
-		 3f5fe9fef5b2 has problem. Fixes commit -> 3054426dc68e5d63aa6a6e9b91ac4ec78e3f3805
-	 orig commit -> efb40f588b43 ......
-		 efb40f588b43 has problem. Fixes commit -> 3f5fe9fef5b2da06b6319fab8123056da5217c3f
 checking 2858d1891eb52cfd4f9b1ec2f4d44b1afcd3f529 ......
 	 orig commit -> 874bfc6e5422d2421f7e4d5ea318d30e91679dfe ......
-	 orig commit -> 4378a7d4be30 ......
-		 4378a7d4be30 has problem. Fixes commit -> 874bfc6e5422d2421f7e4d5ea318d30e91679dfe
 checking 86e42924160397148957ac80a588fe45fafcac6a ......
 	 orig commit -> 40b412897ccb4b98b2cfb2a0aaabed58dd9e2086 ......
-	 orig commit -> d098093ba06e ......
 checking ac8edc62e8134aac60a0370ca1442f6e29a1feb9 ......
 	 orig commit -> 09d3f015d1e1b4fee7e9bbdcf54201d239393391 ......
 checking 61c963ab59fd7272bb752ea4099e5e64d9e452c5 ......
@@ -99,3 +175,39 @@ checking f2d12a0ba143056d14a916ddee701888c6532dc2 ......
 checking 724ff9cbfe1f7a2adbab969f94ee9c2a2592a757 ......
 	 orig commit -> ffe81d45322cc3cb140f0db080a4727ea284661e ......
 		 ffe81d45322cc3cb140f0db080a4727ea284661e has problem. Fixes commit -> c616cbee97aed4bc6178f148a7240206dcdb85a6
+commit 55cbeea76e769b12cd0f1340132d32781f73a3dc
+Author: Jens Axboe <axboe@kernel.dk>
+Date:   Thu Dec 6 22:17:44 2018 -0700
+
+    blk-mq: punt failed direct issue to dispatch list
+    
+    commit c616cbee97aed4bc6178f148a7240206dcdb85a6 upstream.
+    
+    After the direct dispatch corruption fix, we permanently disallow direct
+    dispatch of non read/write requests. This works fine off the normal IO
+    path, as they will be retried like any other failed direct dispatch
+    request. But for the blk_insert_cloned_request() that only DM uses to
+    bypass the bottom level scheduler, we always first attempt direct
+    dispatch. For some types of requests, that's now a permanent failure,
+    and no amount of retrying will make that succeed. This results in a
+    livelock.
+    
+    Instead of making special cases for what we can direct issue, and now
+    having to deal with DM solving the livelock while still retaining a BUSY
+    condition feedback loop, always just add a request that has been through
+    ->queue_rq() to the hardware queue dispatch list. These are safe to use
+    as no merging can take place there. Additionally, if requests do have
+    prepped data from drivers, we aren't dependent on them not sharing space
+    in the request structure to safely add them to the IO scheduler lists.
+    
+    This basically reverts ffe81d45322c and is based on a patch from Ming,
+    but with the list insert case covered as well.
+    
+    Fixes: ffe81d45322c ("blk-mq: fix corruption with direct issue")
+    Cc: stable@vger.kernel.org
+    Suggested-by: Ming Lei <ming.lei@redhat.com>
+    Reported-by: Bart Van Assche <bvanassche@acm.org>
+    Tested-by: Ming Lei <ming.lei@redhat.com>
+    Acked-by: Mike Snitzer <snitzer@redhat.com>
+    Signed-off-by: Jens Axboe <axboe@kernel.dk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>

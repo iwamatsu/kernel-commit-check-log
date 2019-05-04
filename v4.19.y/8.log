@@ -18,6 +18,26 @@ checking d66c1b9280d146f8b2215224ca42535d8ab1fb39 ......
 checking 98206f3400334cbe9f4c3a5c453e68640f1ffce6 ......
 	 orig commit -> ae86cbfef3818300f1972e52f67a93211acb0e24 ......
 		 ae86cbfef3818300f1972e52f67a93211acb0e24 has problem. Fixes commit -> f101ada7da6551127d192c2f1742c1e9e0f62799
+commit 6a89ed7aa14031a3ba3371e81293dcb5e16d92ec
+Author: Wei Yang <richardw.yang@linux.intel.com>
+Date:   Tue Jan 22 10:48:09 2019 +0800
+
+    libnvdimm, pfn: Fix over-trim in trim_pfn_device()
+    
+    commit f101ada7da6551127d192c2f1742c1e9e0f62799 upstream.
+    
+    When trying to see whether current nd_region intersects with others,
+    trim_pfn_device() has already calculated the *size* to be expanded to
+    SECTION size.
+    
+    Do not double append 'adjust' to 'size' when calculating whether the end
+    of a region collides with the next pmem region.
+    
+    Fixes: ae86cbfef381 "libnvdimm, pfn: Pad pfn namespaces relative to other regions"
+    Cc: <stable@vger.kernel.org>
+    Signed-off-by: Wei Yang <richardw.yang@linux.intel.com>
+    Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking beb68a727fb9d5eb42ae919a795dc997ece27de8 ......
 	 orig commit -> dada6a43b0402eba438a17ac86fdc64ac56a4607 ......
 checking 3c1773b0275e2b4e37f7df01b17234ba65b2efc7 ......
@@ -26,8 +46,6 @@ checking 41867ab9b0d396ce51fb63e29fda2b5791124e0e ......
 	 orig commit -> 2a48602615e0a2f563549c7d5c8d507f904cf96e ......
 checking ecbfb178c75cf6b26d2071808111d9f9216f2d23 ......
 	 orig commit -> 100bc3e2bebf95506da57cbdf5f26b25f6da4c81 ......
-	 orig commit -> 68e5fc4a255a ......
-		 68e5fc4a255a has problem. Fixes commit -> 100bc3e2bebf95506da57cbdf5f26b25f6da4c81
 checking b02b86bc74c37feccce8fc3fa67523285c9be1e1 ......
 	 orig commit -> 37c2578c0c40e286bc0d30bdc05290b2058cf66e ......
 checking e88ebc06bd53801891374d5d8f457dfaab02e0ae ......
@@ -52,14 +70,10 @@ checking 35929281460b2d7cd1876dbb4b0f1d57056a56c5 ......
 	 orig commit -> 87e4a5405f087427fbf8b437d2796283dce2b38f ......
 checking 9138ce0a8011d9c22d87c449a5874858c0bea120 ......
 	 orig commit -> 300cd664865bed5d50ae0a42fb4e3a6f415e8a10 ......
-	 orig commit -> 8b7a13c3f404 ......
-		 8b7a13c3f404 has problem. Fixes commit -> 300cd664865bed5d50ae0a42fb4e3a6f415e8a10
 checking 99c694081ba212599388955792a37d2a4560ed4e ......
 	 orig commit -> c988de29ca161823db6a7125e803d597ef75b49c ......
 checking bd5d1c273cce02612f0d3a820fbbab2e33b46a34 ......
 	 orig commit -> 9fd61bc95130d4971568b89c9548b5e0a4e18e0e ......
-	 orig commit -> 124049decbb1 ......
-		 124049decbb1 has problem. Fixes commit -> e181ae0c5db9544de9c53239eb22bc012ce75033
 checking e92cc52ee5e74e118a4becddca9e2ed44101ee2f ......
 	 orig commit -> 13682e524167cbd7e2a26c5e91bec765f0f96273 ......
 checking 33f310e093889405f7d90c9d302073c788b64daa ......
@@ -67,9 +81,65 @@ checking 33f310e093889405f7d90c9d302073c788b64daa ......
 checking 5d3b10677bf82c37b23af00b30420919e336fa00 ......
 	 orig commit -> a7d57abcc8a5bdeb53bbf8e87558e8e0a2c2a29d ......
 		 a7d57abcc8a5bdeb53bbf8e87558e8e0a2c2a29d has problem. Fixes commit -> 2419f30a4a4fcaa5f35111563b4c61f1b2b26841
+commit a67fb441decdd0c94e743f46f331991e2f06684c
+Author: Nicolas Saenz Julienne <nsaenzjulienne@suse.de>
+Date:   Mon Dec 17 14:37:40 2018 +0100
+
+    USB: xhci: fix 'broken_suspend' placement in struct xchi_hcd
+    
+    commit 2419f30a4a4fcaa5f35111563b4c61f1b2b26841 upstream.
+    
+    As commented in the struct's definition there shouldn't be anything
+    underneath its 'priv[0]' member as it would break some macros.
+    
+    The patch converts the broken_suspend into a bit-field and relocates it
+    next to to the rest of bit-fields.
+    
+    Fixes: a7d57abcc8a5 ("xhci: workaround CSS timeout on AMD SNPS 3.0 xHC")
+    Reported-by: Oliver Neukum  <oneukum@suse.com>
+    Signed-off-by: Nicolas Saenz Julienne <nsaenzjulienne@suse.de>
+    Acked-by: Mathias Nyman <mathias.nyman@linux.intel.com>
+    Cc: stable <stable@vger.kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking 3fe0c68aea216d9fb6160bf7ebffb71c88026b5b ......
 	 orig commit -> e46daee53bb50bde38805f1823a182979724c229 ......
 		 e46daee53bb50bde38805f1823a182979724c229 has problem. Fixes commit -> 0ac569bf6a7983c0c5747d6df8db9dc05bc92b6c
+commit 775ab7d3d12b0a7eaa8f758d026daef2aa33f1d3
+Author: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+Date:   Tue Feb 5 16:37:40 2019 +0100
+
+    ARM: 8834/1: Fix: kprobes: optimized kprobes illegal instruction
+    
+    commit 0ac569bf6a7983c0c5747d6df8db9dc05bc92b6c upstream.
+    
+    commit e46daee53bb5 ("ARM: 8806/1: kprobes: Fix false positive with
+    FORTIFY_SOURCE") introduced a regression in optimized kprobes. It
+    triggers "invalid instruction" oopses when using kprobes instrumentation
+    through lttng and perf. This commit was introduced in kernel v4.20, and
+    has been backported to stable kernels 4.19 and 4.14.
+    
+    This crash was also reported by Hongzhi Song on the redhat bugzilla
+    where the patch was originally introduced.
+    
+    Link: https://bugzilla.redhat.com/show_bug.cgi?id=1639397
+    Link: https://bugs.lttng.org/issues/1174
+    Link: https://lore.kernel.org/lkml/342740659.2887.1549307721609.JavaMail.zimbra@efficios.com
+    
+    Fixes: e46daee53bb5 ("ARM: 8806/1: kprobes: Fix false positive with FORTIFY_SOURCE")
+    Signed-off-by: Mathieu Desnoyers <mathieu.desnoyers@efficios.com>
+    Reported-by: Robert Berger <Robert.Berger@ReliableEmbeddedSystems.com>
+    Tested-by: Robert Berger <Robert.Berger@ReliableEmbeddedSystems.com>
+    Acked-by: Kees Cook <keescook@chromium.org>
+    Cc: Robert Berger <Robert.Berger@ReliableEmbeddedSystems.com>
+    Cc: Masami Hiramatsu <mhiramat@kernel.org>
+    Cc: William Cohen <wcohen@redhat.com>
+    Cc: Laura Abbott <labbott@redhat.com>
+    Cc: Kees Cook <keescook@chromium.org>
+    Cc: <stable@vger.kernel.org> # v4.14+
+    Cc: linux-arm-kernel@lists.infradead.org
+    Cc: patches@armlinux.org.uk
+    Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking 37e74076f3cb92a9204e1a9a14687fe2a0d6b1c5 ......
 	 orig commit -> 59861547ec9a9736e7882f6fb0c096a720ff811a ......
 checking 374f384bc66f7a928f11eb20c0518f0f3fc1ffd6 ......
@@ -89,14 +159,53 @@ checking 1d9ca56698ad6554d41057fec297b2ca7c842871 ......
 checking f9cd25b1e5e575a5f18547bdc04ea40a23ad511a ......
 	 orig commit -> 834e772c8db0c6a275d75315d90aba4ebbb1e249 ......
 		 834e772c8db0c6a275d75315d90aba4ebbb1e249 has problem. Fixes commit -> 7fbe078c37aba3088359c9256c1a1d0c3e39ee81
+commit 842bdbe83ccc17930af62f730415b06432d4338c
+Author: Zha Bin <zhabin@linux.alibaba.com>
+Date:   Tue Jan 8 16:07:03 2019 +0800
+
+    vhost/vsock: fix vhost vsock cid hashing inconsistent
+    
+    commit 7fbe078c37aba3088359c9256c1a1d0c3e39ee81 upstream.
+    
+    The vsock core only supports 32bit CID, but the Virtio-vsock spec define
+    CID (dst_cid and src_cid) as u64 and the upper 32bits is reserved as
+    zero. This inconsistency causes one bug in vhost vsock driver. The
+    scenarios is:
+    
+      0. A hash table (vhost_vsock_hash) is used to map an CID to a vsock
+      object. And hash_min() is used to compute the hash key. hash_min() is
+      defined as:
+      (sizeof(val) <= 4 ? hash_32(val, bits) : hash_long(val, bits)).
+      That means the hash algorithm has dependency on the size of macro
+      argument 'val'.
+      0. In function vhost_vsock_set_cid(), a 64bit CID is passed to
+      hash_min() to compute the hash key when inserting a vsock object into
+      the hash table.
+      0. In function vhost_vsock_get(), a 32bit CID is passed to hash_min()
+      to compute the hash key when looking up a vsock for an CID.
+    
+    Because the different size of the CID, hash_min() returns different hash
+    key, thus fails to look up the vsock object for an CID.
+    
+    To fix this bug, we keep CID as u64 in the IOCTLs and virtio message
+    headers, but explicitly convert u64 to u32 when deal with the hash table
+    and vsock core.
+    
+    Fixes: 834e772c8db0 ("vhost/vsock: fix use-after-free in network stack callers")
+    Link: https://github.com/stefanha/virtio/blob/vsock/trunk/content.tex
+    Signed-off-by: Zha Bin <zhabin@linux.alibaba.com>
+    Reviewed-by: Liu Jiang <gerry@linux.alibaba.com>
+    Reviewed-by: Stefan Hajnoczi <stefanha@redhat.com>
+    Acked-by: Jason Wang <jasowang@redhat.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Shengjing Zhu <i@zhsj.me>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking 2a622040a8bce2bb7e646ca73a328b4e86ba336f ......
 	 orig commit -> 78b1a52e05c9db11d293342e8d6d8a230a04b4e7 ......
 checking 79f6e9facb8b53ef2097a9aa35c7069b5627301a ......
 	 orig commit -> 2448a299ec416a80f699940a86f4a6d9a4f643b1 ......
 checking 6c9ac388c6c86c32bc559c06a4ec52aa0f400374 ......
 	 orig commit -> 1e8249b8a4e960018e4baca6b523b8a4500af600 ......
-	 orig commit -> 24b6c22504a2 ......
-		 24b6c22504a2 has problem. Fixes commit -> 1e8249b8a4e960018e4baca6b523b8a4500af600
 checking c91ec2c4eb65cbba321e6edebc3d5e023a24908d ......
 	 orig commit -> 48a2ca0ee3994df53da230c7079a18a70ec914f9 ......
 checking 24a776e398e9c203a712cec9970dd55e2f630607 ......
@@ -110,18 +219,53 @@ checking c4dabf370838d1cf3bae6e96fc1a02cd39f9404f ......
 checking fbb982c6ad97fcaca3d0e01a98c56bf665d34163 ......
 	 orig commit -> b72f936f6b325f4fde06b02e4b6ab682f6f2e73f ......
 		 b72f936f6b325f4fde06b02e4b6ab682f6f2e73f has problem. Fixes commit -> 667a8f73753908c4d0171e52b71774f9be5d6713
+commit 5ec67684be9e686a70d33a694baa53ec9b3ab4de
+Author: Jian-Hong Pan <jian-hong@endlessm.com>
+Date:   Fri Mar 15 17:51:09 2019 +0800
+
+    ALSA: hda/realtek: Enable headset MIC of Acer AIO with ALC286
+    
+    commit 667a8f73753908c4d0171e52b71774f9be5d6713 upstream.
+    
+    Some Acer AIO desktops like Veriton Z6860G, Z4860G and Z4660G cannot
+    record sound from headset MIC.  This patch adds the
+    ALC286_FIXUP_ACER_AIO_HEADSET_MIC quirk to fix this issue.
+    
+    Fixes: 9f8aefed9623 ("ALSA: hda/realtek: Fix mic issue on Acer AIO Veriton Z4660G")
+    Fixes: b72f936f6b32 ("ALSA: hda/realtek: Fix mic issue on Acer AIO Veriton Z4860G/Z6860G")
+    Signed-off-by: Jian-Hong Pan <jian-hong@endlessm.com>
+    Reviewed-by: Kailang Yang <kailang@realtek.com>
+    Cc: <stable@vger.kernel.org>
+    Signed-off-by: Takashi Iwai <tiwai@suse.de>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking ba3ce1bf275c74808a4399a3c5f8380af5bdcb54 ......
 	 orig commit -> 9f8aefed9623a91dec54eab8908f3810b7f8d73a ......
 		 9f8aefed9623a91dec54eab8908f3810b7f8d73a has problem. Fixes commit -> 667a8f73753908c4d0171e52b71774f9be5d6713
+commit 5ec67684be9e686a70d33a694baa53ec9b3ab4de
+Author: Jian-Hong Pan <jian-hong@endlessm.com>
+Date:   Fri Mar 15 17:51:09 2019 +0800
+
+    ALSA: hda/realtek: Enable headset MIC of Acer AIO with ALC286
+    
+    commit 667a8f73753908c4d0171e52b71774f9be5d6713 upstream.
+    
+    Some Acer AIO desktops like Veriton Z6860G, Z4860G and Z4660G cannot
+    record sound from headset MIC.  This patch adds the
+    ALC286_FIXUP_ACER_AIO_HEADSET_MIC quirk to fix this issue.
+    
+    Fixes: 9f8aefed9623 ("ALSA: hda/realtek: Fix mic issue on Acer AIO Veriton Z4660G")
+    Fixes: b72f936f6b32 ("ALSA: hda/realtek: Fix mic issue on Acer AIO Veriton Z4860G/Z6860G")
+    Signed-off-by: Jian-Hong Pan <jian-hong@endlessm.com>
+    Reviewed-by: Kailang Yang <kailang@realtek.com>
+    Cc: <stable@vger.kernel.org>
+    Signed-off-by: Takashi Iwai <tiwai@suse.de>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking bf03eb5e297f0b705ca0c7fbe9c21e449f73a51d ......
 	 orig commit -> 705b65f107470499442240ff7afee5021a7002a6 ......
 checking 642314e11aded202a7e3ee66e876894c59428bbd ......
 	 orig commit -> 33aaebd48ae2d2c78fef5063a0381e17db19b060 ......
 checking 071b34a1a5ed9cffbfa7e22643689fe336d8203b ......
 	 orig commit -> 54947cd64c1b8290f64bb2958e343c07270e3a58 ......
-	 orig commit -> 61fcf8ece9b6 ......
-		 61fcf8ece9b6 has problem. Fixes commit -> 54947cd64c1b8290f64bb2958e343c07270e3a58
-71db96ddfa72671bd43cacdcc99ca178d90ba267
 checking a2928e74981266381b5df13f150384a5c5120ff3 ......
 	 orig commit -> 5363857b916c1f48027e9b96ee8be8376bf20811 ......
 checking 19054c18846ec5fb0820febae3bfea4cac05d6e8 ......
@@ -163,6 +307,25 @@ checking d69eb98a86c0ed560b303a1a078e668d230d9d39 ......
 checking bfa634ba505ab5ad24e1d40b49b23768d8e8d046 ......
 	 orig commit -> a5681e20b541a507c7d4fd48ae4a4040d32ee1ef ......
 		 a5681e20b541a507c7d4fd48ae4a4040d32ee1ef has problem. Fixes commit -> 986103e7920cabc0b910749e77ae5589d3934d52
+commit a9571c006a6e41706c94d64f6f1e1418a462e1be
+Author: Thomas Falcon <tlfalcon@linux.ibm.com>
+Date:   Fri Nov 30 10:59:08 2018 -0600
+
+    net/ibmvnic: Fix RTNL deadlock during device reset
+    
+    [ Upstream commit 986103e7920cabc0b910749e77ae5589d3934d52 ]
+    
+    Commit a5681e20b541 ("net/ibmnvic: Fix deadlock problem
+    in reset") made the change to hold the RTNL lock during
+    driver reset but still calls netdev_notify_peers, which
+    results in a deadlock. Instead, use call_netdevice_notifiers,
+    which is functionally the same except that it does not
+    take the RTNL lock again.
+    
+    Fixes: a5681e20b541 ("net/ibmnvic: Fix deadlock problem in reset")
+    Signed-off-by: Thomas Falcon <tlfalcon@linux.ibm.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
 checking 07f745f9a6d624dc1829f0d2a3a1d31b40a3eb69 ......
 	 orig commit -> eb62cca9bee842e5b23bd0ddfb1f271ca95e8759 ......
 checking b63de441365669195db4db67e9b1a60e6c363b59 ......
@@ -189,8 +352,6 @@ checking b8c51924b4e1bc019a81aae3d6456ac26310cd38 ......
 	 orig commit -> bff466bac59994cfcceabe4d0be5fdc1c20cd5b8 ......
 checking b9284d6c30cb0a273230d83955cdbd71df7198b9 ......
 	 orig commit -> 70cdb6ad6dc342d9643a00c9092e88f0075f2b9a ......
-	 orig commit -> c4e5ffb6f224 ......
-		 c4e5ffb6f224 has problem. Fixes commit -> 70cdb6ad6dc342d9643a00c9092e88f0075f2b9a
 checking 9ebacc1a87541164c9faa528189feb0151e57544 ......
 	 orig commit -> a97b9565338350d70d8d971c4ee6f0d4fa967418 ......
 checking b53fa368dd8e18822cd496083517b9736d1b5e0d ......
@@ -219,6 +380,23 @@ checking 4f22a32f555d1088165ae089e8d92ca3baadc61f ......
 checking d4105c836c131bc07c778a7f9e95738e91ff2f94 ......
 	 orig commit -> 291d57f67d2449737d1e370ab5b9a583818eaa0c ......
 		 291d57f67d2449737d1e370ab5b9a583818eaa0c has problem. Fixes commit -> a97b9565338350d70d8d971c4ee6f0d4fa967418
+commit 9ebacc1a87541164c9faa528189feb0151e57544
+Author: Andrew Morton <akpm@linux-foundation.org>
+Date:   Thu Nov 15 16:15:20 2018 -0800
+
+    drivers/net/ethernet/qlogic/qed/qed_rdma.h: fix typo
+    
+    [ Upstream commit a97b9565338350d70d8d971c4ee6f0d4fa967418 ]
+    
+    Add missing semicolon.
+    
+    Fixes: 291d57f67d244973 ("qed: Fix rdma_info structure allocation")
+    Cc: Michal Kalderon <michal.kalderon@cavium.com>
+    Cc: Denis Bolotin <denis.bolotin@cavium.com>
+    Cc: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
 checking 52da24907e6e775a5f153e934417db66c1d17af0 ......
 	 orig commit -> e90202ed1cf9672c48a363c84a929932ebfe6fc0 ......
 checking 631ebe93bdcb7893e64f5e383d84d5367e92a79c ......

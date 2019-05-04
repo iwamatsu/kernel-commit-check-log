@@ -18,11 +18,61 @@ checking 5c684c250bf3b918eb4ce87f64d074c3e0306a6f ......
 checking 5f0db37d916bece442472e0714de75e330c439e8 ......
 	 orig commit -> 0da03cab87e6323ff2e05b14bc7d5c6fcc531efd ......
 		 0da03cab87e6323ff2e05b14bc7d5c6fcc531efd has problem. Fixes commit -> 758a58d0bc67457f1215321a536226654a830eeb
+commit 61584032c4d6e0510fe5cd1add7728e1e898be5f
+Author: Dongli Zhang <dongli.zhang@oracle.com>
+Date:   Fri Feb 22 22:10:20 2019 +0800
+
+    loop: set GENHD_FL_NO_PART_SCAN after blkdev_reread_part()
+    
+    [ Upstream commit 758a58d0bc67457f1215321a536226654a830eeb ]
+    
+    Commit 0da03cab87e6
+    ("loop: Fix deadlock when calling blkdev_reread_part()") moves
+    blkdev_reread_part() out of the loop_ctl_mutex. However,
+    GENHD_FL_NO_PART_SCAN is set before __blkdev_reread_part(). As a result,
+    __blkdev_reread_part() will fail the check of GENHD_FL_NO_PART_SCAN and
+    will not rescan the loop device to delete all partitions.
+    
+    Below are steps to reproduce the issue:
+    
+    step1 # dd if=/dev/zero of=tmp.raw bs=1M count=100
+    step2 # losetup -P /dev/loop0 tmp.raw
+    step3 # parted /dev/loop0 mklabel gpt
+    step4 # parted -a none -s /dev/loop0 mkpart primary 64s 1
+    step5 # losetup -d /dev/loop0
+    
+    Step5 will not be able to delete /dev/loop0p1 (introduced by step4) and
+    there is below kernel warning message:
+    
+    [  464.414043] __loop_clr_fd: partition scan of loop0 failed (rc=-22)
+    
+    This patch sets GENHD_FL_NO_PART_SCAN after blkdev_reread_part().
+    
+    Fixes: 0da03cab87e6 ("loop: Fix deadlock when calling blkdev_reread_part()")
+    Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+    Reviewed-by: Jan Kara <jack@suse.cz>
+    Signed-off-by: Jens Axboe <axboe@kernel.dk>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
 checking 6e0d6935309579b98249b3b8ffebf49b78bbd771 ......
 	 orig commit -> 85b0a54a82e4fbceeb1aebb7cb6909edd1a24668 ......
 checking ed281a7230c979660fdc8cb6d6ff08e3507aba22 ......
 	 orig commit -> d57f3374ba4817f7c8d26fae8a13d20ac8d31b92 ......
 		 d57f3374ba4817f7c8d26fae8a13d20ac8d31b92 has problem. Fixes commit -> 40853d6fc619a6fd3d3177c3973a2eac9b598a80
+commit 05470b9f23d901f6bd84db3b00b1daca43e94a0c
+Author: Dongli Zhang <dongli.zhang@oracle.com>
+Date:   Fri Feb 22 22:10:19 2019 +0800
+
+    loop: do not print warn message if partition scan is successful
+    
+    [ Upstream commit 40853d6fc619a6fd3d3177c3973a2eac9b598a80 ]
+    
+    Do not print warn message when the partition scan returns 0.
+    
+    Fixes: d57f3374ba48 ("loop: Move special partition reread handling in loop_clr_fd()")
+    Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+    Reviewed-by: Jan Kara <jack@suse.cz>
+    Signed-off-by: Jens Axboe <axboe@kernel.dk>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
 checking dc717408cef0f97455d3850de348987cb7cc7e6f ......
 	 orig commit -> c371077000f4138ee3c15fbed50101ff24bdc91d ......
 checking 9218b108062e159278c45a50f1c81094e30acf86 ......
@@ -34,6 +84,52 @@ checking 8de64127b2aad1c4926e67d545655b659fbbf65e ......
 checking ed87dc6601712a8ff8783acee8701954bc40fbca ......
 	 orig commit -> 7ccd0791d98531df7cd59e92d55e4f063d48a070 ......
 		 7ccd0791d98531df7cd59e92d55e4f063d48a070 has problem. Fixes commit -> f7c8a4120eedf24c36090b7542b179ff7a649219
+commit 3254dd301f80759ea56dd70ad34f1dba0e096aab
+Author: Dongli Zhang <dongli.zhang@oracle.com>
+Date:   Mon Mar 18 20:23:17 2019 +0800
+
+    loop: access lo_backing_file only when the loop device is Lo_bound
+    
+    commit f7c8a4120eedf24c36090b7542b179ff7a649219 upstream.
+    
+    Commit 758a58d0bc67 ("loop: set GENHD_FL_NO_PART_SCAN after
+    blkdev_reread_part()") separates "lo->lo_backing_file = NULL" and
+    "lo->lo_state = Lo_unbound" into different critical regions protected by
+    loop_ctl_mutex.
+    
+    However, there is below race that the NULL lo->lo_backing_file would be
+    accessed when the backend of a loop is another loop device, e.g., loop0's
+    backend is a file, while loop1's backend is loop0.
+    
+    loop0's backend is file            loop1's backend is loop0
+    
+    __loop_clr_fd()
+      mutex_lock(&loop_ctl_mutex);
+      lo->lo_backing_file = NULL; --> set to NULL
+      mutex_unlock(&loop_ctl_mutex);
+                                       loop_set_fd()
+                                         mutex_lock_killable(&loop_ctl_mutex);
+                                         loop_validate_file()
+                                           f = l->lo_backing_file; --> NULL
+                                             access if loop0 is not Lo_unbound
+      mutex_lock(&loop_ctl_mutex);
+      lo->lo_state = Lo_unbound;
+      mutex_unlock(&loop_ctl_mutex);
+    
+    lo->lo_backing_file should be accessed only when the loop device is
+    Lo_bound.
+    
+    In fact, the problem has been introduced already in commit 7ccd0791d985
+    ("loop: Push loop_ctl_mutex down into loop_clr_fd()") after which
+    loop_validate_file() could see devices in Lo_rundown state with which it
+    did not count. It was harmless at that point but still.
+    
+    Fixes: 7ccd0791d985 ("loop: Push loop_ctl_mutex down into loop_clr_fd()")
+    Reported-by: syzbot+9bdc1adc1c55e7fe765b@syzkaller.appspotmail.com
+    Signed-off-by: Dongli Zhang <dongli.zhang@oracle.com>
+    Reviewed-by: Jan Kara <jack@suse.cz>
+    Signed-off-by: Jens Axboe <axboe@kernel.dk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking 18974320825eba3d303b23cf7ef220714e4d6b5b ......
 	 orig commit -> a2505b799a496b7b84d9a4a14ec870ff9e42e11b ......
 checking b8463897a29464d185cb7d3732da15e51cf086a3 ......
@@ -41,6 +137,25 @@ checking b8463897a29464d185cb7d3732da15e51cf086a3 ......
 checking ea5df5077091cbe9dda6b39b728c387055b6a548 ......
 	 orig commit -> 0a42e99b58a208839626465af194cfe640ef9493 ......
 		 0a42e99b58a208839626465af194cfe640ef9493 has problem. Fixes commit -> 628bd85947091830a8c4872adfd5ed1d515a9cf2
+commit 30805ece50683025ecf06b1d18d540e305550409
+Author: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Date:   Mon Nov 12 08:42:14 2018 -0700
+
+    loop: Fix double mutex_unlock(&loop_ctl_mutex) in loop_control_ioctl()
+    
+    commit 628bd85947091830a8c4872adfd5ed1d515a9cf2 upstream.
+    
+    Commit 0a42e99b58a20883 ("loop: Get rid of loop_index_mutex") forgot to
+    remove mutex_unlock(&loop_ctl_mutex) from loop_control_ioctl() when
+    replacing loop_index_mutex with loop_ctl_mutex.
+    
+    Fixes: 0a42e99b58a20883 ("loop: Get rid of loop_index_mutex")
+    Reported-by: syzbot <syzbot+c0138741c2290fc5e63f@syzkaller.appspotmail.com>
+    Reviewed-by: Ming Lei <ming.lei@redhat.com>
+    Reviewed-by: Jan Kara <jack@suse.cz>
+    Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+    Signed-off-by: Jens Axboe <axboe@kernel.dk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking 38d9cce3d61fe8d6ba24413eba74b4c8d24797f9 ......
 	 orig commit -> 967d1dc144b50ad005e5eecdfadfbcfb399ffff6 ......
 checking 342b3360aeb1d1639cac996a042016ee063845e9 ......
@@ -74,14 +189,36 @@ checking 61b29bed90103d1a0fc052fb15027c33cee551f8 ......
 checking c4f39cba6fd08def0a4491f57566582823751568 ......
 	 orig commit -> cd26d1c4d1bc947b56ae404998ae2276df7b39b7 ......
 		 cd26d1c4d1bc947b56ae404998ae2276df7b39b7 has problem. Fixes commit -> c06ef2e9acef4cda1feee2ce055b8086e33d251a
+commit 685cc9c3ee488ed5a1218b9c8294f65000bbbc86
+Author: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+Date:   Fri Nov 23 07:05:58 2018 -0500
+
+    media: vb2: be sure to unlock mutex on errors
+    
+    commit c06ef2e9acef4cda1feee2ce055b8086e33d251a upstream.
+    
+    As reported by smatch:
+    drivers/media/common/videobuf2/videobuf2-core.c: drivers/media/common/videobuf2/videobuf2-core.c:2159 vb2_mmap() warn: inconsistent returns 'mutex:&q->mmap_lock'.
+      Locked on:   line 2148
+      Unlocked on: line 2100
+                   line 2108
+                   line 2113
+                   line 2118
+                   line 2156
+                   line 2159
+    
+    There is one error condition that doesn't unlock a mutex.
+    
+    Fixes: cd26d1c4d1bc ("media: vb2: vb2_mmap: move lock up")
+    Reviewed-by: Hans Verkuil <hverkuil-cisco@xs4all.nl>
+    Signed-off-by: Mauro Carvalho Chehab <mchehab+samsung@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking a19aedf1a77c2e426c9810aece80646283cc2808 ......
 	 orig commit -> a5795fd38ee8194451ba3f281f075301a3696ce2 ......
 checking a72e572f8a2d61db2f4d17e1de17fb92573870ef ......
 	 orig commit -> 8d933670452107e41165bea70a30dffbd281bef1 ......
 checking 341906cb25f9b8355183518769c14e9ea240aa52 ......
 	 orig commit -> e7c87bd6cc4ec7b0ac1ed0a88a58f8206c577488 ......
-	 orig commit -> 1cf1cae963c2 ......
-		 1cf1cae963c2 has problem. Fixes commit -> 6e6fddc78323533be570873abb728b7e0ba7e024
 checking d9c249a302cbc3c40218343dc9d342ca49408bb1 ......
 	 orig commit -> 9729d6d282a6d7ce88e64c9119cecdf79edf4e88 ......
 checking 4497ce43a5d0b8210b289684c2e0c5a887b753a3 ......
@@ -93,6 +230,23 @@ checking 328f3de2ef766cc27f9a85b20691493642a51417 ......
 checking 89a9f049f8b9755d8422c8e6ac6adb6fef437908 ......
 	 orig commit -> a214720cbf50cd8c3f76bbb9c3f5c283910e9d33 ......
 		 a214720cbf50cd8c3f76bbb9c3f5c283910e9d33 has problem. Fixes commit -> dcf300a69ac307053dfb35c2e33972e754a98bce
+commit 264b26201a2245c85a7dddded0493fa9194b210d
+Author: Aaro Koskinen <aaro.koskinen@iki.fi>
+Date:   Sun Jan 27 23:28:33 2019 +0200
+
+    MIPS: OCTEON: don't set octeon_dma_bar_type if PCI is disabled
+    
+    commit dcf300a69ac307053dfb35c2e33972e754a98bce upstream.
+    
+    Don't set octeon_dma_bar_type if PCI is disabled. This avoids creation
+    of the MSI irqchip later on, and saves a bit of memory.
+    
+    Signed-off-by: Aaro Koskinen <aaro.koskinen@iki.fi>
+    Signed-off-by: Paul Burton <paul.burton@mips.com>
+    Fixes: a214720cbf50 ("Disable MSI also when pcie-octeon.pcie_disable on")
+    Cc: stable@vger.kernel.org # v3.3+
+    Cc: linux-mips@vger.kernel.org
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking 3832c115bf806baa991c51474a93909a89024525 ......
 	 orig commit -> 132ac39cffbcfed80ada38ef0fc6d34d95da7be6 ......
 checking ca8080c308f461080e4af429e41e583ee044b5c4 ......
@@ -103,8 +257,6 @@ checking a10cabbf7a7615ab1d868780f15a64b732ea360e ......
 	 orig commit -> 3f1bb6abdf19cfa89860b3bc9e7f31b44b6a0ba1 ......
 checking 0098f2e791d72bc6407459c856fec14470783fba ......
 	 orig commit -> 16fd20aa98080c2fa666dc384036ec08c80af710 ......
-	 orig commit -> e85d1d65cd8a ......
-		 e85d1d65cd8a has problem. Fixes commit -> 16fd20aa98080c2fa666dc384036ec08c80af710
 checking ec485378a4c48c5c08bcc95b3d71233f88db4066 ......
 	 orig commit -> 6325e01b6cdf4636b721cf7259c1616e3cf28ce2 ......
 checking 836edf22ffd1bd3616683c00677f94e881fa2a20 ......
@@ -121,17 +273,12 @@ checking 434b1b91573cf1cc11569a6338b535122d43b51e ......
 	 orig commit -> 2b4dba55b04b212a7fd1f0395b41d79ee3a9801b ......
 checking 19f41f32a4b44b6087b795d5e182e48d8f2c4199 ......
 	 orig commit -> 321c46b91550adc03054125fa7a1639390608e1a ......
-	 orig commit -> f8c55dc6e828 ......
-		 f8c55dc6e828 has problem. Fixes commit -> 18836b48ebae20850631ee2916d0cdbb86df813d
-321c46b91550adc03054125fa7a1639390608e1a
 checking 8f469dc0e6dcc4189972a2dbe0a3aeeb3eb8c9c2 ......
 	 orig commit -> 5a9372f751b5350e0ce3d2ee91832f1feae2c2e5 ......
 checking 9d37f4a046c27c7c86598f128bbc470d17befc20 ......
 	 orig commit -> 44759979a49bfd2d20d789add7fa81a21eb1a4ab ......
 checking d368f540ac3e3ad0f5531457eb827f7cb8d63fa7 ......
 	 orig commit -> 3f7e62bba0003f9c68f599f5997c4647ef5b4f4e ......
-	 orig commit -> 356fd2663cff ......
-		 356fd2663cff has problem. Fixes commit -> 3f7e62bba0003f9c68f599f5997c4647ef5b4f4e
 checking b955a2c75675102b8270fd06c6c2730913994ce7 ......
 	 orig commit -> 9474f4e7cd71a633fa1ef93b7daefd44bbdfd482 ......
 checking 01634ac56393272de45f1f88be9d28f52f91a272 ......
@@ -171,13 +318,31 @@ checking f352903d5d785339623a7d77a60239c76b80eb6e ......
 checking 08be4b72f36206213a0cd3fe8b356fd1f4c03854 ......
 	 orig commit -> 0b7959b6257322f7693b08a459c505d4938646f2 ......
 		 0b7959b6257322f7693b08a459c505d4938646f2 has problem. Fixes commit -> 3a03cb8456cc1d61c467a5375e0a10e5207b948c
+commit dace527492439284dc72605dac7668bf3a633777
+Author: George Amanakis <gamanakis@gmail.com>
+Date:   Tue Jan 29 22:50:13 2019 -0500
+
+    tun: move the call to tun_set_real_num_queues
+    
+    [ Upstream commit 3a03cb8456cc1d61c467a5375e0a10e5207b948c ]
+    
+    Call tun_set_real_num_queues() after the increment of tun->numqueues
+    since the former depends on it. Otherwise, the number of queues is not
+    correctly accounted for, which results to warnings similar to:
+    "vnet0 selects TX queue 11, but real number of TX queues is 11".
+    
+    Fixes: 0b7959b62573 ("tun: publish tfile after it's fully initialized")
+    Reported-and-tested-by: George Amanakis <gamanakis@gmail.com>
+    Signed-off-by: George Amanakis <gamanakis@gmail.com>
+    Signed-off-by: Stanislav Fomichev <sdf@google.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking d7fe54c17aa3995a62345946d6ff8ddc03c17d2a ......
 	 orig commit -> c5715b8fabfca0ef85903f8bad2189940ed41cc8 ......
 checking 3dc241b8fa94650ce5712283334109493516b713 ......
 	 orig commit -> d972f3dce8d161e2142da0ab1ef25df00e2f21a9 ......
 checking 54cbcff82d5eb7fd00d964a6c534362735460d19 ......
 	 orig commit -> 4c84edc11b76590859b1e45dd676074c59602dc4 ......
-	 orig commit -> 2724680bceee ......
 checking c0e1392e37e1f4f1e325a0a8ad75e5832f168450 ......
 	 orig commit -> 7d033c9f6a7fd3821af75620a0257db87c2b552a ......
 checking d29d3891c00956c660452868766655b8447bd8a8 ......
@@ -216,5 +381,30 @@ checking a42c97862837efa6f7d972bb1a81873c8cd5cc71 ......
 checking e6a4caa0b4dd966dc63d15390423cac1cc004c20 ......
 	 orig commit -> 83d817f41070c48bc3eb7ec18e43000a548fca5c ......
 		 83d817f41070c48bc3eb7ec18e43000a548fca5c has problem. Fixes commit -> d3736d82e8169768218ee0ef68718875918091a0
+commit a13520e0d5f5cf2ad805a68b97e391194ada2047
+Author: Dmitry Safonov <dima@arista.com>
+Date:   Wed Jan 9 01:17:40 2019 +0000
+
+    tty: Don't hold ldisc lock in tty_reopen() if ldisc present
+    
+    commit d3736d82e8169768218ee0ef68718875918091a0 upstream.
+    
+    Try to get reference for ldisc during tty_reopen().
+    If ldisc present, we don't need to do tty_ldisc_reinit() and lock the
+    write side for line discipline semaphore.
+    Effectively, it optimizes fast-path for tty_reopen(), but more
+    importantly it won't interrupt ongoing IO on the tty as no ldisc change
+    is needed.
+    Fixes user-visible issue when tty_reopen() interrupted login process for
+    user with a long password, observed and reported by Lukas.
+    
+    Fixes: c96cf923a98d ("tty: Don't block on IO when ldisc change is pending")
+    Fixes: 83d817f41070 ("tty: Hold tty_ldisc_lock() during tty_reopen()")
+    Cc: Jiri Slaby <jslaby@suse.com>
+    Reported-by: Lukas F. Hartmann <lukas@mntmn.com>
+    Tested-by: Lukas F. Hartmann <lukas@mntmn.com>
+    Cc: stable <stable@vger.kernel.org>
+    Signed-off-by: Dmitry Safonov <dima@arista.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking 028c13f7caf2c3c22932f44ef37a8cad43230517 ......
 	 orig commit -> 231f8fd0cca078bd4396dd7e380db813ac5736e2 ......

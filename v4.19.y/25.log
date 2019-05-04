@@ -18,11 +18,6 @@ checking 1500d94e33d88383c69c27d6c9247174898a4078 ......
 	 orig commit -> 23b7ca4f745f21c2b9cfcb67fdd33733b3ae7e66 ......
 checking 6ecc7407187c5ce65fb156a96ef38c544fadf100 ......
 	 orig commit -> 278e2148c07559dd4ad8602f22366d61eb2ee7b7 ......
-	 orig commit -> 5a2de63fd1a5 ......
-		 5a2de63fd1a5 has problem. Fixes commit -> 278e2148c07559dd4ad8602f22366d61eb2ee7b7
-0fe5119e267f3e3d8ac206895f5922195ec55a8a
-	 orig commit -> 0fe5119e267f ......
-		 0fe5119e267f has problem. Fixes commit -> 278e2148c07559dd4ad8602f22366d61eb2ee7b7
 checking bff97255bb29d10b7dcc32e318eb5da84ba0befe ......
 	 orig commit -> b8e076a6ef253e763bfdb81e5c72bcc828b0fbeb ......
 checking 9a6a676e16eb899582022690856828ca926dd804 ......
@@ -50,6 +45,29 @@ checking c375152be9dd9d6fbf6ae5ac8be337d0590f192a ......
 checking e93384b12443c9bb6830b56b7d299beed432b865 ......
 	 orig commit -> d5be7f632bad0f489879eed0ff4b99bd7fe0b74c ......
 		 d5be7f632bad0f489879eed0ff4b99bd7fe0b74c has problem. Fixes commit -> 9e8db5913264d3967b93c765a6a9e464d9c473db
+commit c375152be9dd9d6fbf6ae5ac8be337d0590f192a
+Author: Willem de Bruijn <willemb@google.com>
+Date:   Mon Feb 18 23:37:12 2019 -0500
+
+    net: avoid false positives in untrusted gso validation
+    
+    commit 9e8db5913264d3967b93c765a6a9e464d9c473db upstream.
+    
+    GSO packets with vnet_hdr must conform to a small set of gso_types.
+    The below commit uses flow dissection to drop packets that do not.
+    
+    But it has false positives when the skb is not fully initialized.
+    Dissection needs skb->protocol and skb->network_header.
+    
+    Infer skb->protocol from gso_type as the two must agree.
+    SKB_GSO_UDP can use both ipv4 and ipv6, so try both.
+    
+    Exclude callers for which network header offset is not known.
+    
+    Fixes: d5be7f632bad ("net: validate untrusted gso packets without csum offload")
+    Signed-off-by: Willem de Bruijn <willemb@google.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking 311722240ca62363ef8c9f37d50835b9faab3a31 ......
 	 orig commit -> 511da98d207d5c0675a10351b01e37cbe50a79e5 ......
 checking 6bab27b60c1a9bfcba7bc63825a936153db9187c ......
@@ -60,10 +78,6 @@ checking d8a648cae347dcad29dc976a1970f503eb27febf ......
 	 orig commit -> d179b88deb3bf6fed4991a31fd6f0f2cad21fab5 ......
 checking 06fa186854113793456b0c4c2ba09471f5ec1362 ......
 	 orig commit -> 450d007d199e632a1a4c4b91302deacd7d56815f ......
-	 orig commit -> c62ec4610c40 ......
-		 c62ec4610c40 has problem. Fixes commit -> d33158530660bc89be3cc870a2152e4e9a76cac7
-450d007d199e632a1a4c4b91302deacd7d56815f
-26112ddc254c98681b224aa9ededefc01b6e02d2
 checking 6834afab4becec6d410e295948474a9abf7e1c17 ......
 	 orig commit -> d33158530660bc89be3cc870a2152e4e9a76cac7 ......
 checking 95aed87b9e2ed982b24122f46ca506cd8b368677 ......
@@ -76,6 +90,44 @@ checking ebe390b42e60c1a761b5ba69c174b6857c65dfab ......
 	 orig commit -> b7dc5a071ddf69c0350396b203cba32fe5bab510 ......
 	 orig commit -> 910cd32e552ea09caa89cdbe328e468979b030dd ......
 		 910cd32e552ea09caa89cdbe328e468979b030dd has problem. Fixes commit -> b7dc5a071ddf69c0350396b203cba32fe5bab510
+commit ebe390b42e60c1a761b5ba69c174b6857c65dfab
+Author: Dmitry V. Levin <ldv@altlinux.org>
+Date:   Sat Feb 16 16:10:39 2019 +0300
+
+    parisc: Fix ptrace syscall number modification
+    
+    commit b7dc5a071ddf69c0350396b203cba32fe5bab510 upstream.
+    
+    Commit 910cd32e552e ("parisc: Fix and enable seccomp filter support")
+    introduced a regression in ptrace-based syscall tampering: when tracer
+    changes syscall number to -1, the kernel fails to initialize %r28 with
+    -ENOSYS and subsequently fails to return the error code of the failed
+    syscall to userspace.
+    
+    This erroneous behaviour could be observed with a simple strace syscall
+    fault injection command which is expected to print something like this:
+    
+    $ strace -a0 -ewrite -einject=write:error=enospc echo hello
+    write(1, "hello\n", 6) = -1 ENOSPC (No space left on device) (INJECTED)
+    write(2, "echo: ", 6) = -1 ENOSPC (No space left on device) (INJECTED)
+    write(2, "write error", 11) = -1 ENOSPC (No space left on device) (INJECTED)
+    write(2, "\n", 1) = -1 ENOSPC (No space left on device) (INJECTED)
+    +++ exited with 1 +++
+    
+    After commit 910cd32e552ea09caa89cdbe328e468979b030dd it loops printing
+    something like this instead:
+    
+    write(1, "hello\n", 6../strace: Failed to tamper with process 12345: unexpectedly got no error (return value 0, error 0)
+    ) = 0 (INJECTED)
+    
+    This bug was found by strace test suite.
+    
+    Fixes: 910cd32e552e ("parisc: Fix and enable seccomp filter support")
+    Cc: stable@vger.kernel.org # v4.5+
+    Signed-off-by: Dmitry V. Levin <ldv@altlinux.org>
+    Tested-by: Helge Deller <deller@gmx.de>
+    Signed-off-by: Helge Deller <deller@gmx.de>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking 8b4b1d7cc4d0d1cd9f45cf57e42def40c0b6c1f8 ......
 	 orig commit -> ede0fa98a900e657d1fcd80b50920efc896c1a4c ......
 checking 390c76534de127a69b5028a82c1c28b3a6be5984 ......
@@ -100,13 +152,8 @@ checking e37c96c11175dec4f1b49b25180097ecd80c8c8e ......
 	 orig commit -> c6c9fee35dc27362b7bac34b2fc9f5b8ace2e22c ......
 checking 50021ba98fbd78993e545a2a863e3743b9e6cac9 ......
 	 orig commit -> 37ac39bdddc528c998a9f36db36937de923fdf2a ......
-	 orig commit -> bf4405737f9f ......
-		 bf4405737f9f has problem. Fixes commit -> 37ac39bdddc528c998a9f36db36937de923fdf2a
-1cebf8f143c21eb422cd0f4e27ab2ae366eb4d04
 checking 99f3c89669d9f2d9c88303ee5d03541ae211fc97 ......
 	 orig commit -> 63ff03ab786ab1bc6cca01d48eacd22c95b9b3eb ......
-	 orig commit -> 1cebf8f143c2 ......
-		 1cebf8f143c2 has problem. Fixes commit -> 63ff03ab786ab1bc6cca01d48eacd22c95b9b3eb
 checking c031b433801f7bae4d92e54ddaff9794c0f1ff6e ......
 	 orig commit -> 2fdeee2549231b1f989f011bb18191f5660d3745 ......
 checking 5716864df7c4b0eba223d4fc3278f7e7ce6f1525 ......
@@ -116,9 +163,96 @@ checking e8eff9f4fc6a3b0e88ecf70e4f32fc2b68e26bfc ......
 checking 9e5cc54ea086d91a2e4923bb693cc8e5b76c3085 ......
 	 orig commit -> b5bfc21af5cb3d53f9cee0ef82eaa43762a90f81 ......
 		 b5bfc21af5cb3d53f9cee0ef82eaa43762a90f81 has problem. Fixes commit -> 87454b6edc1b0143fdb3d9853285477e95af74a4
+commit 101e1972655200fccb5b9017c98bed49924845ac
+Author: Russell King <rmk+kernel@armlinux.org.uk>
+Date:   Mon Feb 11 15:04:24 2019 +0000
+
+    net: phylink: avoid resolving link state too early
+    
+    commit 87454b6edc1b0143fdb3d9853285477e95af74a4 upstream.
+    
+    During testing on Armada 388 platforms, it was found with a certain
+    module configuration that it was possible to trigger a kernel oops
+    during the module load process, caused by the phylink resolver being
+    triggered for a currently disabled interface.
+    
+    This problem was introduced by changing the way the SFP registration
+    works, which now can result in the sfp link down notification being
+    called during phylink_create().
+    
+    Fixes: b5bfc21af5cb ("net: sfp: do not probe SFP module before we're attached")
+    Signed-off-by: Russell King <rmk+kernel@armlinux.org.uk>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Cc: Sasha Levin <sashal@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking c2ee2c708aaea514f6efeb9ecdfc491a4da30b3f ......
 	 orig commit -> fc62814d690cf62189854464f4bd07457d5e9e50 ......
 		 fc62814d690cf62189854464f4bd07457d5e9e50 has problem. Fixes commit -> 398f0132c14754fcd03c1c4f8e7176d001ce8ea1
+commit 85ef72d829eb85c58c92c902c9821f26639b254f
+Author: Christoph Paasch <cpaasch@apple.com>
+Date:   Mon Mar 18 23:14:52 2019 -0700
+
+    net/packet: Set __GFP_NOWARN upon allocation in alloc_pg_vec
+    
+    [ Upstream commit 398f0132c14754fcd03c1c4f8e7176d001ce8ea1 ]
+    
+    Since commit fc62814d690c ("net/packet: fix 4gb buffer limit due to overflow check")
+    one can now allocate packet ring buffers >= UINT_MAX. However, syzkaller
+    found that that triggers a warning:
+    
+    [   21.100000] WARNING: CPU: 2 PID: 2075 at mm/page_alloc.c:4584 __alloc_pages_nod0
+    [   21.101490] Modules linked in:
+    [   21.101921] CPU: 2 PID: 2075 Comm: syz-executor.0 Not tainted 5.0.0 #146
+    [   21.102784] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 0.5.1 01/01/2011
+    [   21.103887] RIP: 0010:__alloc_pages_nodemask+0x2a0/0x630
+    [   21.104640] Code: fe ff ff 65 48 8b 04 25 c0 de 01 00 48 05 90 0f 00 00 41 bd 01 00 00 00 48 89 44 24 48 e9 9c fe 3
+    [   21.107121] RSP: 0018:ffff88805e1cf920 EFLAGS: 00010246
+    [   21.107819] RAX: 0000000000000000 RBX: ffffffff85a488a0 RCX: 0000000000000000
+    [   21.108753] RDX: 0000000000000000 RSI: dffffc0000000000 RDI: 0000000000000000
+    [   21.109699] RBP: 1ffff1100bc39f28 R08: ffffed100bcefb67 R09: ffffed100bcefb67
+    [   21.110646] R10: 0000000000000001 R11: ffffed100bcefb66 R12: 000000000000000d
+    [   21.111623] R13: 0000000000000000 R14: ffff88805e77d888 R15: 000000000000000d
+    [   21.112552] FS:  00007f7c7de05700(0000) GS:ffff88806d100000(0000) knlGS:0000000000000000
+    [   21.113612] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+    [   21.114405] CR2: 000000000065c000 CR3: 000000005e58e006 CR4: 00000000001606e0
+    [   21.115367] Call Trace:
+    [   21.115705]  ? __alloc_pages_slowpath+0x21c0/0x21c0
+    [   21.116362]  alloc_pages_current+0xac/0x1e0
+    [   21.116923]  kmalloc_order+0x18/0x70
+    [   21.117393]  kmalloc_order_trace+0x18/0x110
+    [   21.117949]  packet_set_ring+0x9d5/0x1770
+    [   21.118524]  ? packet_rcv_spkt+0x440/0x440
+    [   21.119094]  ? lock_downgrade+0x620/0x620
+    [   21.119646]  ? __might_fault+0x177/0x1b0
+    [   21.120177]  packet_setsockopt+0x981/0x2940
+    [   21.120753]  ? __fget+0x2fb/0x4b0
+    [   21.121209]  ? packet_release+0xab0/0xab0
+    [   21.121740]  ? sock_has_perm+0x1cd/0x260
+    [   21.122297]  ? selinux_secmark_relabel_packet+0xd0/0xd0
+    [   21.123013]  ? __fget+0x324/0x4b0
+    [   21.123451]  ? selinux_netlbl_socket_setsockopt+0x101/0x320
+    [   21.124186]  ? selinux_netlbl_sock_rcv_skb+0x3a0/0x3a0
+    [   21.124908]  ? __lock_acquire+0x529/0x3200
+    [   21.125453]  ? selinux_socket_setsockopt+0x5d/0x70
+    [   21.126075]  ? __sys_setsockopt+0x131/0x210
+    [   21.126533]  ? packet_release+0xab0/0xab0
+    [   21.127004]  __sys_setsockopt+0x131/0x210
+    [   21.127449]  ? kernel_accept+0x2f0/0x2f0
+    [   21.127911]  ? ret_from_fork+0x8/0x50
+    [   21.128313]  ? do_raw_spin_lock+0x11b/0x280
+    [   21.128800]  __x64_sys_setsockopt+0xba/0x150
+    [   21.129271]  ? lockdep_hardirqs_on+0x37f/0x560
+    [   21.129769]  do_syscall_64+0x9f/0x450
+    [   21.130182]  entry_SYSCALL_64_after_hwframe+0x49/0xbe
+    
+    We should allocate with __GFP_NOWARN to handle this.
+    
+    Cc: Kal Conley <kal.conley@dectris.com>
+    Cc: Andrey Konovalov <andreyknvl@google.com>
+    Fixes: fc62814d690c ("net/packet: fix 4gb buffer limit due to overflow check")
+    Signed-off-by: Christoph Paasch <cpaasch@apple.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking f3ec82db191b74fc9c9f45ddd76870e10bb3d405 ......
 	 orig commit -> 218d05ce326f9e1b40a56085431fa1068b43d5d9 ......
 checking 4190a7bcd2afc0cf8746a49735bf88f155ee7da9 ......
@@ -165,13 +299,10 @@ checking dc4ec1bad9e2dfc6308c7c53f95f491b22cef897 ......
 	 orig commit -> 4882a27cec24319d10f95e978ecc80050e3e3e15 ......
 checking a45b037edae37be12f35c3e715dc1abc90d5017d ......
 	 orig commit -> 91fa038d9446b5bf5ea80822790af7dd9bcbb5a2 ......
-	 orig commit -> 90c5c969f0b9 ......
 checking 2c69ea7f0c117d64e7f60cd2dbd49e634970a853 ......
 	 orig commit -> 5216bd77798e2ed773ecd45f3f368dcaec63e5dd ......
-	 orig commit -> 1c25324caf82 ......
 checking 38a27ee2ea03a931345392efaa72ee780db296ea ......
 	 orig commit -> e413615502a3324daba038f529932ba9a5248af0 ......
-	 orig commit -> 80ef0f22ceda ......
 checking 642e26628cf979d258c269cabc4484a520797301 ......
 	 orig commit -> b4711098066f1cf808d4dc11a1a842860a3292fe ......
 checking b4c5be499ba36d33b973745cf4f326bfe16c9554 ......
@@ -224,6 +355,63 @@ checking 2f3480e3407909ee09a45a79bd9bf8ce8f5a2046 ......
 checking 06b919a5177220d7bbaa061fa0f89f1fe73b997a ......
 	 orig commit -> 9f51c05dc41a6d69423e3d03d18eb7ab22f9ec19 ......
 		 9f51c05dc41a6d69423e3d03d18eb7ab22f9ec19 has problem. Fixes commit -> b4711098066f1cf808d4dc11a1a842860a3292fe
+commit 642e26628cf979d258c269cabc4484a520797301
+Author: Wen Yang <wen.yang99@zte.com.cn>
+Date:   Tue Jan 15 10:31:27 2019 +0800
+
+    pvcalls-front: fix potential null dereference
+    
+    [ Upstream commit b4711098066f1cf808d4dc11a1a842860a3292fe ]
+    
+     static checker warning:
+        drivers/xen/pvcalls-front.c:373 alloc_active_ring()
+        error: we previously assumed 'map->active.ring' could be null
+               (see line 357)
+    
+    drivers/xen/pvcalls-front.c
+        351 static int alloc_active_ring(struct sock_mapping *map)
+        352 {
+        353     void *bytes;
+        354
+        355     map->active.ring = (struct pvcalls_data_intf *)
+        356         get_zeroed_page(GFP_KERNEL);
+        357     if (!map->active.ring)
+                        ^^^^^^^^^^^^^^^^^
+    Check
+    
+        358         goto out;
+        359
+        360     map->active.ring->ring_order = PVCALLS_RING_ORDER;
+        361     bytes = (void *)__get_free_pages(GFP_KERNEL | __GFP_ZERO,
+        362                     PVCALLS_RING_ORDER);
+        363     if (!bytes)
+        364         goto out;
+        365
+        366     map->active.data.in = bytes;
+        367     map->active.data.out = bytes +
+        368         XEN_FLEX_RING_SIZE(PVCALLS_RING_ORDER);
+        369
+        370     return 0;
+        371
+        372 out:
+    --> 373     free_active_ring(map);
+                                     ^^^
+    Add null check on map->active.ring before dereferencing it to avoid
+    any NULL pointer dereferences.
+    
+    Fixes: 9f51c05dc41a ("pvcalls-front: Avoid get_free_pages(GFP_KERNEL) under spinlock")
+    Reported-by: Dan Carpenter <dan.carpenter@oracle.com>
+    Suggested-by: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+    Signed-off-by: Wen Yang <wen.yang99@zte.com.cn>
+    Reviewed-by: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+    CC: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+    CC: Juergen Gross <jgross@suse.com>
+    CC: Stefano Stabellini <sstabellini@kernel.org>
+    CC: Dan Carpenter <dan.carpenter@oracle.com>
+    CC: xen-devel@lists.xenproject.org
+    CC: linux-kernel@vger.kernel.org
+    Signed-off-by: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
 checking 26354d538df358801146c6b0cd87e51733ddff8c ......
 	 orig commit -> 31aa6503a15ba00182ea6dbbf51afb63bf9e851d ......
 checking 535be4692ffc89b3446a4970dd3404d36a075b0a ......
@@ -232,10 +420,6 @@ checking 703f4f65372327714e61720d1114b21b078242f0 ......
 	 orig commit -> 41af167fbc0032f9d7562854f58114eaa9270336 ......
 checking 4047a7ad3b2e87534116dba0c228a0f5f3ced537 ......
 	 orig commit -> 3e2ffd655cc6a694608d997738989ff5572a8266 ......
-	 orig commit -> 815f0ddb346c ......
-		 815f0ddb346c has problem. Fixes commit -> 3e2ffd655cc6a694608d997738989ff5572a8266
-ae596de1a0c8c2c924dc99d23c026259372ab234
-d124b44f09cab67fc6da4a4513417e3e54b01efc
 checking 93f3f4c0fdeb084e5d46e379be7c1d49d97b1c57 ......
 	 orig commit -> cc29a1b0a3f2597ce887d339222fa85b9307706d ......
 checking 14285a4a848776ed10b0765d98c34fcd28cbdc66 ......
@@ -252,7 +436,6 @@ checking ac3be9eb875f55e15d189af8154a312ef5297c73 ......
 	 orig commit -> 565dc8a4f55e491935bfb04866068d21784ea9a4 ......
 checking 2ac1c6e71ee74272b0497ffde7ad0595d55ce3ee ......
 	 orig commit -> f65e192af35058e5c82da9e90871b472d24912bc ......
-	 orig commit -> 378efe798ecf ......
 checking b5f7ead81de34cfcaaa092460118ab117279c98e ......
 	 orig commit -> 3aa8b8bbc142eeaac89891de584535ceb7fce405 ......
 checking fc396828a4e6432eed50312a7bd381b1daf8a3d8 ......
@@ -312,6 +495,28 @@ checking cbe43c3d35f5a2be504a808f54c59a4bd3bc1214 ......
 checking c607b6d19859477c644509a2e790b17ed218be84 ......
 	 orig commit -> 7f665b1c3283aae5b61843136d0a8ee808ba3199 ......
 		 7f665b1c3283aae5b61843136d0a8ee808ba3199 has problem. Fixes commit -> 80690a276f444a68a332136d98bfea1c338bc263
+commit bfea74941d6d32b94913d946bdf27d2c27d0bf5d
+Author: Richard Sailer <rs@tuxedocomputers.com>
+Date:   Tue Apr 2 15:52:04 2019 +0200
+
+    ALSA: hda/realtek - Add quirk for Tuxedo XC 1509
+    
+    commit 80690a276f444a68a332136d98bfea1c338bc263 upstream.
+    
+    This adds a SND_PCI_QUIRK(...) line for the Tuxedo XC 1509.
+    
+    The Tuxedo XC 1509 and the System76 oryp5 are the same barebone
+    notebooks manufactured by Clevo. To name the fixups both use after the
+    actual underlying hardware, this patch also changes System76_orpy5
+    to clevo_pb51ed in 2 enum symbols and one function name,
+    matching the other pci_quirk entries which are also named after the
+    device ODM.
+    
+    Fixes: 7f665b1c3283 ("ALSA: hda/realtek - Headset microphone and internal speaker support for System76 oryp5")
+    Signed-off-by: Richard Sailer <rs@tuxedocomputers.com>
+    Cc: <stable@vger.kernel.org>
+    Signed-off-by: Takashi Iwai <tiwai@suse.de>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking a89e0d5c603ac3154670df31a4f871df629507c7 ......
 	 orig commit -> b2b469939e93458753cfbf8282ad52636495965e ......
 checking c7ddb2689d7a427a0e5096d9cf6a1290dea3951e ......
@@ -337,5 +542,3 @@ checking b5e57dbb5a0e21f91527e9e734a2d4776393a662 ......
 	 orig commit -> 9e7382153f80ba45a0bbcd540fb77d4b15f6e966 ......
 checking 775ab7d3d12b0a7eaa8f758d026daef2aa33f1d3 ......
 	 orig commit -> 0ac569bf6a7983c0c5747d6df8db9dc05bc92b6c ......
-	 orig commit -> e46daee53bb5 ......
-		 e46daee53bb5 has problem. Fixes commit -> 0ac569bf6a7983c0c5747d6df8db9dc05bc92b6c
