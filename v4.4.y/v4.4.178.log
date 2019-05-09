@@ -52,7 +52,6 @@ checking 5721b1717bd689321cc192d57e42ab7dcc5fe959 ......
 	 orig commit -> f880eea68fe593342fa6e09be9bb661f3c297aec ......
 checking 5a25b6f93f8422caa7b24c82887a6b30061291e9 ......
 	 orig commit -> ec91e78d378cc5d4b43805a1227d8e04e5dfa17d ......
-	 orig commit -> dd2a3acaecd7 ......
 checking e9a60ab1609a7d975922adad1bf9c46ac6954584 ......
 	 orig commit -> fc340115ffb8235c1bbd200c28855e6373d0dd1a ......
 checking faac81f7cb3430d40e13a0331095384b6c4f11bd ......
@@ -61,7 +60,64 @@ checking fbf569d2beee2a4a7a0bc8b619c26101d1211a88 ......
 	 orig commit -> ed0de45a1008991fdaa27a0152befcb74d126a8b ......
 		 ed0de45a1008991fdaa27a0152befcb74d126a8b has problem. Fixes commit -> 20ff83f10f113c88d0bb74589389b05250994c16
 c543cb4a5f07e09237ec0fc2c60c9f131b2c79ad
-	 orig commit -> 3da1ed7ac398 ......
+commit faac81f7cb3430d40e13a0331095384b6c4f11bd
+Author: Eric Dumazet <edumazet@google.com>
+Date:   Sat Apr 13 17:32:21 2019 -0700
+
+    ipv4: ensure rcu_read_lock() in ipv4_link_failure()
+    
+    [ Upstream commit c543cb4a5f07e09237ec0fc2c60c9f131b2c79ad ]
+    
+    fib_compute_spec_dst() needs to be called under rcu protection.
+    
+    syzbot reported :
+    
+    WARNING: suspicious RCU usage
+    5.1.0-rc4+ #165 Not tainted
+    include/linux/inetdevice.h:220 suspicious rcu_dereference_check() usage!
+    
+    other info that might help us debug this:
+    
+    rcu_scheduler_active = 2, debug_locks = 1
+    1 lock held by swapper/0/0:
+     #0: 0000000051b67925 ((&n->timer)){+.-.}, at: lockdep_copy_map include/linux/lockdep.h:170 [inline]
+     #0: 0000000051b67925 ((&n->timer)){+.-.}, at: call_timer_fn+0xda/0x720 kernel/time/timer.c:1315
+    
+    stack backtrace:
+    CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.1.0-rc4+ #165
+    Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+    Call Trace:
+     <IRQ>
+     __dump_stack lib/dump_stack.c:77 [inline]
+     dump_stack+0x172/0x1f0 lib/dump_stack.c:113
+     lockdep_rcu_suspicious+0x153/0x15d kernel/locking/lockdep.c:5162
+     __in_dev_get_rcu include/linux/inetdevice.h:220 [inline]
+     fib_compute_spec_dst+0xbbd/0x1030 net/ipv4/fib_frontend.c:294
+     spec_dst_fill net/ipv4/ip_options.c:245 [inline]
+     __ip_options_compile+0x15a7/0x1a10 net/ipv4/ip_options.c:343
+     ipv4_link_failure+0x172/0x400 net/ipv4/route.c:1195
+     dst_link_failure include/net/dst.h:427 [inline]
+     arp_error_report+0xd1/0x1c0 net/ipv4/arp.c:297
+     neigh_invalidate+0x24b/0x570 net/core/neighbour.c:995
+     neigh_timer_handler+0xc35/0xf30 net/core/neighbour.c:1081
+     call_timer_fn+0x190/0x720 kernel/time/timer.c:1325
+     expire_timers kernel/time/timer.c:1362 [inline]
+     __run_timers kernel/time/timer.c:1681 [inline]
+     __run_timers kernel/time/timer.c:1649 [inline]
+     run_timer_softirq+0x652/0x1700 kernel/time/timer.c:1694
+     __do_softirq+0x266/0x95a kernel/softirq.c:293
+     invoke_softirq kernel/softirq.c:374 [inline]
+     irq_exit+0x180/0x1d0 kernel/softirq.c:414
+     exiting_irq arch/x86/include/asm/apic.h:536 [inline]
+     smp_apic_timer_interrupt+0x14a/0x570 arch/x86/kernel/apic/apic.c:1062
+     apic_timer_interrupt+0xf/0x20 arch/x86/entry/entry_64.S:807
+    
+    Fixes: ed0de45a1008 ("ipv4: recompile ip options in ipv4_link_failure")
+    Signed-off-by: Eric Dumazet <edumazet@google.com>
+    Reported-by: syzbot <syzkaller@googlegroups.com>
+    Cc: Stephen Suryaputra <ssuryaextr@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking b6d37bba0f7a7492427d7518d4be485dcdd9d5d1 ......
 	 orig commit -> 50ce163a72d817a99e8974222dcf2886d5deb1ae ......
 checking b1aaee5a97c9d6557bec13cf22d3db888c91509c ......
@@ -85,6 +141,34 @@ checking aaedb76c488e5dcf7980f7766ab8dd14edca44bb ......
 checking d49a75f5add4543eb138fb0a8fe0560fb276352e ......
 	 orig commit -> 6377f787aeb945cae7abbb6474798de129e1f3ac ......
 		 6377f787aeb945cae7abbb6474798de129e1f3ac has problem. Fixes commit -> 27da0d2ef998e222a876c0cec72aa7829a626266
+commit 9ca0f944a76b8b27e00328f7d940d176fa1a72c1
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Wed Mar 6 11:52:36 2019 +0100
+
+    appletalk: Fix compile regression
+    
+    [ Upstream commit 27da0d2ef998e222a876c0cec72aa7829a626266 ]
+    
+    A bugfix just broke compilation of appletalk when CONFIG_SYSCTL
+    is disabled:
+    
+    In file included from net/appletalk/ddp.c:65:
+    net/appletalk/ddp.c: In function 'atalk_init':
+    include/linux/atalk.h:164:34: error: expected expression before 'do'
+     #define atalk_register_sysctl()  do { } while(0)
+                                      ^~
+    net/appletalk/ddp.c:1934:7: note: in expansion of macro 'atalk_register_sysctl'
+      rc = atalk_register_sysctl();
+    
+    This is easier to avoid by using conventional inline functions
+    as stubs rather than macros. The header already has inline
+    functions for other purposes, so I'm changing over all the
+    macros for consistency.
+    
+    Fixes: 6377f787aeb9 ("appletalk: Fix use-after-free in atalk_proc_exit")
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
 checking 4528b128bbbc138b295f1dc9ff19fb1a9552bc88 ......
 	 orig commit -> 143c2a89e0e5fda6c6fd08d7bc1126438c19ae90 ......
 checking 3d11671070042b3525c2495eb4c5956e16afd0ec ......
@@ -97,7 +181,6 @@ checking 740562f32daa2ed881c0f3e1430a6f67dda15199 ......
 	 orig commit -> 3b7960caceafdfc2cdfe2850487f8d091eb41144 ......
 checking c49c3925a8462a9804bf6e498af39378b619b095 ......
 	 orig commit -> ca1721c5bee77105829cbd7baab8ee0eab85b06d ......
-	 orig commit -> 3031cddea633 ......
 checking 1e3975db46daaf51e1fd35ae8b69b304895eeddd ......
 	 orig commit -> 6862fdf2201ab67cd962dbf0643d37db909f4860 ......
 checking 3e56f3036b4d347c0b65e82b93d67e69d362429c ......
@@ -163,6 +246,41 @@ checking c082a57d41de986e9e850beb1af674cea5234e86 ......
 checking 442ebc68526116bfa820d0c447499cfaa2df65c2 ......
 	 orig commit -> 045afc24124d80c6998d9c770844c67912083506 ......
 		 045afc24124d80c6998d9c770844c67912083506 has problem. Fixes commit -> ff8acf929014b7f87315588e0daf8597c8aa9d1c
+commit bc76b595cd13dc7ea22f12b62930a5c2bcbddbe0
+Author: Nathan Chancellor <natechancellor@gmail.com>
+Date:   Wed Apr 17 00:21:21 2019 -0700
+
+    arm64: futex: Restore oldval initialization to work around buggy compilers
+    
+    commit ff8acf929014b7f87315588e0daf8597c8aa9d1c upstream.
+    
+    Commit 045afc24124d ("arm64: futex: Fix FUTEX_WAKE_OP atomic ops with
+    non-zero result value") removed oldval's zero initialization in
+    arch_futex_atomic_op_inuser because it is not necessary. Unfortunately,
+    Android's arm64 GCC 4.9.4 [1] does not agree:
+    
+    ../kernel/futex.c: In function 'do_futex':
+    ../kernel/futex.c:1658:17: warning: 'oldval' may be used uninitialized
+    in this function [-Wmaybe-uninitialized]
+       return oldval == cmparg;
+                     ^
+    In file included from ../kernel/futex.c:73:0:
+    ../arch/arm64/include/asm/futex.h:53:6: note: 'oldval' was declared here
+      int oldval, ret, tmp;
+          ^
+    
+    GCC fails to follow that when ret is non-zero, futex_atomic_op_inuser
+    returns right away, avoiding the uninitialized use that it claims.
+    Restoring the zero initialization works around this issue.
+    
+    [1]: https://android.googlesource.com/platform/prebuilts/gcc/linux-x86/aarch64/aarch64-linux-android-4.9/
+    
+    Cc: stable@vger.kernel.org
+    Fixes: 045afc24124d ("arm64: futex: Fix FUTEX_WAKE_OP atomic ops with non-zero result value")
+    Reviewed-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+    Signed-off-by: Nathan Chancellor <natechancellor@gmail.com>
+    Signed-off-by: Catalin Marinas <catalin.marinas@arm.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking e9b63a38da24b0bb41889d54a3e3c1c318725861 ......
 	 orig commit -> e7dfb6d04e4715be1f3eb2c60d97b753fd2e4516 ......
 checking 39aecae01dd20be204798832f68d617512ec8cc2 ......
@@ -171,7 +289,6 @@ checking f449309b7f43ae6aa457a2ee75e1e00783bc8f2d ......
 	 orig commit -> a3761c3c91209b58b6f33bf69dd8bb8ec0c9d925 ......
 checking ad344fb86201ce9b2631969b4416e8e528a6373e ......
 	 orig commit -> 0ff4e8c61b794a4bf6c854ab071a1abaaa80f358 ......
-	 orig commit -> 43d24e76b698 ......
 checking 4e843163c6d9a5a6fc35dd45f1f357ca9aef357f ......
 	 orig commit -> 6147e136ff5071609b54f18982dea87706288e21 ......
 checking ae9981cee7b321ae018a345beb0ed0eb09a0fc18 ......
@@ -209,7 +326,6 @@ checking 79739ad2d0ac5787a15a1acf7caaf34cd95bbf3c ......
 		 379d98ddf41344273d9718556f761420f4dc80b3 has problem. Fixes commit -> cd01544a268ad8ee5b1dfe42c4393f1095f86879
 checking b79e268b1fb420c4398b0e5977a35e535b9e4301 ......
 	 orig commit -> 927185c124d62a9a4d35878d7f6d432a166b74e3 ......
-	 orig commit -> 58ab5e0c2c40 ......
 checking a34640de4046b962a848da232c95fff01d1265a7 ......
 	 orig commit -> ad15006cc78459d059af56729c4d9bed7c7fd860 ......
 checking 1eb40df35d99f353e7bdfcbb21f249428ec0f4b6 ......
@@ -230,7 +346,6 @@ checking 421d2aae103cc215cc8167c00e842441d2b06fce ......
 	 orig commit -> 8e2f311a68494a6677c1724bdcb10bada21af37c ......
 checking 10fc10c3270d7d60108b071ebc37058be5dbf028 ......
 	 orig commit -> 9227ab5643cb8350449502dd9e3168a873ab0e3b ......
-	 orig commit -> 930507c18304 ......
 checking e5cb8ab4b0e02238afeb0915d5e3a10f065ebabc ......
 	 orig commit -> 24d48a61f2666630da130cc2ec2e526eacf229e3 ......
 checking cdc7a66f679e5fb1f60a41a3766e1cbe309d3e82 ......
@@ -324,6 +439,70 @@ checking 722a15d798ff696608da37d77a3b1593fee0a566 ......
 checking cf503f1b938fa1aeebd44a8388a0c738b6614999 ......
 	 orig commit -> 32a5ad9c22852e6bd9e74bdec5934ef9d1480bc5 ......
 		 32a5ad9c22852e6bd9e74bdec5934ef9d1480bc5 has problem. Fixes commit -> 9002b21465fa4d829edfc94a5a441005cffaa972
+commit e6ca59daafd002905230cdebdb167b2a01579e17
+Author: Will Deacon <will.deacon@arm.com>
+Date:   Fri Apr 5 18:39:38 2019 -0700
+
+    kernel/sysctl.c: fix out-of-bounds access when setting file-max
+    
+    commit 9002b21465fa4d829edfc94a5a441005cffaa972 upstream.
+    
+    Commit 32a5ad9c2285 ("sysctl: handle overflow for file-max") hooked up
+    min/max values for the file-max sysctl parameter via the .extra1 and
+    .extra2 fields in the corresponding struct ctl_table entry.
+    
+    Unfortunately, the minimum value points at the global 'zero' variable,
+    which is an int.  This results in a KASAN splat when accessed as a long
+    by proc_doulongvec_minmax on 64-bit architectures:
+    
+      | BUG: KASAN: global-out-of-bounds in __do_proc_doulongvec_minmax+0x5d8/0x6a0
+      | Read of size 8 at addr ffff2000133d1c20 by task systemd/1
+      |
+      | CPU: 0 PID: 1 Comm: systemd Not tainted 5.1.0-rc3-00012-g40b114779944 #2
+      | Hardware name: linux,dummy-virt (DT)
+      | Call trace:
+      |  dump_backtrace+0x0/0x228
+      |  show_stack+0x14/0x20
+      |  dump_stack+0xe8/0x124
+      |  print_address_description+0x60/0x258
+      |  kasan_report+0x140/0x1a0
+      |  __asan_report_load8_noabort+0x18/0x20
+      |  __do_proc_doulongvec_minmax+0x5d8/0x6a0
+      |  proc_doulongvec_minmax+0x4c/0x78
+      |  proc_sys_call_handler.isra.19+0x144/0x1d8
+      |  proc_sys_write+0x34/0x58
+      |  __vfs_write+0x54/0xe8
+      |  vfs_write+0x124/0x3c0
+      |  ksys_write+0xbc/0x168
+      |  __arm64_sys_write+0x68/0x98
+      |  el0_svc_common+0x100/0x258
+      |  el0_svc_handler+0x48/0xc0
+      |  el0_svc+0x8/0xc
+      |
+      | The buggy address belongs to the variable:
+      |  zero+0x0/0x40
+      |
+      | Memory state around the buggy address:
+      |  ffff2000133d1b00: 00 00 00 00 00 00 00 00 fa fa fa fa 04 fa fa fa
+      |  ffff2000133d1b80: fa fa fa fa 04 fa fa fa fa fa fa fa 04 fa fa fa
+      | >ffff2000133d1c00: fa fa fa fa 04 fa fa fa fa fa fa fa 00 00 00 00
+      |                                ^
+      |  ffff2000133d1c80: fa fa fa fa 00 fa fa fa fa fa fa fa 00 00 00 00
+      |  ffff2000133d1d00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    
+    Fix the splat by introducing a unsigned long 'zero_ul' and using that
+    instead.
+    
+    Link: http://lkml.kernel.org/r/20190403153409.17307-1-will.deacon@arm.com
+    Fixes: 32a5ad9c2285 ("sysctl: handle overflow for file-max")
+    Signed-off-by: Will Deacon <will.deacon@arm.com>
+    Acked-by: Christian Brauner <christian@brauner.io>
+    Cc: Kees Cook <keescook@chromium.org>
+    Cc: Alexey Dobriyan <adobriyan@gmail.com>
+    Cc: Matteo Croce <mcroce@redhat.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking 28833fee9f4a4deb5bffefd7afb22d0e8cd0ed4e ......
 	 orig commit -> d01849f7deba81f4959fd9e51bf20dbf46987d1c ......
 checking f7b7a59b47a0052c25c2b53f1f8cfdf104c688fa ......
@@ -340,9 +519,6 @@ checking 02bfc06ca2fa1158d6cd2e5688bfc4ef278d8425 ......
 	 orig commit -> 89c6efa61f5709327ecfa24bff18e57a4e80c7fa ......
 checking b3b489eea284f61ed2dcec033ff9ef9f83394730 ......
 	 orig commit -> a7f40cfe3b7ada57af9b62fd28430eeb4a7cfcb7 ......
-	 orig commit -> 6f4576e3687b ......
-		 6f4576e3687b has problem. Fixes commit -> a7f40cfe3b7ada57af9b62fd28430eeb4a7cfcb7
-	 orig commit -> c8633798497c ......
 checking a526c14d841b2dba90a56d2d59e2aaa6ef70f8c8 ......
 	 orig commit -> f3040983132bf3477acd45d2452a906e67c2fec9 ......
 checking 6f88ce1ff22581e67e2c892189126216f5bce795 ......

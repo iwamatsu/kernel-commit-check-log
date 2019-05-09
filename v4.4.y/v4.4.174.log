@@ -31,8 +31,6 @@ checking 6d6d6255b7a8987259b75eb1aa07b62cd5e20a27 ......
 	 orig commit -> 90cc55f067f6ca0e64e5e52883ece47d8af7b67b ......
 checking 05268b5cca5fe1664687f630ee82fdf6b5fa6797 ......
 	 orig commit -> 2bc16b9f3223d049b57202ee702fcb5b9b507019 ......
-	 orig commit -> a60945fd08e4 ......
-		 a60945fd08e4 has problem. Fixes commit -> 2bc16b9f3223d049b57202ee702fcb5b9b507019
 checking 422e1adf1714d18ea07a48d44084907596be1f47 ......
 	 orig commit -> 4cd3016ce996494f78fdfd87ea35c8ca5d0b413e ......
 checking 222b22e1f32d7f96d5a4fdb15f3be3eb82cf340c ......
@@ -54,6 +52,51 @@ checking 20ad50464b74dd2fc066f32cc4cbe2a3ac3673df ......
 checking 28b5d0be0ab6427ee495fb4f10c0574f4132b360 ......
 	 orig commit -> 6926e041a8920c8ec27e4e155efa760aa01551fd ......
 		 6926e041a8920c8ec27e4e155efa760aa01551fd has problem. Fixes commit -> da360299b6734135a5f66d7db458dcc7801c826a
+commit cb4f43bf87eb7332b3df1e78e50dee2dffea06f8
+Author: Hauke Mehrtens <hauke@hauke-m.de>
+Date:   Mon Feb 12 23:59:51 2018 +0100
+
+    uapi/if_ether.h: move __UAPI_DEF_ETHHDR libc define
+    
+    commit da360299b6734135a5f66d7db458dcc7801c826a upstream.
+    
+    This fixes a compile problem of some user space applications by not
+    including linux/libc-compat.h in uapi/if_ether.h.
+    
+    linux/libc-compat.h checks which "features" the header files, included
+    from the libc, provide to make the Linux kernel uapi header files only
+    provide no conflicting structures and enums. If a user application mixes
+    kernel headers and libc headers it could happen that linux/libc-compat.h
+    gets included too early where not all other libc headers are included
+    yet. Then the linux/libc-compat.h would not prevent all the
+    redefinitions and we run into compile problems.
+    This patch removes the include of linux/libc-compat.h from
+    uapi/if_ether.h to fix the recently introduced case, but not all as this
+    is more or less impossible.
+    
+    It is no problem to do the check directly in the if_ether.h file and not
+    in libc-compat.h as this does not need any fancy glibc header detection
+    as glibc never provided struct ethhdr and should define
+    __UAPI_DEF_ETHHDR by them self when they will provide this.
+    
+    The following test program did not compile correctly any more:
+    
+    #include <linux/if_ether.h>
+    #include <netinet/in.h>
+    #include <linux/in.h>
+    
+    int main(void)
+    {
+            return 0;
+    }
+    
+    Fixes: 6926e041a892 ("uapi/if_ether.h: prevent redefinition of struct ethhdr")
+    Reported-by: Guillaume Nault <g.nault@alphalink.fr>
+    Cc: <stable@vger.kernel.org> # 4.15
+    Signed-off-by: Hauke Mehrtens <hauke@hauke-m.de>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Cc: Sudip Mukherjee <sudipm.mukherjee@gmail.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking 7cbbbf750ef6542aebc00993ded62cc9c3256a6c ......
 	 orig commit -> cb5b020a8d38f77209d0472a0fea755299a8ec78 ......
 checking b2942d59a3cd66a5202eedcd41e751c0d0bd6e5e ......
@@ -71,8 +114,6 @@ checking 2a41ed30abe710f39717e42e76a8466c15965eee ......
 	 orig commit -> 2eee74b7e2a496dea49847c36fd09320505f45b7 ......
 checking b661fff5f8a0f19824df91cc3905ba2c5b54dc87 ......
 	 orig commit -> 13054abbaa4f1fd4e6f3b4b63439ec033b4c8035 ......
-	 orig commit -> 717adfdaf147 ......
-		 717adfdaf147 has problem. Fixes commit -> 13054abbaa4f1fd4e6f3b4b63439ec033b4c8035
 checking 697c6f72c4935a6361fb36d7d80fa6a8f958c271 ......
 	 orig commit -> 728354c005c36eaf44b6e5552372b67e60d17f56 ......
 checking 6bcca0bc47652a55ff1d2a71f50665661f24dfaa ......
@@ -98,14 +139,179 @@ checking 60de9fffbe5d59325d9c2319bac1620588b20d17 ......
 checking 381fc50960aa551da7abb4a630fde2d0aee737b4 ......
 	 orig commit -> 35634ffa1751b6efd8cf75010b509dcb0263e29b ......
 		 35634ffa1751b6efd8cf75010b509dcb0263e29b has problem. Fixes commit -> cf43a757fd49442bc38f76088b70c2299eed2c2f
+commit 492647b22f997a4ad1b7db790a55c3c3b80fec4b
+Author: Eric W. Biederman <ebiederm@xmission.com>
+Date:   Mon Feb 11 23:27:42 2019 -0600
+
+    signal: Restore the stop PTRACE_EVENT_EXIT
+    
+    commit cf43a757fd49442bc38f76088b70c2299eed2c2f upstream.
+    
+    In the middle of do_exit() there is there is a call
+    "ptrace_event(PTRACE_EVENT_EXIT, code);" That call places the process
+    in TACKED_TRACED aka "(TASK_WAKEKILL | __TASK_TRACED)" and waits for
+    for the debugger to release the task or SIGKILL to be delivered.
+    
+    Skipping past dequeue_signal when we know a fatal signal has already
+    been delivered resulted in SIGKILL remaining pending and
+    TIF_SIGPENDING remaining set.  This in turn caused the
+    scheduler to not sleep in PTACE_EVENT_EXIT as it figured
+    a fatal signal was pending.  This also caused ptrace_freeze_traced
+    in ptrace_check_attach to fail because it left a per thread
+    SIGKILL pending which is what fatal_signal_pending tests for.
+    
+    This difference in signal state caused strace to report
+    strace: Exit of unknown pid NNNNN ignored
+    
+    Therefore update the signal handling state like dequeue_signal
+    would when removing a per thread SIGKILL, by removing SIGKILL
+    from the per thread signal mask and clearing TIF_SIGPENDING.
+    
+    Acked-by: Oleg Nesterov <oleg@redhat.com>
+    Reported-by: Oleg Nesterov <oleg@redhat.com>
+    Reported-by: Ivan Delalande <colona@arista.com>
+    Cc: stable@vger.kernel.org
+    Fixes: 35634ffa1751 ("signal: Always notice exiting tasks")
+    Signed-off-by: "Eric W. Biederman" <ebiederm@xmission.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking 6f17dfe5bbd52189249d8ef359c93e9300712cea ......
 	 orig commit -> d5d27fd9826b59979b184ec288e4812abac0e988 ......
 checking cb7c96ee91df92164ade7575f117b3962e5ab260 ......
 	 orig commit -> 489338a717a0dfbbd5a3fabccf172b78f0ac9015 ......
 		 489338a717a0dfbbd5a3fabccf172b78f0ac9015 has problem. Fixes commit -> 03d309711d687460d1345de8a0363f45b1c8cd11
+commit 7a36263302979039305b2103ecc550394b0a944c
+Author: Thomas Richter <tmricht@linux.ibm.com>
+Date:   Tue Feb 19 16:36:39 2019 +0100
+
+    perf test: Fix failure of 'evsel-tp-sched' test on s390
+    
+    [ Upstream commit 03d309711d687460d1345de8a0363f45b1c8cd11 ]
+    
+    Commit 489338a717a0 ("perf tests evsel-tp-sched: Fix bitwise operator")
+    causes test case 14 "Parse sched tracepoints fields" to fail on s390.
+    
+    This test succeeds on x86.
+    
+    In fact this test now fails on all architectures with type char treated
+    as type unsigned char.
+    
+    The root cause is the signed-ness of character arrays in the tracepoints
+    sched_switch for structure members prev_comm and next_comm.
+    
+    On s390 the output of:
+    
+     [root@m35lp76 perf]# cat /sys/kernel/debug/tracing/events/sched/sched_switch/format
+     name: sched_switch
+     ID: 287
+     format:
+       field:unsigned short common_type; offset:0; size:2;  signed:0;
+       ...
+       field:char prev_comm[16]; offset:8; size:16; signed:0;
+       ...
+       field:char next_comm[16]; offset:40; size:16; signed:0;
+    
+    reveals the character arrays prev_comm and next_comm are per
+    default unsigned char and have values in the range of 0..255.
+    
+    On x86 both fields are signed as this output shows:
+     [root@f29]# cat /sys/kernel/debug/tracing/events/sched/sched_switch/format
+     name: sched_switch
+     ID: 287
+     format:
+       field:unsigned short common_type; offset:0; size:2;  signed:0;
+       ...
+       field:char prev_comm[16]; offset:8; size:16; signed:1;
+       ...
+       field:char next_comm[16]; offset:40; size:16; signed:1;
+    
+    and the character arrays prev_comm and next_comm are per default signed
+    char and have values in the range of -1..127.  The implementation of
+    type char is architecture specific.
+    
+    Since the character arrays in both tracepoints sched_switch and
+    sched_wakeup should contain ascii characters, simply omit the check for
+    signedness in the test case.
+    
+    Output before:
+    
+      [root@m35lp76 perf]# ./perf test -F 14
+      14: Parse sched tracepoints fields                        :
+      --- start ---
+      sched:sched_switch: "prev_comm" signedness(0) is wrong, should be 1
+      sched:sched_switch: "next_comm" signedness(0) is wrong, should be 1
+      sched:sched_wakeup: "comm" signedness(0) is wrong, should be 1
+      ---- end ----
+      14: Parse sched tracepoints fields                        : FAILED!
+      [root@m35lp76 perf]#
+    
+    Output after:
+    
+      [root@m35lp76 perf]# ./perf test -Fv 14
+      14: Parse sched tracepoints fields                        :
+      --- start ---
+      ---- end ----
+      Parse sched tracepoints fields: Ok
+      [root@m35lp76 perf]#
+    
+    Fixes: 489338a717a0 ("perf tests evsel-tp-sched: Fix bitwise operator")
+    
+    Signed-off-by: Thomas Richter <tmricht@linux.ibm.com>
+    Cc: Heiko Carstens <heiko.carstens@de.ibm.com>
+    Cc: Hendrik Brueckner <brueckner@linux.vnet.ibm.com>
+    Cc: Martin Schwidefsky <schwidefsky@de.ibm.com>
+    Link: http://lkml.kernel.org/r/20190219153639.31267-1-tmricht@linux.ibm.com
+    Signed-off-by: Arnaldo Carvalho de Melo <acme@redhat.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
 checking 06bbc4838a38854b8487aa19cdcb5816837fc059 ......
 	 orig commit -> 9dff0aa95a324e262ffb03f425d00e4751f3294e ......
 		 9dff0aa95a324e262ffb03f425d00e4751f3294e has problem. Fixes commit -> 528871b456026e6127d95b1b2bd8e3a003dc1614
+commit 222b22e1f32d7f96d5a4fdb15f3be3eb82cf340c
+Author: Ingo Molnar <mingo@kernel.org>
+Date:   Wed Feb 13 07:57:02 2019 +0100
+
+    perf/core: Fix impossible ring-buffer sizes warning
+    
+    commit 528871b456026e6127d95b1b2bd8e3a003dc1614 upstream.
+    
+    The following commit:
+    
+      9dff0aa95a32 ("perf/core: Don't WARN() for impossible ring-buffer sizes")
+    
+    results in perf recording failures with larger mmap areas:
+    
+      root@skl:/tmp# perf record -g -a
+      failed to mmap with 12 (Cannot allocate memory)
+    
+    The root cause is that the following condition is buggy:
+    
+            if (order_base_2(size) >= MAX_ORDER)
+                    goto fail;
+    
+    The problem is that @size is in bytes and MAX_ORDER is in pages,
+    so the right test is:
+    
+            if (order_base_2(size) >= PAGE_SHIFT+MAX_ORDER)
+                    goto fail;
+    
+    Fix it.
+    
+    Reported-by: "Jin, Yao" <yao.jin@linux.intel.com>
+    Bisected-by: Borislav Petkov <bp@alien8.de>
+    Analyzed-by: Peter Zijlstra <peterz@infradead.org>
+    Cc: Julien Thierry <julien.thierry@arm.com>
+    Cc: Mark Rutland <mark.rutland@arm.com>
+    Cc: Alexander Shishkin <alexander.shishkin@linux.intel.com>
+    Cc: Arnaldo Carvalho de Melo <acme@redhat.com>
+    Cc: Jiri Olsa <jolsa@redhat.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Namhyung Kim <namhyung@kernel.org>
+    Cc: Peter Zijlstra <peterz@infradead.org>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+    Cc: <stable@vger.kernel.org>
+    Fixes: 9dff0aa95a32 ("perf/core: Don't WARN() for impossible ring-buffer sizes")
+    Signed-off-by: Ingo Molnar <mingo@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking 122c0149ad74375d2e740048298aa0b82342004f ......
 	 orig commit -> d28af26faa0b1daf3c692603d46bc4687c16f19e ......
 checking 00025153e202c6040763cce695004dc977823822 ......
@@ -120,8 +326,6 @@ checking ff8c1826eec15e441c6d19c0de327e2cd786fde5 ......
 	 orig commit -> a53469a68eb886e84dd8b69a1458a623d3591793 ......
 checking b191f1953846029cff59e07eb73502dccc87010d ......
 	 orig commit -> 341198eda723c8c1cddbb006a89ad9e362502ea2 ......
-	 orig commit -> fcaaba6c7136 ......
-	 orig commit -> 4cd13c21b207 ......
 checking c5cf17c81df2b82ea25e8e05e297272adcdc3f49 ......
 	 orig commit -> 97e1532ef81acb31c30f9e75bf00306c33a77812 ......
 checking bade8e5f2686ed458c4b71061a00a33ae1e5154c ......
@@ -144,7 +348,6 @@ checking 16570a4ab84d7017da388c59cc48494ad452b8a5 ......
 	 orig commit -> 7596175e99b3d4bce28022193efd954c201a782a ......
 checking ff0a4fa3e70f8c6106d53a895ef378636e2bc490 ......
 	 orig commit -> 9b1f19d810e92d6cdc68455fbc22d9f961a58ce1 ......
-	 orig commit -> 276bdb82dedb ......
 checking a7ea4de3664593a4d79cb7e62e3c8736cabb5d3c ......
 	 orig commit -> 08a77676f9c5fc69a681ccd2cd8140e65dcb26c7 ......
 checking ae46de2430b7bfd5971de37589d565fdfc6463b3 ......
@@ -188,6 +391,21 @@ checking 90beb6bbed6719bf5ee73dadebe6fd99cb57cc98 ......
 checking 259c502d0a0fee860097ed5fa0061223a302003b ......
 	 orig commit -> c9c63915519b1def7043b184680f33c24cd49d7b ......
 		 c9c63915519b1def7043b184680f33c24cd49d7b has problem. Fixes commit -> 07bd14ccc3049f9c0147a91a4227a571f981601a
+commit 27763b01a4ff6a7cd87ed388f317ac489631468b
+Author: Wei Yongjun <weiyongjun1@huawei.com>
+Date:   Wed Dec 26 11:28:24 2018 +0000
+
+    hwmon: (lm80) Fix missing unlock on error in set_fan_div()
+    
+    [ Upstream commit 07bd14ccc3049f9c0147a91a4227a571f981601a ]
+    
+    Add the missing unlock before return from function set_fan_div()
+    in the error handling case.
+    
+    Fixes: c9c63915519b ("hwmon: (lm80) fix a missing check of the status of SMBus read")
+    Signed-off-by: Wei Yongjun <weiyongjun1@huawei.com>
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
 checking 8ba3a4eec0a5ec5428f431ec9fe35e3c6cd08ce1 ......
 	 orig commit -> 594d1644cd59447f4fceb592448d5cd09eb09b5e ......
 checking a8014f2741b434598c5323f7fb2984725fbc5ad5 ......
@@ -196,11 +414,8 @@ checking 2e7c1f0dedb0838035fa7c7629b388ee2a5c10fd ......
 	 orig commit -> 2122b40580dd9d0620398739c773d07a7b7939d0 ......
 checking 03c5ed7dc9b9c051ff966f69e4645d623d4d187d ......
 	 orig commit -> 1fb3a7a75e2efcc83ef21f2434069cddd6fae6f5 ......
-	 orig commit -> 42eca2302146 ......
-		 42eca2302146 has problem. Fixes commit -> 1fb3a7a75e2efcc83ef21f2434069cddd6fae6f5
 checking 472f3f067cb96eac72991f5162594cf51e507bca ......
 	 orig commit -> f75df8d4b4fabfad7e3cba2debfad12741c6fde7 ......
-	 orig commit -> 34bdb666f4b2 ......
 checking da079f87f933ddb8beee0b31bad57a3e5ba230b5 ......
 	 orig commit -> fdac751355cd76e049f628afe6acb8ff4b1399f7 ......
 checking 1fbbe0ccd56a59a5c07f73fe47bd60ca9a464409 ......
@@ -265,12 +480,28 @@ checking 2d6f9a86cd9a6081e0431f19757cc0879a701775 ......
 checking ef9cc1ec63de22707cefdc57da64522376d7dbc2 ......
 	 orig commit -> 62a063b8e7d1db684db3f207261a466fa3194e72 ......
 		 62a063b8e7d1db684db3f207261a466fa3194e72 has problem. Fixes commit -> dd838821f0a29781b185cd8fb8e48d5c177bd838
+commit d18bcfe455106b23aa254d1da0c1a7f39b9b20fe
+Author: Yihao Wu <wuyihao@linux.alibaba.com>
+Date:   Wed Mar 6 21:03:50 2019 +0800
+
+    nfsd: fix wrong check in write_v4_end_grace()
+    
+    commit dd838821f0a29781b185cd8fb8e48d5c177bd838 upstream.
+    
+    Commit 62a063b8e7d1 "nfsd4: fix crash on writing v4_end_grace before
+    nfsd startup" is trying to fix a NULL dereference issue, but it
+    mistakenly checks if the nfsd server is started. So fix it.
+    
+    Fixes: 62a063b8e7d1 "nfsd4: fix crash on writing v4_end_grace before nfsd startup"
+    Cc: stable@vger.kernel.org
+    Reviewed-by: Joseph Qi <joseph.qi@linux.alibaba.com>
+    Signed-off-by: Yihao Wu <wuyihao@linux.alibaba.com>
+    Signed-off-by: J. Bruce Fields <bfields@redhat.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking 627e656239c63d8a81672d08de7885e89c12fa75 ......
 	 orig commit -> a11f6ca9aef989b56cd31ff4ee2af4fb31a172ec ......
-	 orig commit -> adddc32d6fde ......
 checking d67dec906b7a9069c5541fce2b50118178133a1a ......
 	 orig commit -> f6176473a0c7472380eef72ebeb330cf9485bf0a ......
-	 orig commit -> beaf226b863a ......
 checking 262871e633994cd2fd5b68a2a8c3984081576511 ......
 	 orig commit -> b61ac5b720146c619c7cdf17eff2551b934399e5 ......
 checking f936083094d8c13444aa1d1af586f282ff542191 ......
@@ -291,10 +522,8 @@ checking 7c6340dfba35672db971c87bdc4fa178720abc12 ......
 	 orig commit -> 397bd9211fe014b347ca8f95a8f4e1017bac1aeb ......
 checking c9ddfda641c4e868b08c37ed51debee2f539ea0d ......
 	 orig commit -> 5b3f5c408d8cc59b87e47f1ab9803dbd006e4a91 ......
-	 orig commit -> 68baf692c435 ......
 checking 2f85daf84873df51f533894e50d9c0b80137dca0 ......
 	 orig commit -> 53bb565fc5439f2c8c57a786feea5946804aa3e9 ......
-	 orig commit -> 0b2d70764bb3 ......
 checking dd307a8d156bf0d2a53bd389f48f90f86d604496 ......
 	 orig commit -> 216f0efd19b9cc32207934fd1b87a45f2c4c593e ......
 checking aeef84f38288f15d80905513c4eaf5b5cc66badd ......

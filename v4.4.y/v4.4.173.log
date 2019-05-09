@@ -1,0 +1,527 @@
+checking dc5e8c99975bb1a1561de884a83b3c19e4ac7ada ......
+checking 60c7f8fca1bbc6ac677a76f25843202b91f52abb ......
+	 orig commit -> ec3833ed02ae6ef2a933ece9de7cbab0c64c699e ......
+checking 873beab3740a085ba284ed7daa4ab4068074db53 ......
+	 orig commit -> ade446403bfb79d3528d56071a84b15351a139ad ......
+checking 0836bdfee568a417ffba238fc180bf5c00c648e3 ......
+	 orig commit -> d55bef5059dd057bd077155375c581b49d25be7e ......
+checking e92b8475d6d7319bb69c3bdf307f3d9384c3776a ......
+	 orig commit -> 0d5b9311baf27bb545f187f12ecfd558220c607d ......
+checking acd00a0692072b374afee4b6f38c1eb1c6cf6f4a ......
+	 orig commit -> 70837ffe3085c9a91488b52ca13ac84424da1042 ......
+checking cb5fd4aa24b57206548d5940dc359f0b181a2688 ......
+	 orig commit -> 5d407b071dc369c26a38398326ee2be53651cfe4 ......
+checking 2822475e70db5a4b46de88a5b66eb2aceb3734af ......
+	 orig commit -> a4fd284a1f8fd4b6c59aa59db2185b1e17c5c11c ......
+checking 2039bd8669f4ecefca163f0c9d8c5f5f6a4c8610 ......
+	 orig commit -> 353c9cb360874e737fb000545f783df756c06f9a ......
+checking 3f78a3f45e79ca378cb850a598e4c76633710e92 ......
+	 orig commit -> fa0f527358bd900ef92f925878ed6bfbd51305cc ......
+		 fa0f527358bd900ef92f925878ed6bfbd51305cc has problem. Fixes commit -> 5d407b071dc369c26a38398326ee2be53651cfe4
+70837ffe3085c9a91488b52ca13ac84424da1042
+commit acd00a0692072b374afee4b6f38c1eb1c6cf6f4a
+Author: Dan Carpenter <dan.carpenter@oracle.com>
+Date:   Wed Oct 10 12:30:17 2018 -0700
+
+    ipv4: frags: precedence bug in ip_expire()
+    
+    commit 70837ffe3085c9a91488b52ca13ac84424da1042 upstream.
+    
+    We accidentally removed the parentheses here, but they are required
+    because '!' has higher precedence than '&'.
+    
+    Fixes: fa0f527358bd ("ip: use rb trees for IP frag queue.")
+    Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Mao Wenan <maowenan@huawei.com>
+    Signed-off-by: Ben Hutchings <ben.hutchings@codethink.co.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+commit acd00a0692072b374afee4b6f38c1eb1c6cf6f4a
+Author: Dan Carpenter <dan.carpenter@oracle.com>
+Date:   Wed Oct 10 12:30:17 2018 -0700
+
+    ipv4: frags: precedence bug in ip_expire()
+    
+    commit 70837ffe3085c9a91488b52ca13ac84424da1042 upstream.
+    
+    We accidentally removed the parentheses here, but they are required
+    because '!' has higher precedence than '&'.
+    
+    Fixes: fa0f527358bd ("ip: use rb trees for IP frag queue.")
+    Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Mao Wenan <maowenan@huawei.com>
+    Signed-off-by: Ben Hutchings <ben.hutchings@codethink.co.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit cb5fd4aa24b57206548d5940dc359f0b181a2688
+Author: Taehee Yoo <ap420073@gmail.com>
+Date:   Wed Oct 10 12:30:16 2018 -0700
+
+    ip: frags: fix crash in ip_do_fragment()
+    
+    commit 5d407b071dc369c26a38398326ee2be53651cfe4 upstream.
+    
+    A kernel crash occurrs when defragmented packet is fragmented
+    in ip_do_fragment().
+    In defragment routine, skb_orphan() is called and
+    skb->ip_defrag_offset is set. but skb->sk and
+    skb->ip_defrag_offset are same union member. so that
+    frag->sk is not NULL.
+    Hence crash occurrs in skb->sk check routine in ip_do_fragment() when
+    defragmented packet is fragmented.
+    
+    test commands:
+       %iptables -t nat -I POSTROUTING -j MASQUERADE
+       %hping3 192.168.4.2 -s 1000 -p 2000 -d 60000
+    
+    splat looks like:
+    [  261.069429] kernel BUG at net/ipv4/ip_output.c:636!
+    [  261.075753] invalid opcode: 0000 [#1] SMP DEBUG_PAGEALLOC KASAN PTI
+    [  261.083854] CPU: 1 PID: 1349 Comm: hping3 Not tainted 4.19.0-rc2+ #3
+    [  261.100977] RIP: 0010:ip_do_fragment+0x1613/0x2600
+    [  261.106945] Code: e8 e2 38 e3 fe 4c 8b 44 24 18 48 8b 74 24 08 e9 92 f6 ff ff 80 3c 02 00 0f 85 da 07 00 00 48 8b b5 d0 00 00 00 e9 25 f6 ff ff <0f> 0b 0f 0b 44 8b 54 24 58 4c 8b 4c 24 18 4c 8b 5c 24 60 4c 8b 6c
+    [  261.127015] RSP: 0018:ffff8801031cf2c0 EFLAGS: 00010202
+    [  261.134156] RAX: 1ffff1002297537b RBX: ffffed0020639e6e RCX: 0000000000000004
+    [  261.142156] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff880114ba9bd8
+    [  261.150157] RBP: ffff880114ba8a40 R08: ffffed0022975395 R09: ffffed0022975395
+    [  261.158157] R10: 0000000000000001 R11: ffffed0022975394 R12: ffff880114ba9ca4
+    [  261.166159] R13: 0000000000000010 R14: ffff880114ba9bc0 R15: dffffc0000000000
+    [  261.174169] FS:  00007fbae2199700(0000) GS:ffff88011b400000(0000) knlGS:0000000000000000
+    [  261.183012] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+    [  261.189013] CR2: 00005579244fe000 CR3: 0000000119bf4000 CR4: 00000000001006e0
+    [  261.198158] Call Trace:
+    [  261.199018]  ? dst_output+0x180/0x180
+    [  261.205011]  ? save_trace+0x300/0x300
+    [  261.209018]  ? ip_copy_metadata+0xb00/0xb00
+    [  261.213034]  ? sched_clock_local+0xd4/0x140
+    [  261.218158]  ? kill_l4proto+0x120/0x120 [nf_conntrack]
+    [  261.223014]  ? rt_cpu_seq_stop+0x10/0x10
+    [  261.227014]  ? find_held_lock+0x39/0x1c0
+    [  261.233008]  ip_finish_output+0x51d/0xb50
+    [  261.237006]  ? ip_fragment.constprop.56+0x220/0x220
+    [  261.243011]  ? nf_ct_l4proto_register_one+0x5b0/0x5b0 [nf_conntrack]
+    [  261.250152]  ? rcu_is_watching+0x77/0x120
+    [  261.255010]  ? nf_nat_ipv4_out+0x1e/0x2b0 [nf_nat_ipv4]
+    [  261.261033]  ? nf_hook_slow+0xb1/0x160
+    [  261.265007]  ip_output+0x1c7/0x710
+    [  261.269005]  ? ip_mc_output+0x13f0/0x13f0
+    [  261.273002]  ? __local_bh_enable_ip+0xe9/0x1b0
+    [  261.278152]  ? ip_fragment.constprop.56+0x220/0x220
+    [  261.282996]  ? nf_hook_slow+0xb1/0x160
+    [  261.287007]  raw_sendmsg+0x21f9/0x4420
+    [  261.291008]  ? dst_output+0x180/0x180
+    [  261.297003]  ? sched_clock_cpu+0x126/0x170
+    [  261.301003]  ? find_held_lock+0x39/0x1c0
+    [  261.306155]  ? stop_critical_timings+0x420/0x420
+    [  261.311004]  ? check_flags.part.36+0x450/0x450
+    [  261.315005]  ? _raw_spin_unlock_irq+0x29/0x40
+    [  261.320995]  ? _raw_spin_unlock_irq+0x29/0x40
+    [  261.326142]  ? cyc2ns_read_end+0x10/0x10
+    [  261.330139]  ? raw_bind+0x280/0x280
+    [  261.334138]  ? sched_clock_cpu+0x126/0x170
+    [  261.338995]  ? check_flags.part.36+0x450/0x450
+    [  261.342991]  ? __lock_acquire+0x4500/0x4500
+    [  261.348994]  ? inet_sendmsg+0x11c/0x500
+    [  261.352989]  ? dst_output+0x180/0x180
+    [  261.357012]  inet_sendmsg+0x11c/0x500
+    [ ... ]
+    
+    v2:
+     - clear skb->sk at reassembly routine.(Eric Dumarzet)
+    
+    Fixes: fa0f527358bd ("ip: use rb trees for IP frag queue.")
+    Suggested-by: Eric Dumazet <edumazet@google.com>
+    Signed-off-by: Taehee Yoo <ap420073@gmail.com>
+    Reviewed-by: Eric Dumazet <edumazet@google.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Mao Wenan <maowenan@huawei.com>
+    Signed-off-by: Ben Hutchings <ben.hutchings@codethink.co.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 7fab8b2f0c994decf580027286b97533c8b7f6fd ......
+	 orig commit -> 88078d98d1bb085d72af8437707279e203524fa5 ......
+		 88078d98d1bb085d72af8437707279e203524fa5 has problem. Fixes commit -> 0aa1d18615c163f92935b806dcaff9157645233a
+74abc07dee613086f9c0ded9e263ddc959a6de04
+29dded89e80e3fff61efb34f07a8a3fba3ea146d
+e8c8b53ccaff568fef4c13a6ccaf08bf241aa01a
+7de414a9dd91426318df7b63da024b2b07e53df5
+d55bef5059dd057bd077155375c581b49d25be7e
+commit 6f0ec47b9a615ea495e501a9cce34f08a441241a
+Author: Saeed Mahameed <saeedm@mellanox.com>
+Date:   Mon Feb 11 18:04:17 2019 +0200
+
+    net/mlx4_en: Force CHECKSUM_NONE for short ethernet frames
+    
+    [ Upstream commit 29dded89e80e3fff61efb34f07a8a3fba3ea146d ]
+    
+    When an ethernet frame is padded to meet the minimum ethernet frame
+    size, the padding octets are not covered by the hardware checksum.
+    Fortunately the padding octets are usually zero's, which don't affect
+    checksum. However, it is not guaranteed. For example, switches might
+    choose to make other use of these octets.
+    This repeatedly causes kernel hardware checksum fault.
+    
+    Prior to the cited commit below, skb checksum was forced to be
+    CHECKSUM_NONE when padding is detected. After it, we need to keep
+    skb->csum updated. However, fixing up CHECKSUM_COMPLETE requires to
+    verify and parse IP headers, it does not worth the effort as the packets
+    are so small that CHECKSUM_COMPLETE has no significant advantage.
+    
+    Future work: when reporting checksum complete is not an option for
+    IP non-TCP/UDP packets, we can actually fallback to report checksum
+    unnecessary, by looking at cqe IPOK bit.
+    
+    Fixes: 88078d98d1bb ("net: pskb_trim_rcsum() and CHECKSUM_COMPLETE are friends")
+    Cc: Eric Dumazet <edumazet@google.com>
+    Signed-off-by: Saeed Mahameed <saeedm@mellanox.com>
+    Signed-off-by: Tariq Toukan <tariqt@mellanox.com>
+    Reviewed-by: Eric Dumazet <edumazet@google.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 0836bdfee568a417ffba238fc180bf5c00c648e3
+Author: Dimitris Michailidis <dmichail@google.com>
+Date:   Fri Oct 19 17:07:13 2018 -0700
+
+    net: fix pskb_trim_rcsum_slow() with odd trim offset
+    
+    commit d55bef5059dd057bd077155375c581b49d25be7e upstream.
+    
+    We've been getting checksum errors involving small UDP packets, usually
+    59B packets with 1 extra non-zero padding byte. netdev_rx_csum_fault()
+    has been complaining that HW is providing bad checksums. Turns out the
+    problem is in pskb_trim_rcsum_slow(), introduced in commit 88078d98d1bb
+    ("net: pskb_trim_rcsum() and CHECKSUM_COMPLETE are friends").
+    
+    The source of the problem is that when the bytes we are trimming start
+    at an odd address, as in the case of the 1 padding byte above,
+    skb_checksum() returns a byte-swapped value. We cannot just combine this
+    with skb->csum using csum_sub(). We need to use csum_block_sub() here
+    that takes into account the parity of the start address and handles the
+    swapping.
+    
+    Matches existing code in __skb_postpull_rcsum() and esp_remove_trailer().
+    
+    Fixes: 88078d98d1bb ("net: pskb_trim_rcsum() and CHECKSUM_COMPLETE are friends")
+    Signed-off-by: Dimitris Michailidis <dmichail@google.com>
+    Reviewed-by: Eric Dumazet <edumazet@google.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Ben Hutchings <ben.hutchings@codethink.co.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 8de8589c09dc78c5245b73d6b31a615a5aed52b6
+Author: Cong Wang <xiyou.wangcong@gmail.com>
+Date:   Thu Nov 1 12:02:37 2018 -0700
+
+    net: drop skb on failure in ip_check_defrag()
+    
+    [ Upstream commit 7de414a9dd91426318df7b63da024b2b07e53df5 ]
+    
+    Most callers of pskb_trim_rcsum() simply drop the skb when
+    it fails, however, ip_check_defrag() still continues to pass
+    the skb up to stack. This is suspicious.
+    
+    In ip_check_defrag(), after we learn the skb is an IP fragment,
+    passing the skb to callers makes no sense, because callers expect
+    fragments are defrag'ed on success. So, dropping the skb when we
+    can't defrag it is reasonable.
+    
+    Note, prior to commit 88078d98d1bb, this is not a big problem as
+    checksum will be fixed up anyway. After it, the checksum is not
+    correct on failure.
+    
+    Found this during code review.
+    
+    Fixes: 88078d98d1bb ("net: pskb_trim_rcsum() and CHECKSUM_COMPLETE are friends")
+    Cc: Eric Dumazet <edumazet@google.com>
+    Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
+    Reviewed-by: Eric Dumazet <edumazet@google.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+commit 6f0ec47b9a615ea495e501a9cce34f08a441241a
+Author: Saeed Mahameed <saeedm@mellanox.com>
+Date:   Mon Feb 11 18:04:17 2019 +0200
+
+    net/mlx4_en: Force CHECKSUM_NONE for short ethernet frames
+    
+    [ Upstream commit 29dded89e80e3fff61efb34f07a8a3fba3ea146d ]
+    
+    When an ethernet frame is padded to meet the minimum ethernet frame
+    size, the padding octets are not covered by the hardware checksum.
+    Fortunately the padding octets are usually zero's, which don't affect
+    checksum. However, it is not guaranteed. For example, switches might
+    choose to make other use of these octets.
+    This repeatedly causes kernel hardware checksum fault.
+    
+    Prior to the cited commit below, skb checksum was forced to be
+    CHECKSUM_NONE when padding is detected. After it, we need to keep
+    skb->csum updated. However, fixing up CHECKSUM_COMPLETE requires to
+    verify and parse IP headers, it does not worth the effort as the packets
+    are so small that CHECKSUM_COMPLETE has no significant advantage.
+    
+    Future work: when reporting checksum complete is not an option for
+    IP non-TCP/UDP packets, we can actually fallback to report checksum
+    unnecessary, by looking at cqe IPOK bit.
+    
+    Fixes: 88078d98d1bb ("net: pskb_trim_rcsum() and CHECKSUM_COMPLETE are friends")
+    Cc: Eric Dumazet <edumazet@google.com>
+    Signed-off-by: Saeed Mahameed <saeedm@mellanox.com>
+    Signed-off-by: Tariq Toukan <tariqt@mellanox.com>
+    Reviewed-by: Eric Dumazet <edumazet@google.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 0836bdfee568a417ffba238fc180bf5c00c648e3
+Author: Dimitris Michailidis <dmichail@google.com>
+Date:   Fri Oct 19 17:07:13 2018 -0700
+
+    net: fix pskb_trim_rcsum_slow() with odd trim offset
+    
+    commit d55bef5059dd057bd077155375c581b49d25be7e upstream.
+    
+    We've been getting checksum errors involving small UDP packets, usually
+    59B packets with 1 extra non-zero padding byte. netdev_rx_csum_fault()
+    has been complaining that HW is providing bad checksums. Turns out the
+    problem is in pskb_trim_rcsum_slow(), introduced in commit 88078d98d1bb
+    ("net: pskb_trim_rcsum() and CHECKSUM_COMPLETE are friends").
+    
+    The source of the problem is that when the bytes we are trimming start
+    at an odd address, as in the case of the 1 padding byte above,
+    skb_checksum() returns a byte-swapped value. We cannot just combine this
+    with skb->csum using csum_sub(). We need to use csum_block_sub() here
+    that takes into account the parity of the start address and handles the
+    swapping.
+    
+    Matches existing code in __skb_postpull_rcsum() and esp_remove_trailer().
+    
+    Fixes: 88078d98d1bb ("net: pskb_trim_rcsum() and CHECKSUM_COMPLETE are friends")
+    Signed-off-by: Dimitris Michailidis <dmichail@google.com>
+    Reviewed-by: Eric Dumazet <edumazet@google.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Ben Hutchings <ben.hutchings@codethink.co.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 8de8589c09dc78c5245b73d6b31a615a5aed52b6
+Author: Cong Wang <xiyou.wangcong@gmail.com>
+Date:   Thu Nov 1 12:02:37 2018 -0700
+
+    net: drop skb on failure in ip_check_defrag()
+    
+    [ Upstream commit 7de414a9dd91426318df7b63da024b2b07e53df5 ]
+    
+    Most callers of pskb_trim_rcsum() simply drop the skb when
+    it fails, however, ip_check_defrag() still continues to pass
+    the skb up to stack. This is suspicious.
+    
+    In ip_check_defrag(), after we learn the skb is an IP fragment,
+    passing the skb to callers makes no sense, because callers expect
+    fragments are defrag'ed on success. So, dropping the skb when we
+    can't defrag it is reasonable.
+    
+    Note, prior to commit 88078d98d1bb, this is not a big problem as
+    checksum will be fixed up anyway. After it, the checksum is not
+    correct on failure.
+    
+    Found this during code review.
+    
+    Fixes: 88078d98d1bb ("net: pskb_trim_rcsum() and CHECKSUM_COMPLETE are friends")
+    Cc: Eric Dumazet <edumazet@google.com>
+    Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
+    Reviewed-by: Eric Dumazet <edumazet@google.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 5f2d68b6b5a439c3223d8fa6ba20736f91fc58d8 ......
+	 orig commit -> 0ed4229b08c13c84a3c301a08defdc9e7f4467e6 ......
+checking 26cfea3c1d041d08edacae291565f295553e15ce ......
+	 orig commit -> 385114dec8a49b5e5945e77ba7de6356106713f4 ......
+checking ef0f963de1d2c5bc99d3d6ace3dd44a7d6002717 ......
+	 orig commit -> 7969e5c40dfd04799d4341f1b7cd266b6e47f227 ......
+		 7969e5c40dfd04799d4341f1b7cd266b6e47f227 has problem. Fixes commit -> ade446403bfb79d3528d56071a84b15351a139ad
+commit 873beab3740a085ba284ed7daa4ab4068074db53
+Author: Michal Kubecek <mkubecek@suse.cz>
+Date:   Thu Dec 13 17:23:32 2018 +0100
+
+    net: ipv4: do not handle duplicate fragments as overlapping
+    
+    commit ade446403bfb79d3528d56071a84b15351a139ad upstream.
+    
+    Since commit 7969e5c40dfd ("ip: discard IPv4 datagrams with overlapping
+    segments.") IPv4 reassembly code drops the whole queue whenever an
+    overlapping fragment is received. However, the test is written in a way
+    which detects duplicate fragments as overlapping so that in environments
+    with many duplicate packets, fragmented packets may be undeliverable.
+    
+    Add an extra test and for (potentially) duplicate fragment, only drop the
+    new fragment rather than the whole queue. Only starting offset and length
+    are checked, not the contents of the fragments as that would be too
+    expensive. For similar reason, linear list ("run") of a rbtree node is not
+    iterated, we only check if the new fragment is a subset of the interval
+    covered by existing consecutive fragments.
+    
+    v2: instead of an exact check iterating through linear list of an rbtree
+    node, only check if the new fragment is subset of the "run" (suggested
+    by Eric Dumazet)
+    
+    Fixes: 7969e5c40dfd ("ip: discard IPv4 datagrams with overlapping segments.")
+    Signed-off-by: Michal Kubecek <mkubecek@suse.cz>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Mao Wenan <maowenan@huawei.com>
+    [bwh: Backported to 4.4:
+     - goto discard_qp, not err, in case of overlap
+     - Set err earlier variable, as done upstream in commit 0ff89efb5246
+       "ip: fail fast on IP defrag errors"]
+    Signed-off-by: Ben Hutchings <ben.hutchings@codethink.co.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking bf40801a018bbe8f2076fab89f538cc05eb15c03 ......
+	 orig commit -> 3d23401283e80ceb03f765842787e0e79ff598b7 ......
+checking 826ff799146685450f84e3158ce66499c928c8ea ......
+	 orig commit -> bf66337140c64c27fa37222b7abca7e49d63fb57 ......
+checking 29ff723c549906a5d8d64dd406d1b1b4da0eb85b ......
+	 orig commit -> c2615cf5a761b32bf74e85bddc223dfff3d9b9f0 ......
+checking 33990010ea40454a41c4c5dc78d26165579578ca ......
+	 orig commit -> e5d672a0780d9e7118caad4c171ec88b8299398d ......
+checking bf8187348f264b720d5bc165703afeb1dee36f14 ......
+	 orig commit -> 05c0b86b9696802fd0ce5676a92a63f1b455bdf3 ......
+checking f925a29652a00e312d373b19f177af17be4ba5be ......
+	 orig commit -> 1eec5d5670084ee644597bd26c25e22c69b9f748 ......
+checking 567ef0554b91de121e9c1ad6b30d0077a5ea1fbf ......
+	 orig commit -> 3e67f106f619dcfaf6f4e2039599bdb69848c714 ......
+		 3e67f106f619dcfaf6f4e2039599bdb69848c714 has problem. Fixes commit -> 6e00f7dd5e4edc2443f030b226f66fe4f1267667
+checking 50fc08963b0ccc01bc9a01a4e699aed9eb0137f1 ......
+	 orig commit -> 2d44ed22e607f9a285b049de2263e3840673a260 ......
+checking b047c796dedca591d1a3dc1ba8166d5082c337ef ......
+	 orig commit -> 399d1404be660d355192ff4df5ccc3f4159ec1e4 ......
+checking cf2b9e68a684bf8dd6c1a7671f59faaab8e4ca2c ......
+	 orig commit -> 6befe4a78b1553edb6eed3a78b4bcd9748526672 ......
+checking f67b17c0233a3eb18463a661fbeb671110ada4b9 ......
+	 orig commit -> f6f2a4a2eb92bc73671204198bb2f8ab53ff59fb ......
+checking 24641fb6453c4cc642f548e1f11502c7c0caaa54 ......
+	 orig commit -> f18fa5de5ba7f1d6650951502bb96a6e4715a948 ......
+checking 493107105843f299662b3b664a83804645564f12 ......
+	 orig commit -> 648700f76b03b7e8149d13cc2bdb3355035258a9 ......
+		 648700f76b03b7e8149d13cc2bdb3355035258a9 has problem. Fixes commit -> 0d5b9311baf27bb545f187f12ecfd558220c607d
+f6f2a4a2eb92bc73671204198bb2f8ab53ff59fb
+f18fa5de5ba7f1d6650951502bb96a6e4715a948
+commit f67b17c0233a3eb18463a661fbeb671110ada4b9
+Author: Paolo Abeni <pabeni@redhat.com>
+Date:   Fri Jul 6 12:30:20 2018 +0200
+
+    ipfrag: really prevent allocation on netns exit
+    
+    commit f6f2a4a2eb92bc73671204198bb2f8ab53ff59fb upstream.
+    
+    Setting the low threshold to 0 has no effect on frags allocation,
+    we need to clear high_thresh instead.
+    
+    The code was pre-existent to commit 648700f76b03 ("inet: frags:
+    use rhashtables for reassembly units"), but before the above,
+    such assignment had a different role: prevent concurrent eviction
+    from the worker and the netns cleanup helper.
+    
+    Fixes: 648700f76b03 ("inet: frags: use rhashtables for reassembly units")
+    Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Ben Hutchings <ben.hutchings@codethink.co.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 24641fb6453c4cc642f548e1f11502c7c0caaa54
+Author: Alexander Aring <aring@mojatatu.com>
+Date:   Fri Apr 20 14:54:13 2018 -0400
+
+    net: ieee802154: 6lowpan: fix frag reassembly
+    
+    commit f18fa5de5ba7f1d6650951502bb96a6e4715a948 upstream.
+    
+    This patch initialize stack variables which are used in
+    frag_lowpan_compare_key to zero. In my case there are padding bytes in the
+    structures ieee802154_addr as well in frag_lowpan_compare_key. Otherwise
+    the key variable contains random bytes. The result is that a compare of
+    two keys by memcmp works incorrect.
+    
+    Fixes: 648700f76b03 ("inet: frags: use rhashtables for reassembly units")
+    Signed-off-by: Alexander Aring <aring@mojatatu.com>
+    Reported-by: Stefan Schmidt <stefan@osg.samsung.com>
+    Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
+    Signed-off-by: Ben Hutchings <ben.hutchings@codethink.co.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+commit e92b8475d6d7319bb69c3bdf307f3d9384c3776a
+Author: Eric Dumazet <edumazet@google.com>
+Date:   Thu Nov 8 17:34:27 2018 -0800
+
+    inet: frags: better deal with smp races
+    
+    commit 0d5b9311baf27bb545f187f12ecfd558220c607d upstream.
+    
+    Multiple cpus might attempt to insert a new fragment in rhashtable,
+    if for example RPS is buggy, as reported by 배석진 in
+    https://patchwork.ozlabs.org/patch/994601/
+    
+    We use rhashtable_lookup_get_insert_key() instead of
+    rhashtable_insert_fast() to let cpus losing the race
+    free their own inet_frag_queue and use the one that
+    was inserted by another cpu.
+    
+    Fixes: 648700f76b03 ("inet: frags: use rhashtables for reassembly units")
+    Signed-off-by: Eric Dumazet <edumazet@google.com>
+    Reported-by: 배석진 <soukjin.bae@samsung.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Ben Hutchings <ben.hutchings@codethink.co.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit f67b17c0233a3eb18463a661fbeb671110ada4b9
+Author: Paolo Abeni <pabeni@redhat.com>
+Date:   Fri Jul 6 12:30:20 2018 +0200
+
+    ipfrag: really prevent allocation on netns exit
+    
+    commit f6f2a4a2eb92bc73671204198bb2f8ab53ff59fb upstream.
+    
+    Setting the low threshold to 0 has no effect on frags allocation,
+    we need to clear high_thresh instead.
+    
+    The code was pre-existent to commit 648700f76b03 ("inet: frags:
+    use rhashtables for reassembly units"), but before the above,
+    such assignment had a different role: prevent concurrent eviction
+    from the worker and the netns cleanup helper.
+    
+    Fixes: 648700f76b03 ("inet: frags: use rhashtables for reassembly units")
+    Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Ben Hutchings <ben.hutchings@codethink.co.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 24641fb6453c4cc642f548e1f11502c7c0caaa54
+Author: Alexander Aring <aring@mojatatu.com>
+Date:   Fri Apr 20 14:54:13 2018 -0400
+
+    net: ieee802154: 6lowpan: fix frag reassembly
+    
+    commit f18fa5de5ba7f1d6650951502bb96a6e4715a948 upstream.
+    
+    This patch initialize stack variables which are used in
+    frag_lowpan_compare_key to zero. In my case there are padding bytes in the
+    structures ieee802154_addr as well in frag_lowpan_compare_key. Otherwise
+    the key variable contains random bytes. The result is that a compare of
+    two keys by memcmp works incorrect.
+    
+    Fixes: 648700f76b03 ("inet: frags: use rhashtables for reassembly units")
+    Signed-off-by: Alexander Aring <aring@mojatatu.com>
+    Reported-by: Stefan Schmidt <stefan@osg.samsung.com>
+    Signed-off-by: Stefan Schmidt <stefan@osg.samsung.com>
+    Signed-off-by: Ben Hutchings <ben.hutchings@codethink.co.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking bf5ea30ff5a143cf7ccb068259d16f4d2d1a2dd9 ......
+	 orig commit -> ae6da1f503abb5a5081f9f6c4a6881de97830f3e ......
+checking 9e5f4d0b79f8708db79c912404e68c915eb54f4d ......
+checking 8295999786a5141bb3a8db8e7a8b40e82e66ce3f ......
+	 orig commit -> 5ca8cc5bf11faed257c762018aea9106d529232f ......
+checking a7fb573c164488b36aeafe63a1531b9e7cf27fad ......
+	 orig commit -> 807f1844df4ac23594268fa9f41902d0549e92aa ......
+checking 705e71ed99017c123cb09a516f51e0203446ba56 ......
+	 orig commit -> 5b975bab23615cd0fdf67af6c9298eb01c4b9f61 ......
+checking 8c639cad891c671b449014887678f11b8a1f519a ......
+	 orig commit -> 483a6e4fa055123142d8956866fe2aa9c98d546d ......
+checking 9c6727de82e47238f389b415e25443ac46a06de5 ......
+	 orig commit -> 093ba72914b696521e4885756a68a3332782c8de ......
+checking 5eb2471ef43ea672cef90c7c8d66313aae8745f8 ......
+	 orig commit -> 787bea7748a76130566f881c2342a0be4127d182 ......

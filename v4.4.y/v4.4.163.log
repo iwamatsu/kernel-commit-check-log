@@ -6,6 +6,69 @@ checking 8ef21c4005bdeb3c7932837abe571d30a1d36ec8 ......
 checking 67dbeda8f4bb1c728683869ee7c35d50f73e76a3 ......
 	 orig commit -> 7f3ef5dedb146e3d5063b6845781ad1bb59b92b5 ......
 		 7f3ef5dedb146e3d5063b6845781ad1bb59b92b5 has problem. Fixes commit -> 63238173b2faf3d6b85a416f1c69af6c7be2413f
+commit 985ee65d554c2c48107b929b26e28fae2b946809
+Author: Brian Norris <briannorris@chromium.org>
+Date:   Wed Dec 5 10:16:57 2018 -0800
+
+    Revert "drm/rockchip: Allow driver to be shutdown on reboot/kexec"
+    
+    commit 63238173b2faf3d6b85a416f1c69af6c7be2413f upstream.
+    
+    This reverts commit 7f3ef5dedb146e3d5063b6845781ad1bb59b92b5.
+    
+    It causes new warnings [1] on shutdown when running the Google Kevin or
+    Scarlet (RK3399) boards under Chrome OS. Presumably our usage of DRM is
+    different than what Marc and Heiko test.
+    
+    We're looking at a different approach (e.g., [2]) to replace this, but
+    IMO the revert should be taken first, as it already propagated to
+    -stable.
+    
+    [1] Report here:
+    http://lkml.kernel.org/lkml/20181205030127.GA200921@google.com
+    
+    WARNING: CPU: 4 PID: 2035 at drivers/gpu/drm/drm_mode_config.c:477 drm_mode_config_cleanup+0x1c4/0x294
+    ...
+     Call trace:
+      drm_mode_config_cleanup+0x1c4/0x294
+      rockchip_drm_unbind+0x4c/0x8c
+      component_master_del+0x88/0xb8
+      rockchip_drm_platform_remove+0x2c/0x44
+      rockchip_drm_platform_shutdown+0x20/0x2c
+      platform_drv_shutdown+0x2c/0x38
+      device_shutdown+0x164/0x1b8
+      kernel_restart_prepare+0x40/0x48
+      kernel_restart+0x20/0x68
+    ...
+     Memory manager not clean during takedown.
+     WARNING: CPU: 4 PID: 2035 at drivers/gpu/drm/drm_mm.c:950 drm_mm_takedown+0x34/0x44
+    ...
+      drm_mm_takedown+0x34/0x44
+      rockchip_drm_unbind+0x64/0x8c
+      component_master_del+0x88/0xb8
+      rockchip_drm_platform_remove+0x2c/0x44
+      rockchip_drm_platform_shutdown+0x20/0x2c
+      platform_drv_shutdown+0x2c/0x38
+      device_shutdown+0x164/0x1b8
+      kernel_restart_prepare+0x40/0x48
+      kernel_restart+0x20/0x68
+    ...
+    
+    [2] https://patchwork.kernel.org/patch/10556151/
+        https://www.spinics.net/lists/linux-rockchip/msg21342.html
+        [PATCH] drm/rockchip: shutdown drm subsystem on shutdown
+    
+    Fixes: 7f3ef5dedb14 ("drm/rockchip: Allow driver to be shutdown on reboot/kexec")
+    Cc: Jeffy Chen <jeffy.chen@rock-chips.com>
+    Cc: Robin Murphy <robin.murphy@arm.com>
+    Cc: Vicente Bergas <vicencb@gmail.com>
+    Cc: Marc Zyngier <marc.zyngier@arm.com>
+    Cc: Heiko Stuebner <heiko@sntech.de>
+    Cc: stable@vger.kernel.org
+    Signed-off-by: Brian Norris <briannorris@chromium.org>
+    Signed-off-by: Heiko Stuebner <heiko@sntech.de>
+    Link: https://patchwork.freedesktop.org/patch/msgid/20181205181657.177703-1-briannorris@chromium.org
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking b026c7ee565994721805503b570cf5b7feed608b ......
 	 orig commit -> 017b1660df89f5fb4bfe66c34e35f7d2031100c7 ......
 checking 575361a2cbe0bfe1ef9bf43a8c017074f913c4e3 ......
@@ -45,6 +108,24 @@ checking d507dfb5e4fe3e5b01259055c7a4fcaba114f89e ......
 checking 47aa49f64f0f2b8db7de8eba2e89490e8371fd7e ......
 	 orig commit -> 61a9c11e5e7a0dab5381afa5d9d4dd5ebf18f7a0 ......
 		 61a9c11e5e7a0dab5381afa5d9d4dd5ebf18f7a0 has problem. Fixes commit -> d64264d6218e6892edd832dc3a5a5857c2856c53
+commit d8ef8e9465ef976f3b8a61d9b453947b2d144d73
+Author: Lukas Czerner <lczerner@redhat.com>
+Date:   Fri Mar 15 00:15:32 2019 -0400
+
+    ext4: add missing brelse() in add_new_gdb_meta_bg()
+    
+    [ Upstream commit d64264d6218e6892edd832dc3a5a5857c2856c53 ]
+    
+    Currently in add_new_gdb_meta_bg() there is a missing brelse of gdb_bh
+    in case ext4_journal_get_write_access() fails.
+    Additionally kvfree() is missing in the same error path. Fix it by
+    moving the ext4_journal_get_write_access() before the ext4 sb update as
+    Ted suggested and release n_group_desc and gdb_bh in case it fails.
+    
+    Fixes: 61a9c11e5e7a ("ext4: add missing brelse() add_new_gdb_meta_bg()'s error path")
+    Signed-off-by: Lukas Czerner <lczerner@redhat.com>
+    Signed-off-by: Theodore Ts'o <tytso@mit.edu>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
 checking 88cc2d51d221bf5bbc3622a47b07ef0947cdbfa1 ......
 	 orig commit -> cea5794122125bf67559906a0762186cf417099c ......
 checking 2eefc69471f17b4b65fc8ba8356b9ee3a7c523d0 ......
@@ -53,9 +134,6 @@ checking 989e44d6d2688a9bb162589a719410d6e7898502 ......
 	 orig commit -> 35b69a420bfb56b7b74cb635ea903db05e357bec ......
 checking f02c3c34bda23e96df909d23625073539db19e3d ......
 	 orig commit -> ac765f83f1397646c11092a032d4f62c3d478b81 ......
-	 orig commit -> de02b9f6bb65 ......
-		 de02b9f6bb65 has problem. Fixes commit -> 11023d3f5fdf89bba5e1142127701ca6e6014587
-	 orig commit -> 07d19dc9fbe9 ......
 checking d2db9e2ee15f44173838b52bd0cdbfdea9f21583 ......
 	 orig commit -> d0ffb805b729322626639336986bc83fc2e60871 ......
 checking 505bc0f3c125f985f4482cacf009437bc26932f9 ......
@@ -180,8 +258,6 @@ checking 54e9c8cf659f3f8d07a610b2836025cde6556f46 ......
 	 orig commit -> 1bd54d851f50dea6af30c3e6ff4f3e9aab5558f9 ......
 checking 8e5e88948e5f02e7441c2dd77b33c6fc26a401d9 ......
 	 orig commit -> 3f2aa244ee1a0d17ed5b6c86564d2c1b24d1c96b ......
-	 orig commit -> 205e1b7f51e4 ......
-		 205e1b7f51e4 has problem. Fixes commit -> 3f2aa244ee1a0d17ed5b6c86564d2c1b24d1c96b
 checking d3105e63dc72969cf5cc643154146c1a181043c7 ......
 	 orig commit -> c0fae7e2452b90c31edd2d25eb3baf0c76b400ca ......
 checking 901c46620f2fb8f93e0888b658e424f38e706cba ......
@@ -234,16 +310,39 @@ checking 8954771abdea5c34280870e35592c7226a816d95 ......
 	 orig commit -> b6eae0f61db27748606cc00dafcfd1e2c032f0a5 ......
 checking 7546540bfd7e9be6e29602624fafae747de22558 ......
 	 orig commit -> 076ed3da0c9b2f88d9157dbe7044a45641ae369e ......
-	 orig commit -> 40413955ee26 ......
 checking 4f2f01aa89e9332ebc5b07919ab17ee7d367fb35 ......
 	 orig commit -> a856531951dc8094359dfdac21d59cee5969c18e ......
 		 a856531951dc8094359dfdac21d59cee5969c18e has problem. Fixes commit -> d3132b3860f6cf35ff7609a76bbcdbb814bd027c
+commit afe7fb75a67b8f80042f019e7bf60e60d0d5c1fb
+Author: Juergen Gross <jgross@suse.com>
+Date:   Thu Nov 8 08:35:06 2018 +0100
+
+    xen: fix xen_qlock_wait()
+    
+    commit d3132b3860f6cf35ff7609a76bbcdbb814bd027c upstream.
+    
+    Commit a856531951dc80 ("xen: make xen_qlock_wait() nestable")
+    introduced a regression for Xen guests running fully virtualized
+    (HVM or PVH mode). The Xen hypervisor wouldn't return from the poll
+    hypercall with interrupts disabled in case of an interrupt (for PV
+    guests it does).
+    
+    So instead of disabling interrupts in xen_qlock_wait() use a nesting
+    counter to avoid calling xen_clear_irq_pending() in case
+    xen_qlock_wait() is nested.
+    
+    Fixes: a856531951dc80 ("xen: make xen_qlock_wait() nestable")
+    Cc: stable@vger.kernel.org
+    Reported-by: Sander Eikelenboom <linux@eikelenboom.it>
+    Signed-off-by: Juergen Gross <jgross@suse.com>
+    Reviewed-by: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+    Tested-by: Sander Eikelenboom <linux@eikelenboom.it>
+    Signed-off-by: Juergen Gross <jgross@suse.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking a1a52e429decbc3e9bd31634ba1ecd4870ffa686 ......
 	 orig commit -> 2ac2a7d4d9ff4e01e36f9c3d116582f6f655ab47 ......
 checking 8cacd37f58a5aa170877bc61c41327086d57ce81 ......
 	 orig commit -> e487a0f52301293152a6f8c4e217f2a11dd808e3 ......
-	 orig commit -> ccc9d90a9a8b ......
-		 ccc9d90a9a8b has problem. Fixes commit -> e487a0f52301293152a6f8c4e217f2a11dd808e3
 checking cf9e0f77f54a18775516de808195cb57439be98a ......
 	 orig commit -> 7250f422da0480d8512b756640f131b9b893ccda ......
 checking a9d21a73909f3bce076ecdaed589640d001bc5b2 ......
@@ -275,12 +374,8 @@ checking 93ceb8dcdef904189b10cbddcf9be3f971a1ab89 ......
 	 orig commit -> a9911937e7d332761e8c4fcbc7ba0426bdc3956f ......
 checking 1305e3d89377e1e5d0df42e4bcedd58d9af5e983 ......
 	 orig commit -> b432414b996d32a1bd9afe2bd595bd5729c1477f ......
-	 orig commit -> 1cf86bc21257 ......
-	 orig commit -> 05e0c828955c ......
 checking ace4787f6cc6512696141aace9996df90673b51c ......
 	 orig commit -> 0d5b476f8f57fcb06c45fe27681ac47254f63fd2 ......
-	 orig commit -> 1cf86bc21257 ......
-	 orig commit -> 05e0c828955c ......
 checking 37f2457cf4cfe826a7a58c4d8a48c34ef575948c ......
 	 orig commit -> 89c68b102f13f123aaef22b292526d6b92501334 ......
 checking c55954e7e0b8fb84e3250a44d7431334555636a4 ......
@@ -288,6 +383,60 @@ checking c55954e7e0b8fb84e3250a44d7431334555636a4 ......
 checking 0524e92e0f8240866e9f3d79d10d335175c6bb59 ......
 	 orig commit -> 819319fc93461c07b9cdb3064f154bd8cfd48172 ......
 		 819319fc93461c07b9cdb3064f154bd8cfd48172 has problem. Fixes commit -> 5f843ed415581cfad4ef8fefe31c138a8346ca8a
+commit e70a2d376c59147b897dd4f38bcd16ad97ccec0c
+Author: Masami Hiramatsu <mhiramat@kernel.org>
+Date:   Mon Apr 15 15:01:25 2019 +0900
+
+    kprobes: Fix error check when reusing optimized probes
+    
+    commit 5f843ed415581cfad4ef8fefe31c138a8346ca8a upstream.
+    
+    The following commit introduced a bug in one of our error paths:
+    
+      819319fc9346 ("kprobes: Return error if we fail to reuse kprobe instead of BUG_ON()")
+    
+    it missed to handle the return value of kprobe_optready() as
+    error-value. In reality, the kprobe_optready() returns a bool
+    result, so "true" case must be passed instead of 0.
+    
+    This causes some errors on kprobe boot-time selftests on ARM:
+    
+     [   ] Beginning kprobe tests...
+     [   ] Probe ARM code
+     [   ]     kprobe
+     [   ]     kretprobe
+     [   ] ARM instruction simulation
+     [   ]     Check decoding tables
+     [   ]     Run test cases
+     [   ] FAIL: test_case_handler not run
+     [   ] FAIL: Test andge r10, r11, r14, asr r7
+     [   ] FAIL: Scenario 11
+     ...
+     [   ] FAIL: Scenario 7
+     [   ] Total instruction simulation tests=1631, pass=1433 fail=198
+     [   ] kprobe tests failed
+    
+    This can happen if an optimized probe is unregistered and next
+    kprobe is registered on same address until the previous probe
+    is not reclaimed.
+    
+    If this happens, a hidden aggregated probe may be kept in memory,
+    and no new kprobe can probe same address. Also, in that case
+    register_kprobe() will return "1" instead of minus error value,
+    which can mislead caller logic.
+    
+    Signed-off-by: Masami Hiramatsu <mhiramat@kernel.org>
+    Cc: Anil S Keshavamurthy <anil.s.keshavamurthy@intel.com>
+    Cc: David S . Miller <davem@davemloft.net>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Naveen N . Rao <naveen.n.rao@linux.vnet.ibm.com>
+    Cc: Peter Zijlstra <peterz@infradead.org>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Cc: stable@vger.kernel.org # v5.0+
+    Fixes: 819319fc9346 ("kprobes: Return error if we fail to reuse kprobe instead of BUG_ON()")
+    Link: http://lkml.kernel.org/r/155530808559.32517.539898325433642204.stgit@devnote2
+    Signed-off-by: Ingo Molnar <mingo@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking 45947209d3565d0f31b3fca4a7f8c46701cf0bea ......
 	 orig commit -> 69f8455f6cc78fa6cdf80d0105d7a748106271dc ......
 checking cd6ace69ba21fd54d70cfa1403c979dfccdf1eca ......

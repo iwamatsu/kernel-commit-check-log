@@ -26,8 +26,6 @@ checking ffe6376c1803b5e964f609e8bc01507642397641 ......
 checking 2b29980eb75bc7dcb23ed0436fe805ac6e684542 ......
 	 orig commit -> c164154f66f0c9b02673f07aa4f044f1d9c70274 ......
 checking ff099ed77421a5dc8206bb61e5a598b28ab39ebb ......
-	 orig commit -> cde70140fed8 ......
-	 orig commit -> 768ae309a961 ......
 checking ab424c8eb71ee9ea4ba798faaeaf62e84048cb9a ......
 	 orig commit -> d4944b0ecec0af882483fe44b66729316e575208 ......
 checking 6a3c9524df93e9597d30c2d32114950772fce58e ......
@@ -41,14 +39,153 @@ checking 0d547583faaa4371ec566bdd38488b1eba5e8a2d ......
 checking 38d924e1d040a5632c023d7b9a3a6bfbaf4d49d1 ......
 	 orig commit -> 63489f8e821144000e0bdca7e65a8d1cc23a7ee7 ......
 		 63489f8e821144000e0bdca7e65a8d1cc23a7ee7 has problem. Fixes commit -> 5df63c2a149ae65a9ec239e7c2af44efa6f79beb
+commit 0d547583faaa4371ec566bdd38488b1eba5e8a2d
+Author: Mike Kravetz <mike.kravetz@oracle.com>
+Date:   Thu Apr 5 16:18:21 2018 -0700
+
+    hugetlbfs: fix bug in pgoff overflow checking
+    
+    commit 5df63c2a149ae65a9ec239e7c2af44efa6f79beb upstream.
+    
+    This is a fix for a regression in 32 bit kernels caused by an invalid
+    check for pgoff overflow in hugetlbfs mmap setup.  The check incorrectly
+    specified that the size of a loff_t was the same as the size of a long.
+    The regression prevents mapping hugetlbfs files at offsets greater than
+    4GB on 32 bit kernels.
+    
+    On 32 bit kernels conversion from a page based unsigned long can not
+    overflow a loff_t byte offset.  Therefore, skip this check if
+    sizeof(unsigned long) != sizeof(loff_t).
+    
+    Link: http://lkml.kernel.org/r/20180330145402.5053-1-mike.kravetz@oracle.com
+    Fixes: 63489f8e8211 ("hugetlbfs: check for pgoff value overflow")
+    Reported-by: Dan Rue <dan.rue@linaro.org>
+    Signed-off-by: Mike Kravetz <mike.kravetz@oracle.com>
+    Tested-by: Anders Roxell <anders.roxell@linaro.org>
+    Cc: Michal Hocko <mhocko@kernel.org>
+    Cc: Yisheng Xie <xieyisheng1@huawei.com>
+    Cc: "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+    Cc: Nic Losby <blurbdust@gmail.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Ben Hutchings <ben.hutchings@codethink.co.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking f24fb9efea4df0376c5bda53a2e4b189a28dc09e ......
 	 orig commit -> 045c7a3f53d9403b62d396b6d051c4be5044cdb4 ......
 		 045c7a3f53d9403b62d396b6d051c4be5044cdb4 has problem. Fixes commit -> 63489f8e821144000e0bdca7e65a8d1cc23a7ee7
-	 orig commit -> ff8c0c53c475 ......
-		 ff8c0c53c475 has problem. Fixes commit -> 045c7a3f53d9403b62d396b6d051c4be5044cdb4
+commit 38d924e1d040a5632c023d7b9a3a6bfbaf4d49d1
+Author: Mike Kravetz <mike.kravetz@oracle.com>
+Date:   Thu Mar 22 16:17:13 2018 -0700
+
+    hugetlbfs: check for pgoff value overflow
+    
+    commit 63489f8e821144000e0bdca7e65a8d1cc23a7ee7 upstream.
+    
+    A vma with vm_pgoff large enough to overflow a loff_t type when
+    converted to a byte offset can be passed via the remap_file_pages system
+    call.  The hugetlbfs mmap routine uses the byte offset to calculate
+    reservations and file size.
+    
+    A sequence such as:
+    
+      mmap(0x20a00000, 0x600000, 0, 0x66033, -1, 0);
+      remap_file_pages(0x20a00000, 0x600000, 0, 0x20000000000000, 0);
+    
+    will result in the following when task exits/file closed,
+    
+      kernel BUG at mm/hugetlb.c:749!
+      Call Trace:
+        hugetlbfs_evict_inode+0x2f/0x40
+        evict+0xcb/0x190
+        __dentry_kill+0xcb/0x150
+        __fput+0x164/0x1e0
+        task_work_run+0x84/0xa0
+        exit_to_usermode_loop+0x7d/0x80
+        do_syscall_64+0x18b/0x190
+        entry_SYSCALL_64_after_hwframe+0x3d/0xa2
+    
+    The overflowed pgoff value causes hugetlbfs to try to set up a mapping
+    with a negative range (end < start) that leaves invalid state which
+    causes the BUG.
+    
+    The previous overflow fix to this code was incomplete and did not take
+    the remap_file_pages system call into account.
+    
+    [mike.kravetz@oracle.com: v3]
+      Link: http://lkml.kernel.org/r/20180309002726.7248-1-mike.kravetz@oracle.com
+    [akpm@linux-foundation.org: include mmdebug.h]
+    [akpm@linux-foundation.org: fix -ve left shift count on sh]
+    Link: http://lkml.kernel.org/r/20180308210502.15952-1-mike.kravetz@oracle.com
+    Fixes: 045c7a3f53d9 ("hugetlbfs: fix offset overflow in hugetlbfs mmap")
+    Signed-off-by: Mike Kravetz <mike.kravetz@oracle.com>
+    Reported-by: Nic Losby <blurbdust@gmail.com>
+    Acked-by: Michal Hocko <mhocko@suse.com>
+    Cc: "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+    Cc: Yisheng Xie <xieyisheng1@huawei.com>
+    Cc: <stable@vger.kernel.org>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+    [bwh: Backported to 4.4: Use a conditional WARN() instead of VM_WARN()]
+    Signed-off-by: Ben Hutchings <ben.hutchings@codethink.co.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking 30a2ae50aef84ce6bb6132859a04dca461dbafdd ......
 	 orig commit -> ff8c0c53c47530ffea82c22a0a6df6332b56c957 ......
 		 ff8c0c53c47530ffea82c22a0a6df6332b56c957 has problem. Fixes commit -> 045c7a3f53d9403b62d396b6d051c4be5044cdb4
+commit f24fb9efea4df0376c5bda53a2e4b189a28dc09e
+Author: Mike Kravetz <mike.kravetz@oracle.com>
+Date:   Thu Apr 13 14:56:32 2017 -0700
+
+    hugetlbfs: fix offset overflow in hugetlbfs mmap
+    
+    commit 045c7a3f53d9403b62d396b6d051c4be5044cdb4 upstream.
+    
+    If mmap() maps a file, it can be passed an offset into the file at which
+    the mapping is to start.  Offset could be a negative value when
+    represented as a loff_t.  The offset plus length will be used to update
+    the file size (i_size) which is also a loff_t.
+    
+    Validate the value of offset and offset + length to make sure they do
+    not overflow and appear as negative.
+    
+    Found by syzcaller with commit ff8c0c53c475 ("mm/hugetlb.c: don't call
+    region_abort if region_chg fails") applied.  Prior to this commit, the
+    overflow would still occur but we would luckily return ENOMEM.
+    
+    To reproduce:
+    
+       mmap(0, 0x2000, 0, 0x40021, 0xffffffffffffffffULL, 0x8000000000000000ULL);
+    
+    Resulted in,
+    
+      kernel BUG at mm/hugetlb.c:742!
+      Call Trace:
+       hugetlbfs_evict_inode+0x80/0xa0
+       evict+0x24a/0x620
+       iput+0x48f/0x8c0
+       dentry_unlink_inode+0x31f/0x4d0
+       __dentry_kill+0x292/0x5e0
+       dput+0x730/0x830
+       __fput+0x438/0x720
+       ____fput+0x1a/0x20
+       task_work_run+0xfe/0x180
+       exit_to_usermode_loop+0x133/0x150
+       syscall_return_slowpath+0x184/0x1c0
+       entry_SYSCALL_64_fastpath+0xab/0xad
+    
+    Fixes: ff8c0c53c475 ("mm/hugetlb.c: don't call region_abort if region_chg fails")
+    Link: http://lkml.kernel.org/r/1491951118-30678-1-git-send-email-mike.kravetz@oracle.com
+    Reported-by: Vegard Nossum <vegard.nossum@oracle.com>
+    Signed-off-by: Mike Kravetz <mike.kravetz@oracle.com>
+    Acked-by: Hillf Danton <hillf.zj@alibaba-inc.com>
+    Cc: Dmitry Vyukov <dvyukov@google.com>
+    Cc: Michal Hocko <mhocko@suse.com>
+    Cc: "Kirill A . Shutemov" <kirill.shutemov@linux.intel.com>
+    Cc: Andrey Ryabinin <aryabinin@virtuozzo.com>
+    Cc: Naoya Horiguchi <n-horiguchi@ah.jp.nec.com>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Ben Hutchings <ben.hutchings@codethink.co.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking 954648ebf8e27fcbf23b7954b79a22a5cacc83b1 ......
 	 orig commit -> 78c9c4dfbf8c04883941445a195276bb4bb92c76 ......
 checking e47b9b2b005ab8b1b83bc0ac4aa2803cba57182a ......
@@ -56,12 +193,7 @@ checking e47b9b2b005ab8b1b83bc0ac4aa2803cba57182a ......
 checking 1c74bd22e846b162ea6401e8d43172e0e7256ccf ......
 	 orig commit -> af86ca4e3088fe5eacf2f7e58c01fa68ca067672 ......
 checking 451624d47005aace4e314b488cb70ba3ee5dcce8 ......
-	 orig commit -> 31fd85816dbe ......
 checking 168cb9b7b2839e861278f9fde03820aba32c4ee0 ......
-	 orig commit -> dc503a8ad984 ......
-		 dc503a8ad984 has problem. Fixes commit -> 8fe2d6ccd52b086268f2f36e5e2fc0fe3aeffa80
-63f45f840634ab5fd71bbc07acff915277764068
-1ab2de2bfed3ab2073ed1e7afa2b1134930d2b70
 checking 3c4bb079e16e222324c68d7594b1ab6f699edfca ......
 	 orig commit -> cedaf52693f02372010548c63b2e63228b959099 ......
 checking ff3c3b181c5ee5930b9cc6ca59c4c985a3d93220 ......
@@ -84,11 +216,41 @@ checking 6d1d4fc34287da617b50bd7139e536a8d69c24ea ......
 	 orig commit -> b3bbfb3fb5d25776b8e3f361d2eedaabb0b496cd ......
 checking 45b871531cb6d2973d0c68083376719c50779a96 ......
 	 orig commit -> de9e478b9d49f3a0214310d921450cf5bb4a21e6 ......
-	 orig commit -> 11f1a4b9755f ......
-		 11f1a4b9755f has problem. Fixes commit -> 2a418cf3f5f1caf911af288e978d61c9844b0695
 checking cc8c5450b6d7ac0cbc36d133ffa21a01dd21b3d8 ......
 	 orig commit -> 11f1a4b9755f5dbc3e822a96502ebe9b044b14d8 ......
 		 11f1a4b9755f5dbc3e822a96502ebe9b044b14d8 has problem. Fixes commit -> 2a418cf3f5f1caf911af288e978d61c9844b0695
+commit e90171edbef7b43e3eab51906f5f499f131a2887
+Author: Andy Lutomirski <luto@kernel.org>
+Date:   Fri Feb 22 17:17:04 2019 -0800
+
+    x86/uaccess: Don't leak the AC flag into __put_user() value evaluation
+    
+    commit 2a418cf3f5f1caf911af288e978d61c9844b0695 upstream.
+    
+    When calling __put_user(foo(), ptr), the __put_user() macro would call
+    foo() in between __uaccess_begin() and __uaccess_end().  If that code
+    were buggy, then those bugs would be run without SMAP protection.
+    
+    Fortunately, there seem to be few instances of the problem in the
+    kernel. Nevertheless, __put_user() should be fixed to avoid doing this.
+    Therefore, evaluate __put_user()'s argument before setting AC.
+    
+    This issue was noticed when an objtool hack by Peter Zijlstra complained
+    about genregs_get() and I compared the assembly output to the C source.
+    
+     [ bp: Massage commit message and fixed up whitespace. ]
+    
+    Fixes: 11f1a4b9755f ("x86: reorganize SMAP handling in user space accesses")
+    Signed-off-by: Andy Lutomirski <luto@kernel.org>
+    Signed-off-by: Borislav Petkov <bp@suse.de>
+    Acked-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Peter Zijlstra <peterz@infradead.org>
+    Cc: Brian Gerst <brgerst@gmail.com>
+    Cc: Josh Poimboeuf <jpoimboe@redhat.com>
+    Cc: Denys Vlasenko <dvlasenk@redhat.com>
+    Cc: stable@vger.kernel.org
+    Link: http://lkml.kernel.org/r/20190225125231.845656645@infradead.org
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking d0169c04fee013922a272a19f7950439a5e07230 ......
 	 orig commit -> ecb586bd29c99fb4de599dec388658e74388daad ......
 checking 89be8950bab799ddb9cc3777345e3c21bcb32dba ......
@@ -96,6 +258,36 @@ checking 89be8950bab799ddb9cc3777345e3c21bcb32dba ......
 checking fc6aae9f407810cb153a9133c28735871f9f0a16 ......
 	 orig commit -> d28b387fb74da95d69d2615732f50cceb38e9a4d ......
 		 d28b387fb74da95d69d2615732f50cceb38e9a4d has problem. Fixes commit -> ecb586bd29c99fb4de599dec388658e74388daad
+commit d0169c04fee013922a272a19f7950439a5e07230
+Author: Paolo Bonzini <pbonzini@redhat.com>
+Date:   Thu Feb 22 16:43:17 2018 +0100
+
+    KVM/x86: Remove indirect MSR op calls from SPEC_CTRL
+    
+    commit ecb586bd29c99fb4de599dec388658e74388daad upstream.
+    
+    Having a paravirt indirect call in the IBRS restore path is not a
+    good idea, since we are trying to protect from speculative execution
+    of bogus indirect branch targets.  It is also slower, so use
+    native_wrmsrl() on the vmentry path too.
+    
+    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+    Reviewed-by: Jim Mattson <jmattson@google.com>
+    Cc: David Woodhouse <dwmw@amazon.co.uk>
+    Cc: KarimAllah Ahmed <karahmed@amazon.de>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Peter Zijlstra <peterz@infradead.org>
+    Cc: Radim Krčmář <rkrcmar@redhat.com>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Cc: kvm@vger.kernel.org
+    Cc: stable@vger.kernel.org
+    Fixes: d28b387fb74da95d69d2615732f50cceb38e9a4d
+    Link: http://lkml.kernel.org/r/20180222154318.20361-2-pbonzini@redhat.com
+    Signed-off-by: Ingo Molnar <mingo@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+    [bwh: Backported to 4.4: adjust context]
+    Signed-off-by: Ben Hutchings <ben.hutchings@codethink.co.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking 337c26f50a7189f114fce87e45eadd8d6dd9560b ......
 	 orig commit -> 28c1c9fabf48d6ad596273a11c46e0d0da3e14cd ......
 		 28c1c9fabf48d6ad596273a11c46e0d0da3e14cd has problem. Fixes commit -> 1eaafe91a0df4157521b6417b3dd8430bf5f52f0
@@ -184,12 +376,8 @@ checking ed7748bcf290ad8f80020217d832f458ac9bae7f ......
 	 orig commit -> b2b7af861122a0c0f6260155c29a1b2e594cd5b5 ......
 checking 266b50e76449bf4a2391aabd9cc8ec364f8e0589 ......
 	 orig commit -> 688838934c231bb08f46db687e57f6d8bf82709c ......
-	 orig commit -> da71577545a5 ......
 checking d7519c01c9b83129530434baa3d78ee23078400c ......
 	 orig commit -> 9410d386d0a829ace9558336263086c2fbbe8aed ......
-	 orig commit -> 68d2f84a1368 ......
-		 68d2f84a1368 has problem. Fixes commit -> 9410d386d0a829ace9558336263086c2fbbe8aed
-	 orig commit -> 992cba7e276d ......
 checking a1ec658a588b6d18c1cc1a5760c34e1dcfca1696 ......
 	 orig commit -> d2a36971ef595069b7a600d1144c2e0881a930a1 ......
 checking 8832e33045b5219357fe7c859fda385902c1d052 ......

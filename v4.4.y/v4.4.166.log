@@ -13,8 +13,6 @@ checking 9ef13fecf975e714774d2a1cd49b520b4be9fea4 ......
 	 orig commit -> dada6a43b0402eba438a17ac86fdc64ac56a4607 ......
 checking dc0e5734399b9d135ed044af983e3ef779b23f0a ......
 	 orig commit -> 100bc3e2bebf95506da57cbdf5f26b25f6da4c81 ......
-	 orig commit -> 68e5fc4a255a ......
-		 68e5fc4a255a has problem. Fixes commit -> 100bc3e2bebf95506da57cbdf5f26b25f6da4c81
 checking 122775d733a01970741c59fb8078cdfc22c807a0 ......
 	 orig commit -> c988de29ca161823db6a7125e803d597ef75b49c ......
 checking bcecc9e5751f7c64e96299706609ab2e85b408da ......
@@ -74,7 +72,6 @@ checking af70fc347ff2c0a331e79e7662537fe18df6c572 ......
 	 orig commit -> b155b4fde5bdde9fed439cd1f5ea07173df2ed31 ......
 checking 78b572c9e3a1b7edf46da17ad96a86110dd65fe8 ......
 	 orig commit -> 6ff38bd40230af35e446239396e5fc8ebd6a5248 ......
-	 orig commit -> 91b0abe36a7b ......
 checking 4d0afb8b19aa3ba916fdac613dcab76f05e3ed32 ......
 	 orig commit -> 6b04114f6fae5e84d33404c2970b1949c032546e ......
 checking d473a00bd808652f2a46b9a3ff3dfc55753aba5f ......
@@ -105,6 +102,71 @@ checking fa8d814aba4a53fab1b6d2cbc8575a8132fc10df ......
 	 orig commit -> 2dd453168643d9475028cd867c57e65956a0f7f9 ......
 		 2dd453168643d9475028cd867c57e65956a0f7f9 has problem. Fixes commit -> 3ec8002951ea173e24b466df1ea98c56b7920e63
 1cd25cbb2fedbc777f3a8c3cb1ba69b645aeaa64
+commit 5403677a46a8155ad369e3ca17c9cc6a037b258e
+Author: Laura Abbott <labbott@redhat.com>
+Date:   Wed Sep 19 18:59:01 2018 -0700
+
+    kgdboc: Fix warning with module build
+    
+    commit 1cd25cbb2fedbc777f3a8c3cb1ba69b645aeaa64 upstream.
+    
+    After 2dd453168643 ("kgdboc: Fix restrict error"), kgdboc_option_setup is
+    now only used when built in, resulting in a warning when compiled as a
+    module:
+    
+    drivers/tty/serial/kgdboc.c:134:12: warning: 'kgdboc_option_setup' defined but not used [-Wunused-function]
+     static int kgdboc_option_setup(char *opt)
+                ^~~~~~~~~~~~~~~~~~~
+    
+    Move the function under the appropriate ifdef for builtin only.
+    
+    Fixes: 2dd453168643 ("kgdboc: Fix restrict error")
+    Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+    Signed-off-by: Laura Abbott <labbott@redhat.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+commit 98bc2f91e918979b3b660b38cca9697ca1178330
+Author: Wentao Wang <witallwang@gmail.com>
+Date:   Wed Mar 20 15:30:39 2019 +0000
+
+    Disable kgdboc failed by echo space to /sys/module/kgdboc/parameters/kgdboc
+    
+    commit 3ec8002951ea173e24b466df1ea98c56b7920e63 upstream.
+    
+    Echo "" to /sys/module/kgdboc/parameters/kgdboc will fail with "No such
+    device” error.
+    
+    This is caused by function "configure_kgdboc" who init err to ENODEV
+    when the config is empty (legal input) the code go out with ENODEV
+    returned.
+    
+    Fixes: 2dd453168643 ("kgdboc: Fix restrict error")
+    Signed-off-by: Wentao Wang <witallwang@gmail.com>
+    Cc: stable <stable@vger.kernel.org>
+    Acked-by: Daniel Thompson <daniel.thompson@linaro.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 5403677a46a8155ad369e3ca17c9cc6a037b258e
+Author: Laura Abbott <labbott@redhat.com>
+Date:   Wed Sep 19 18:59:01 2018 -0700
+
+    kgdboc: Fix warning with module build
+    
+    commit 1cd25cbb2fedbc777f3a8c3cb1ba69b645aeaa64 upstream.
+    
+    After 2dd453168643 ("kgdboc: Fix restrict error"), kgdboc_option_setup is
+    now only used when built in, resulting in a warning when compiled as a
+    module:
+    
+    drivers/tty/serial/kgdboc.c:134:12: warning: 'kgdboc_option_setup' defined but not used [-Wunused-function]
+     static int kgdboc_option_setup(char *opt)
+                ^~~~~~~~~~~~~~~~~~~
+    
+    Move the function under the appropriate ifdef for builtin only.
+    
+    Fixes: 2dd453168643 ("kgdboc: Fix restrict error")
+    Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+    Signed-off-by: Laura Abbott <labbott@redhat.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
 checking 81ff3e2f640f664582f982d6f3e2e4deacb04e81 ......
 	 orig commit -> 42c335f7e67029d2e01711f2f2bc6252277c8993 ......
 checking 0d980b7e4ec0cdc33fe1dafeb4f6cbd16b02bf4a ......
