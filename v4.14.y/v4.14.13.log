@@ -1,0 +1,1277 @@
+Check from v4.14.13 to v4.14.14
+Commit count: 118
+checking 9c0bf9847171edd597a13adf3ddc879e96d947cd ......
+checking 198660b7a5dd33b114001023d540c9072603e2a8 ......
+	 orig commit -> b8b9ce4b5aec8de9e23cabb0a26b78641f9ab1d6 ......
+checking 6d8b7d3934b2c4f718441784823fbaeaa4c5327d ......
+	 orig commit -> 99a9dc98ba52267ce5e062b52de88ea1f1b2a7d8 ......
+checking c3e7fc96545d83abbc1c2c1a7ac6809cf5fb6202 ......
+	 orig commit -> a237f762681e2a394ca67f21df2feb2b76a3609b ......
+checking 026b3f23c970a22165ffdbd47a2a0cdccfd8c009 ......
+	 orig commit -> f10ee3dcc9f0aba92a5c4c064628be5200765dc2 ......
+checking 5a6e7a27d01eee812e37030aa083ac7bbba762c5 ......
+	 orig commit -> 352909b49ba0d74929b96af6dfbefc854ab6ebb5 ......
+checking b9cdaaf0a3becc52e8b4662fef28c452c4f009b4 ......
+	 orig commit -> 117cc7a908c83697b0b737d15ae1eb5943afe35b ......
+		 117cc7a908c83697b0b737d15ae1eb5943afe35b has problem. Fixes commit -> af189c95a371b59f493dbe0f50c0a09724868881
+checking b0edc2dfb684b43c56d81a58271430a614a4975a ......
+	 orig commit -> 7614e913db1f40fff819b36216484dc3808995d4 ......
+checking 470703735b39d743afe0d9e91edaab6ac400c6c7 ......
+	 orig commit -> 5096732f6f695001fa2d6f1335a2680b37912c69 ......
+checking 41f8af6a4656e9dd348506b4ebfa4677730994c3 ......
+	 orig commit -> ea08816d5b185ab3d09e95e393f265af54560350 ......
+checking e0dcc73d67359c67d8b81868c2dd388b0c6be1f2 ......
+	 orig commit -> e70e5892b28c18f517f29ab6e83bd57705104b31 ......
+checking 82de9301b4ea4389ee889558f770513930bf803f ......
+	 orig commit -> 9351803bd803cdbeb9b5a7850b7b6f464806e3db ......
+checking d4edaa981b8749acd8fdd7ab8d2be2585ebeeb9e ......
+	 orig commit -> 2641f08bb7fc63a636a2b18173221d7040a3512e ......
+checking 79f2c12856404c5acfbc33e021108c0810a6d2b8 ......
+	 orig commit -> 9697fa39efd3fc3692f2949d4045f393ec58450b ......
+checking dcd4311d0e646ae9e739f7238002b664613f2355 ......
+	 orig commit -> da285121560e769cc31797bba6422eea71d473e0 ......
+		 da285121560e769cc31797bba6422eea71d473e0 has problem. Fixes commit -> 9471eee9186a46893726e22ebb54cade3f9bc043
+checking 3a72bd4b60da338e66922e4f9eded174b3ad147d ......
+	 orig commit -> 76b043848fd22dbf7f8bf3a1452f8c70d557b860 ......
+		 76b043848fd22dbf7f8bf3a1452f8c70d557b860 has problem. Fixes commit -> 1df37383a8aeabb9b418698f0bcdffea01f4b1b2
+b8b9ce4b5aec8de9e23cabb0a26b78641f9ab1d6
+commit 198660b7a5dd33b114001023d540c9072603e2a8
+Author: Thomas Gleixner <tglx@linutronix.de>
+Date:   Sun Jan 14 22:13:29 2018 +0100
+
+    x86/retpoline: Remove compile time warning
+    
+    commit b8b9ce4b5aec8de9e23cabb0a26b78641f9ab1d6 upstream.
+    
+    Remove the compile time warning when CONFIG_RETPOLINE=y and the compiler
+    does not have retpoline support. Linus rationale for this is:
+    
+      It's wrong because it will just make people turn off RETPOLINE, and the
+      asm updates - and return stack clearing - that are independent of the
+      compiler are likely the most important parts because they are likely the
+      ones easiest to target.
+    
+      And it's annoying because most people won't be able to do anything about
+      it. The number of people building their own compiler? Very small. So if
+      their distro hasn't got a compiler yet (and pretty much nobody does), the
+      warning is just annoying crap.
+    
+      It is already properly reported as part of the sysfs interface. The
+      compile-time warning only encourages bad things.
+    
+    Fixes: 76b043848fd2 ("x86/retpoline: Add initial retpoline support")
+    Requested-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Cc: David Woodhouse <dwmw@amazon.co.uk>
+    Cc: Peter Zijlstra (Intel) <peterz@infradead.org>
+    Cc: gnomes@lxorguk.ukuu.org.uk
+    Cc: Rik van Riel <riel@redhat.com>
+    Cc: Andi Kleen <ak@linux.intel.com>
+    Cc: Josh Poimboeuf <jpoimboe@redhat.com>
+    Cc: thomas.lendacky@amd.com
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Jiri Kosina <jikos@kernel.org>
+    Cc: Andy Lutomirski <luto@amacapital.net>
+    Cc: Dave Hansen <dave.hansen@intel.com>
+    Cc: Kees Cook <keescook@google.com>
+    Cc: Tim Chen <tim.c.chen@linux.intel.com>
+    Cc: Greg Kroah-Hartman <gregkh@linux-foundation.org>
+    Link: https://lkml.kernel.org/r/CA+55aFzWgquv4i6Mab6bASqYXg3ErV3XDFEYf=GEcCDQg5uAtw@mail.gmail.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+commit 4ce354deed2cc18b5b2175cf487011e375e89c75
+Author: Waiman Long <longman@redhat.com>
+Date:   Mon Jan 22 17:09:34 2018 -0500
+
+    x86/retpoline: Remove the esp/rsp thunk
+    
+    commit 1df37383a8aeabb9b418698f0bcdffea01f4b1b2
+    
+    It doesn't make sense to have an indirect call thunk with esp/rsp as
+    retpoline code won't work correctly with the stack pointer register.
+    Removing it will help compiler writers to catch error in case such
+    a thunk call is emitted incorrectly.
+    
+    Fixes: 76b043848fd2 ("x86/retpoline: Add initial retpoline support")
+    Suggested-by: Jeff Law <law@redhat.com>
+    Signed-off-by: Waiman Long <longman@redhat.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Acked-by: David Woodhouse <dwmw@amazon.co.uk>
+    Cc: Tom Lendacky <thomas.lendacky@amd.com>
+    Cc: Kees Cook <keescook@google.com>
+    Cc: Andi Kleen <ak@linux.intel.com>
+    Cc: Tim Chen <tim.c.chen@linux.intel.com>
+    Cc: Peter Zijlstra <peterz@infradead.org>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Jiri Kosina <jikos@kernel.org>
+    Cc: Andy Lutomirski <luto@amacapital.net>
+    Cc: Dave Hansen <dave.hansen@intel.com>
+    Cc: Josh Poimboeuf <jpoimboe@redhat.com>
+    Cc: Arjan van de Ven <arjan@linux.intel.com>
+    Cc: Greg Kroah-Hartman <gregkh@linux-foundation.org>
+    Cc: Paul Turner <pjt@google.com>
+    Link: https://lkml.kernel.org/r/1516658974-27852-1-git-send-email-longman@redhat.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 198660b7a5dd33b114001023d540c9072603e2a8
+Author: Thomas Gleixner <tglx@linutronix.de>
+Date:   Sun Jan 14 22:13:29 2018 +0100
+
+    x86/retpoline: Remove compile time warning
+    
+    commit b8b9ce4b5aec8de9e23cabb0a26b78641f9ab1d6 upstream.
+    
+    Remove the compile time warning when CONFIG_RETPOLINE=y and the compiler
+    does not have retpoline support. Linus rationale for this is:
+    
+      It's wrong because it will just make people turn off RETPOLINE, and the
+      asm updates - and return stack clearing - that are independent of the
+      compiler are likely the most important parts because they are likely the
+      ones easiest to target.
+    
+      And it's annoying because most people won't be able to do anything about
+      it. The number of people building their own compiler? Very small. So if
+      their distro hasn't got a compiler yet (and pretty much nobody does), the
+      warning is just annoying crap.
+    
+      It is already properly reported as part of the sysfs interface. The
+      compile-time warning only encourages bad things.
+    
+    Fixes: 76b043848fd2 ("x86/retpoline: Add initial retpoline support")
+    Requested-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Cc: David Woodhouse <dwmw@amazon.co.uk>
+    Cc: Peter Zijlstra (Intel) <peterz@infradead.org>
+    Cc: gnomes@lxorguk.ukuu.org.uk
+    Cc: Rik van Riel <riel@redhat.com>
+    Cc: Andi Kleen <ak@linux.intel.com>
+    Cc: Josh Poimboeuf <jpoimboe@redhat.com>
+    Cc: thomas.lendacky@amd.com
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Jiri Kosina <jikos@kernel.org>
+    Cc: Andy Lutomirski <luto@amacapital.net>
+    Cc: Dave Hansen <dave.hansen@intel.com>
+    Cc: Kees Cook <keescook@google.com>
+    Cc: Tim Chen <tim.c.chen@linux.intel.com>
+    Cc: Greg Kroah-Hartman <gregkh@linux-foundation.org>
+    Link: https://lkml.kernel.org/r/CA+55aFzWgquv4i6Mab6bASqYXg3ErV3XDFEYf=GEcCDQg5uAtw@mail.gmail.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 6b95f61a41349ef4a115520ac4868bf52555eab9 ......
+	 orig commit -> 258c76059cece01bebae098e81bacb1af2edad17 ......
+checking 6a4d11820d12836785f64a609eecbcadc0d526d0 ......
+	 orig commit -> 39b735332cb8b33a27c28592d969e4016c86c3ea ......
+checking 22e64ef9cdc3eee09e230855e01f1a3826494ce7 ......
+	 orig commit -> 445b69e3b75e42362a5bdc13c8b8f61599e2228a ......
+checking b50f563f7c1a4dc307ba2d7f3f9b8ef2f98a2aa2 ......
+	 orig commit -> 612e8e9350fd19cae6900cf36ea0c6892d1a0dca ......
+checking 31431b7b4665cae7bc197980e42a5f3728258688 ......
+	 orig commit -> 9ecccfaa7cb5249bd31bdceb93fcf5bedb8a24d8 ......
+checking 268114cdb3086ef54652b214f4f1e5d0a961c5f8 ......
+	 orig commit -> 9c6a73c75864ad9fa49e5fa6513e4c4071c0e29f ......
+checking 649c1de819afc90cb6699dc04f5340009dd3783c ......
+	 orig commit -> e4d0e84e490790798691aaa0f2e598637f1867ec ......
+checking c0090f9f280d576a3b0cab9fb5eec9fb0de988d0 ......
+	 orig commit -> 8d56eff266f3e41a6c39926269c4c3f58f881a8e ......
+checking 968a3bb156424a9e4ea7aa1eb2779b6e86b5a63e ......
+	 orig commit -> 262b6b30087246abf09d6275eb0c0dc421bcbe38 ......
+		 262b6b30087246abf09d6275eb0c0dc421bcbe38 has problem. Fixes commit -> 445b69e3b75e42362a5bdc13c8b8f61599e2228a
+commit 22e64ef9cdc3eee09e230855e01f1a3826494ce7
+Author: Dave Hansen <dave.hansen@linux.intel.com>
+Date:   Wed Jan 10 14:49:39 2018 -0800
+
+    x86/pti: Make unpoison of pgd for trusted boot work for real
+    
+    commit 445b69e3b75e42362a5bdc13c8b8f61599e2228a upstream.
+    
+    The inital fix for trusted boot and PTI potentially misses the pgd clearing
+    if pud_alloc() sets a PGD.  It probably works in *practice* because for two
+    adjacent calls to map_tboot_page() that share a PGD entry, the first will
+    clear NX, *then* allocate and set the PGD (without NX clear).  The second
+    call will *not* allocate but will clear the NX bit.
+    
+    Defer the NX clearing to a point after it is known that all top-level
+    allocations have occurred.  Add a comment to clarify why.
+    
+    [ tglx: Massaged changelog ]
+    
+    Fixes: 262b6b30087 ("x86/tboot: Unbreak tboot with PTI enabled")
+    Signed-off-by: Dave Hansen <dave.hansen@linux.intel.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Reviewed-by: Andrea Arcangeli <aarcange@redhat.com>
+    Cc: Jon Masters <jcm@redhat.com>
+    Cc: "Tim Chen" <tim.c.chen@linux.intel.com>
+    Cc: gnomes@lxorguk.ukuu.org.uk
+    Cc: peterz@infradead.org
+    Cc: ning.sun@intel.com
+    Cc: tboot-devel@lists.sourceforge.net
+    Cc: andi@firstfloor.org
+    Cc: luto@kernel.org
+    Cc: law@redhat.com
+    Cc: pbonzini@redhat.com
+    Cc: torvalds@linux-foundation.org
+    Cc: gregkh@linux-foundation.org
+    Cc: dwmw@amazon.co.uk
+    Cc: nickc@redhat.com
+    Cc: stable@vger.kernel.org
+    Link: https://lkml.kernel.org/r/20180110224939.2695CD47@viggo.jf.intel.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking e0d753568c16f123e4805b7136734f3a83403fb6 ......
+	 orig commit -> 61dc0f555b5c761cdafb0ba5bd41ecf22d68a4c4 ......
+checking 5a3e4b399ebc994516f7b6bd8ae0584027e72418 ......
+	 orig commit -> 87590ce6e373d1a5401f6539f0c59ef92dd924a9 ......
+		 87590ce6e373d1a5401f6539f0c59ef92dd924a9 has problem. Fixes commit -> 9ecccfaa7cb5249bd31bdceb93fcf5bedb8a24d8
+commit 31431b7b4665cae7bc197980e42a5f3728258688
+Author: David Woodhouse <dwmw@amazon.co.uk>
+Date:   Tue Jan 9 15:02:51 2018 +0000
+
+    sysfs/cpu: Fix typos in vulnerability documentation
+    
+    commit 9ecccfaa7cb5249bd31bdceb93fcf5bedb8a24d8 upstream.
+    
+    Fixes: 87590ce6e ("sysfs/cpu: Add vulnerability folder")
+    Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 9298e868dddd820829f814cd25a0f28c92036af7 ......
+	 orig commit -> 99c6fa2511d8a683e61468be91b83f85452115fa ......
+checking af17c6526b60d52a35033fede9461bd9fbfa5a70 ......
+	 orig commit -> 01c9b17bf673b05bb401b76ec763e9730ccf1376 ......
+checking 58168505a9f13a60b3465fbdd85c70a560640a41 ......
+	 orig commit -> de53c3786a3ce162a1c815d0c04c766c23ec9c0a ......
+checking fbbc6c4eeb0a55935e0d4d89a46f3783cf170b84 ......
+	 orig commit -> 4110e02eb45ea447ec6f5459c9934de0a273fb91 ......
+checking 233363fd02c5fffdfd0be305b70adbbe661d22cf ......
+	 orig commit -> 0dda0b3fb255048a221f736c8a2a24c674da8bf3 ......
+checking a4ae05b7bfcdd72f135099b848e1777e486efb19 ......
+	 orig commit -> a0b1280368d1e91ab72f849ef095b4f07a39bbf1 ......
+checking 45a061d6b4e0e671cc3aa1bed8bf47078eade69e ......
+	 orig commit -> aa1f10e85b0ab53dee85d8e293c8159d18d293a8 ......
+checking 8e13548c7f50cba68a0a122218431bec741938f9 ......
+	 orig commit -> 928afc85270753657b5543e052cc270c279a3fe9 ......
+checking 02462928e2234eea95dd1ce05ca1f2c02088dc13 ......
+	 orig commit -> 06e7e776ca4d36547e503279aeff996cbb292c16 ......
+checking 242e20a5b3cc2b99ace977546d3cffc6a2a35991 ......
+	 orig commit -> 443064cb0b1fb4569fe0a71209da7625129fb760 ......
+checking 0382becc1d24e1cd00dc44e1fa5f7655441c258c ......
+	 orig commit -> 5fd77a3a0e408c23ab4002a57db980e46bc16e72 ......
+checking e56d7cd5f31ef90b1c4ecb9a0f771bad46938a01 ......
+	 orig commit -> b78d830f0049ef1966dc1e0ebd1ec2a594e2cf25 ......
+checking 34e5d097bc36f9f62db3b08b570abcd91800d00d ......
+	 orig commit -> e1346fd87c71a1f61de1fe476ec8df1425ac931c ......
+checking 2817c4c8fc1feab053b2e21f15bc040c3828d304 ......
+	 orig commit -> 7ae2c3c280db183ca9ada2675c34ec2f7378abfa ......
+checking 204d8fb1b417732359338ec0eae6eb16ff854bcc ......
+	 orig commit -> 46eb14a6e1585d99c1b9f58d0e7389082a5f466b ......
+checking f562a823dd2564e8af78424e9580031387809bfd ......
+	 orig commit -> b8626f1dc29d3eee444bfaa92146ec7b291ef41c ......
+checking d5f322fea60a96812ba3ab079bf03e27be4fc225 ......
+	 orig commit -> d14ac576d10f865970bb1324d337e5e24d79aaf4 ......
+checking fbe0d2251b3896dc927cc980e6bfb4e73814d748 ......
+	 orig commit -> 4307413256ac1e09b8f53e8715af3df9e49beec3 ......
+checking a2e0b5db9b581f78155bd4999b5bb2d0d8037eda ......
+	 orig commit -> 7891a87efc7116590eaba57acc3c422487802c6f ......
+checking 67c05d9414512e1f9040d29e37e3d5533d8c51dd ......
+	 orig commit -> bbeb6e4323dad9b5e0ee9f60c223dd532e2403b1 ......
+checking a5dbaf87684c81693854a87b4a6c46460fc7a731 ......
+	 orig commit -> b2157399cc9898260d6031c5bfe45fe137c1fbe7 ......
+		 b2157399cc9898260d6031c5bfe45fe137c1fbe7 has problem. Fixes commit -> 9d5564ddcf2a0f5ba3fa1c3a1f8a1b59ad309553
+979d63d50c0c0f7bc537bf821e056cc9fe5abd38
+c93552c443ebc63b14e26e46d2e76941c88e0d71
+bbeb6e4323dad9b5e0ee9f60c223dd532e2403b1
+commit ae03b6b1c880a03d4771257336dc3bca156dd51b
+Author: Daniel Borkmann <daniel@iogearbox.net>
+Date:   Wed Apr 3 18:39:12 2019 +0000
+
+    bpf: prevent out of bounds speculation on pointer arithmetic
+    
+    commit 979d63d50c0c0f7bc537bf821e056cc9fe5abd38 upstream.
+    
+    Jann reported that the original commit back in b2157399cc98
+    ("bpf: prevent out-of-bounds speculation") was not sufficient
+    to stop CPU from speculating out of bounds memory access:
+    While b2157399cc98 only focussed on masking array map access
+    for unprivileged users for tail calls and data access such
+    that the user provided index gets sanitized from BPF program
+    and syscall side, there is still a more generic form affected
+    from BPF programs that applies to most maps that hold user
+    data in relation to dynamic map access when dealing with
+    unknown scalars or "slow" known scalars as access offset, for
+    example:
+    
+      - Load a map value pointer into R6
+      - Load an index into R7
+      - Do a slow computation (e.g. with a memory dependency) that
+        loads a limit into R8 (e.g. load the limit from a map for
+        high latency, then mask it to make the verifier happy)
+      - Exit if R7 >= R8 (mispredicted branch)
+      - Load R0 = R6[R7]
+      - Load R0 = R6[R0]
+    
+    For unknown scalars there are two options in the BPF verifier
+    where we could derive knowledge from in order to guarantee
+    safe access to the memory: i) While </>/<=/>= variants won't
+    allow to derive any lower or upper bounds from the unknown
+    scalar where it would be safe to add it to the map value
+    pointer, it is possible through ==/!= test however. ii) another
+    option is to transform the unknown scalar into a known scalar,
+    for example, through ALU ops combination such as R &= <imm>
+    followed by R |= <imm> or any similar combination where the
+    original information from the unknown scalar would be destroyed
+    entirely leaving R with a constant. The initial slow load still
+    precedes the latter ALU ops on that register, so the CPU
+    executes speculatively from that point. Once we have the known
+    scalar, any compare operation would work then. A third option
+    only involving registers with known scalars could be crafted
+    as described in [0] where a CPU port (e.g. Slow Int unit)
+    would be filled with many dependent computations such that
+    the subsequent condition depending on its outcome has to wait
+    for evaluation on its execution port and thereby executing
+    speculatively if the speculated code can be scheduled on a
+    different execution port, or any other form of mistraining
+    as described in [1], for example. Given this is not limited
+    to only unknown scalars, not only map but also stack access
+    is affected since both is accessible for unprivileged users
+    and could potentially be used for out of bounds access under
+    speculation.
+    
+    In order to prevent any of these cases, the verifier is now
+    sanitizing pointer arithmetic on the offset such that any
+    out of bounds speculation would be masked in a way where the
+    pointer arithmetic result in the destination register will
+    stay unchanged, meaning offset masked into zero similar as
+    in array_index_nospec() case. With regards to implementation,
+    there are three options that were considered: i) new insn
+    for sanitation, ii) push/pop insn and sanitation as inlined
+    BPF, iii) reuse of ax register and sanitation as inlined BPF.
+    
+    Option i) has the downside that we end up using from reserved
+    bits in the opcode space, but also that we would require
+    each JIT to emit masking as native arch opcodes meaning
+    mitigation would have slow adoption till everyone implements
+    it eventually which is counter-productive. Option ii) and iii)
+    have both in common that a temporary register is needed in
+    order to implement the sanitation as inlined BPF since we
+    are not allowed to modify the source register. While a push /
+    pop insn in ii) would be useful to have in any case, it
+    requires once again that every JIT needs to implement it
+    first. While possible, amount of changes needed would also
+    be unsuitable for a -stable patch. Therefore, the path which
+    has fewer changes, less BPF instructions for the mitigation
+    and does not require anything to be changed in the JITs is
+    option iii) which this work is pursuing. The ax register is
+    already mapped to a register in all JITs (modulo arm32 where
+    it's mapped to stack as various other BPF registers there)
+    and used in constant blinding for JITs-only so far. It can
+    be reused for verifier rewrites under certain constraints.
+    The interpreter's tmp "register" has therefore been remapped
+    into extending the register set with hidden ax register and
+    reusing that for a number of instructions that needed the
+    prior temporary variable internally (e.g. div, mod). This
+    allows for zero increase in stack space usage in the interpreter,
+    and enables (restricted) generic use in rewrites otherwise as
+    long as such a patchlet does not make use of these instructions.
+    The sanitation mask is dynamic and relative to the offset the
+    map value or stack pointer currently holds.
+    
+    There are various cases that need to be taken under consideration
+    for the masking, e.g. such operation could look as follows:
+    ptr += val or val += ptr or ptr -= val. Thus, the value to be
+    sanitized could reside either in source or in destination
+    register, and the limit is different depending on whether
+    the ALU op is addition or subtraction and depending on the
+    current known and bounded offset. The limit is derived as
+    follows: limit := max_value_size - (smin_value + off). For
+    subtraction: limit := umax_value + off. This holds because
+    we do not allow any pointer arithmetic that would
+    temporarily go out of bounds or would have an unknown
+    value with mixed signed bounds where it is unclear at
+    verification time whether the actual runtime value would
+    be either negative or positive. For example, we have a
+    derived map pointer value with constant offset and bounded
+    one, so limit based on smin_value works because the verifier
+    requires that statically analyzed arithmetic on the pointer
+    must be in bounds, and thus it checks if resulting
+    smin_value + off and umax_value + off is still within map
+    value bounds at time of arithmetic in addition to time of
+    access. Similarly, for the case of stack access we derive
+    the limit as follows: MAX_BPF_STACK + off for subtraction
+    and -off for the case of addition where off := ptr_reg->off +
+    ptr_reg->var_off.value. Subtraction is a special case for
+    the masking which can be in form of ptr += -val, ptr -= -val,
+    or ptr -= val. In the first two cases where we know that
+    the value is negative, we need to temporarily negate the
+    value in order to do the sanitation on a positive value
+    where we later swap the ALU op, and restore original source
+    register if the value was in source.
+    
+    The sanitation of pointer arithmetic alone is still not fully
+    sufficient as is, since a scenario like the following could
+    happen ...
+    
+      PTR += 0x1000 (e.g. K-based imm)
+      PTR -= BIG_NUMBER_WITH_SLOW_COMPARISON
+      PTR += 0x1000
+      PTR -= BIG_NUMBER_WITH_SLOW_COMPARISON
+      [...]
+    
+    ... which under speculation could end up as ...
+    
+      PTR += 0x1000
+      PTR -= 0 [ truncated by mitigation ]
+      PTR += 0x1000
+      PTR -= 0 [ truncated by mitigation ]
+      [...]
+    
+    ... and therefore still access out of bounds. To prevent such
+    case, the verifier is also analyzing safety for potential out
+    of bounds access under speculative execution. Meaning, it is
+    also simulating pointer access under truncation. We therefore
+    "branch off" and push the current verification state after the
+    ALU operation with known 0 to the verification stack for later
+    analysis. Given the current path analysis succeeded it is
+    likely that the one under speculation can be pruned. In any
+    case, it is also subject to existing complexity limits and
+    therefore anything beyond this point will be rejected. In
+    terms of pruning, it needs to be ensured that the verification
+    state from speculative execution simulation must never prune
+    a non-speculative execution path, therefore, we mark verifier
+    state accordingly at the time of push_stack(). If verifier
+    detects out of bounds access under speculative execution from
+    one of the possible paths that includes a truncation, it will
+    reject such program.
+    
+    Given we mask every reg-based pointer arithmetic for
+    unprivileged programs, we've been looking into how it could
+    affect real-world programs in terms of size increase. As the
+    majority of programs are targeted for privileged-only use
+    case, we've unconditionally enabled masking (with its alu
+    restrictions on top of it) for privileged programs for the
+    sake of testing in order to check i) whether they get rejected
+    in its current form, and ii) by how much the number of
+    instructions and size will increase. We've tested this by
+    using Katran, Cilium and test_l4lb from the kernel selftests.
+    For Katran we've evaluated balancer_kern.o, Cilium bpf_lxc.o
+    and an older test object bpf_lxc_opt_-DUNKNOWN.o and l4lb
+    we've used test_l4lb.o as well as test_l4lb_noinline.o. We
+    found that none of the programs got rejected by the verifier
+    with this change, and that impact is rather minimal to none.
+    balancer_kern.o had 13,904 bytes (1,738 insns) xlated and
+    7,797 bytes JITed before and after the change. Most complex
+    program in bpf_lxc.o had 30,544 bytes (3,817 insns) xlated
+    and 18,538 bytes JITed before and after and none of the other
+    tail call programs in bpf_lxc.o had any changes either. For
+    the older bpf_lxc_opt_-DUNKNOWN.o object we found a small
+    increase from 20,616 bytes (2,576 insns) and 12,536 bytes JITed
+    before to 20,664 bytes (2,582 insns) and 12,558 bytes JITed
+    after the change. Other programs from that object file had
+    similar small increase. Both test_l4lb.o had no change and
+    remained at 6,544 bytes (817 insns) xlated and 3,401 bytes
+    JITed and for test_l4lb_noinline.o constant at 5,080 bytes
+    (634 insns) xlated and 3,313 bytes JITed. This can be explained
+    in that LLVM typically optimizes stack based pointer arithmetic
+    by using K-based operations and that use of dynamic map access
+    is not overly frequent. However, in future we may decide to
+    optimize the algorithm further under known guarantees from
+    branch and value speculation. Latter seems also unclear in
+    terms of prediction heuristics that today's CPUs apply as well
+    as whether there could be collisions in e.g. the predictor's
+    Value History/Pattern Table for triggering out of bounds access,
+    thus masking is performed unconditionally at this point but could
+    be subject to relaxation later on. We were generally also
+    brainstorming various other approaches for mitigation, but the
+    blocker was always lack of available registers at runtime and/or
+    overhead for runtime tracking of limits belonging to a specific
+    pointer. Thus, we found this to be minimally intrusive under
+    given constraints.
+    
+    With that in place, a simple example with sanitized access on
+    unprivileged load at post-verification time looks as follows:
+    
+      # bpftool prog dump xlated id 282
+      [...]
+      28: (79) r1 = *(u64 *)(r7 +0)
+      29: (79) r2 = *(u64 *)(r7 +8)
+      30: (57) r1 &= 15
+      31: (79) r3 = *(u64 *)(r0 +4608)
+      32: (57) r3 &= 1
+      33: (47) r3 |= 1
+      34: (2d) if r2 > r3 goto pc+19
+      35: (b4) (u32) r11 = (u32) 20479  |
+      36: (1f) r11 -= r2                | Dynamic sanitation for pointer
+      37: (4f) r11 |= r2                | arithmetic with registers
+      38: (87) r11 = -r11               | containing bounded or known
+      39: (c7) r11 s>>= 63              | scalars in order to prevent
+      40: (5f) r11 &= r2                | out of bounds speculation.
+      41: (0f) r4 += r11                |
+      42: (71) r4 = *(u8 *)(r4 +0)
+      43: (6f) r4 <<= r1
+      [...]
+    
+    For the case where the scalar sits in the destination register
+    as opposed to the source register, the following code is emitted
+    for the above example:
+    
+      [...]
+      16: (b4) (u32) r11 = (u32) 20479
+      17: (1f) r11 -= r2
+      18: (4f) r11 |= r2
+      19: (87) r11 = -r11
+      20: (c7) r11 s>>= 63
+      21: (5f) r2 &= r11
+      22: (0f) r2 += r0
+      23: (61) r0 = *(u32 *)(r2 +0)
+      [...]
+    
+    JIT blinding example with non-conflicting use of r10:
+    
+      [...]
+       d5:  je     0x0000000000000106    _
+       d7:  mov    0x0(%rax),%edi       |
+       da:  mov    $0xf153246,%r10d     | Index load from map value and
+       e0:  xor    $0xf153259,%r10      | (const blinded) mask with 0x1f.
+       e7:  and    %r10,%rdi            |_
+       ea:  mov    $0x2f,%r10d          |
+       f0:  sub    %rdi,%r10            | Sanitized addition. Both use r10
+       f3:  or     %rdi,%r10            | but do not interfere with each
+       f6:  neg    %r10                 | other. (Neither do these instructions
+       f9:  sar    $0x3f,%r10           | interfere with the use of ax as temp
+       fd:  and    %r10,%rdi            | in interpreter.)
+      100:  add    %rax,%rdi            |_
+      103:  mov    0x0(%rdi),%eax
+     [...]
+    
+    Tested that it fixes Jann's reproducer, and also checked that test_verifier
+    and test_progs suite with interpreter, JIT and JIT with hardening enabled
+    on x86-64 and arm64 runs successfully.
+    
+      [0] Speculose: Analyzing the Security Implications of Speculative
+          Execution in CPUs, Giorgi Maisuradze and Christian Rossow,
+          https://arxiv.org/pdf/1801.04084.pdf
+    
+      [1] A Systematic Evaluation of Transient Execution Attacks and
+          Defenses, Claudio Canella, Jo Van Bulck, Michael Schwarz,
+          Moritz Lipp, Benjamin von Berg, Philipp Ortner, Frank Piessens,
+          Dmitry Evtyushkin, Daniel Gruss,
+          https://arxiv.org/pdf/1811.05441.pdf
+    
+    Fixes: b2157399cc98 ("bpf: prevent out-of-bounds speculation")
+    Reported-by: Jann Horn <jannh@google.com>
+    Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+    Acked-by: Alexei Starovoitov <ast@kernel.org>
+    Signed-off-by: Alexei Starovoitov <ast@kernel.org>
+    Signed-off-by: Vallish Vaidyeshwara <vallish@amazon.com>
+    [some checkpatch cleanups and backported to 4.14 by sblbir]
+    Signed-off-by: Balbir Singh <sblbir@amzn.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 67c05d9414512e1f9040d29e37e3d5533d8c51dd
+Author: Daniel Borkmann <daniel@iogearbox.net>
+Date:   Wed Jan 10 23:25:05 2018 +0100
+
+    bpf, array: fix overflow in max_entries and undefined behavior in index_mask
+    
+    commit bbeb6e4323dad9b5e0ee9f60c223dd532e2403b1 upstream.
+    
+    syzkaller tried to alloc a map with 0xfffffffd entries out of a userns,
+    and thus unprivileged. With the recently added logic in b2157399cc98
+    ("bpf: prevent out-of-bounds speculation") we round this up to the next
+    power of two value for max_entries for unprivileged such that we can
+    apply proper masking into potentially zeroed out map slots.
+    
+    However, this will generate an index_mask of 0xffffffff, and therefore
+    a + 1 will let this overflow into new max_entries of 0. This will pass
+    allocation, etc, and later on map access we still enforce on the original
+    attr->max_entries value which was 0xfffffffd, therefore triggering GPF
+    all over the place. Thus bail out on overflow in such case.
+    
+    Moreover, on 32 bit archs roundup_pow_of_two() can also not be used,
+    since fls_long(max_entries - 1) can result in 32 and 1UL << 32 in 32 bit
+    space is undefined. Therefore, do this by hand in a 64 bit variable.
+    
+    This fixes all the issues triggered by syzkaller's reproducers.
+    
+    Fixes: b2157399cc98 ("bpf: prevent out-of-bounds speculation")
+    Reported-by: syzbot+b0efb8e572d01bce1ae0@syzkaller.appspotmail.com
+    Reported-by: syzbot+6c15e9744f75f2364773@syzkaller.appspotmail.com
+    Reported-by: syzbot+d2f5524fb46fd3b312ee@syzkaller.appspotmail.com
+    Reported-by: syzbot+61d23c95395cc90dbc2b@syzkaller.appspotmail.com
+    Reported-by: syzbot+0d363c942452cca68c01@syzkaller.appspotmail.com
+    Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+    Signed-off-by: Alexei Starovoitov <ast@kernel.org>
+    Cc: Jiri Slaby <jslaby@suse.cz>
+    Cc: Eric Dumazet <eric.dumazet@gmail.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+commit 0ed998d17cd421da18334745af7aee246abe4c70
+Author: Daniel Borkmann <daniel@iogearbox.net>
+Date:   Wed Apr 3 18:39:14 2019 +0000
+
+    bpf: fix inner map masking to prevent oob under speculation
+    
+    commit 9d5564ddcf2a0f5ba3fa1c3a1f8a1b59ad309553 upstream.
+    
+    During review I noticed that inner meta map setup for map in
+    map is buggy in that it does not propagate all needed data
+    from the reference map which the verifier is later accessing.
+    
+    In particular one such case is index masking to prevent out of
+    bounds access under speculative execution due to missing the
+    map's unpriv_array/index_mask field propagation. Fix this such
+    that the verifier is generating the correct code for inlined
+    lookups in case of unpriviledged use.
+    
+    Before patch (test_verifier's 'map in map access' dump):
+    
+      # bpftool prog dump xla id 3
+         0: (62) *(u32 *)(r10 -4) = 0
+         1: (bf) r2 = r10
+         2: (07) r2 += -4
+         3: (18) r1 = map[id:4]
+         5: (07) r1 += 272                |
+         6: (61) r0 = *(u32 *)(r2 +0)     |
+         7: (35) if r0 >= 0x1 goto pc+6   | Inlined map in map lookup
+         8: (54) (u32) r0 &= (u32) 0      | with index masking for
+         9: (67) r0 <<= 3                 | map->unpriv_array.
+        10: (0f) r0 += r1                 |
+        11: (79) r0 = *(u64 *)(r0 +0)     |
+        12: (15) if r0 == 0x0 goto pc+1   |
+        13: (05) goto pc+1                |
+        14: (b7) r0 = 0                   |
+        15: (15) if r0 == 0x0 goto pc+11
+        16: (62) *(u32 *)(r10 -4) = 0
+        17: (bf) r2 = r10
+        18: (07) r2 += -4
+        19: (bf) r1 = r0
+        20: (07) r1 += 272                |
+        21: (61) r0 = *(u32 *)(r2 +0)     | Index masking missing (!)
+        22: (35) if r0 >= 0x1 goto pc+3   | for inner map despite
+        23: (67) r0 <<= 3                 | map->unpriv_array set.
+        24: (0f) r0 += r1                 |
+        25: (05) goto pc+1                |
+        26: (b7) r0 = 0                   |
+        27: (b7) r0 = 0
+        28: (95) exit
+    
+    After patch:
+    
+      # bpftool prog dump xla id 1
+         0: (62) *(u32 *)(r10 -4) = 0
+         1: (bf) r2 = r10
+         2: (07) r2 += -4
+         3: (18) r1 = map[id:2]
+         5: (07) r1 += 272                |
+         6: (61) r0 = *(u32 *)(r2 +0)     |
+         7: (35) if r0 >= 0x1 goto pc+6   | Same inlined map in map lookup
+         8: (54) (u32) r0 &= (u32) 0      | with index masking due to
+         9: (67) r0 <<= 3                 | map->unpriv_array.
+        10: (0f) r0 += r1                 |
+        11: (79) r0 = *(u64 *)(r0 +0)     |
+        12: (15) if r0 == 0x0 goto pc+1   |
+        13: (05) goto pc+1                |
+        14: (b7) r0 = 0                   |
+        15: (15) if r0 == 0x0 goto pc+12
+        16: (62) *(u32 *)(r10 -4) = 0
+        17: (bf) r2 = r10
+        18: (07) r2 += -4
+        19: (bf) r1 = r0
+        20: (07) r1 += 272                |
+        21: (61) r0 = *(u32 *)(r2 +0)     |
+        22: (35) if r0 >= 0x1 goto pc+4   | Now fixed inlined inner map
+        23: (54) (u32) r0 &= (u32) 0      | lookup with proper index masking
+        24: (67) r0 <<= 3                 | for map->unpriv_array.
+        25: (0f) r0 += r1                 |
+        26: (05) goto pc+1                |
+        27: (b7) r0 = 0                   |
+        28: (b7) r0 = 0
+        29: (95) exit
+    
+    
+    Fixes: b2157399cc98 ("bpf: prevent out-of-bounds speculation")
+    Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+    Acked-by: Martin KaFai Lau <kafai@fb.com>
+    Signed-off-by: Alexei Starovoitov <ast@kernel.org>
+    Signed-off-by: Vallish Vaidyeshwara <vallish@amazon.com>
+    Signed-off-by: Balbir Singh <sblbir@amzn.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit ae03b6b1c880a03d4771257336dc3bca156dd51b
+Author: Daniel Borkmann <daniel@iogearbox.net>
+Date:   Wed Apr 3 18:39:12 2019 +0000
+
+    bpf: prevent out of bounds speculation on pointer arithmetic
+    
+    commit 979d63d50c0c0f7bc537bf821e056cc9fe5abd38 upstream.
+    
+    Jann reported that the original commit back in b2157399cc98
+    ("bpf: prevent out-of-bounds speculation") was not sufficient
+    to stop CPU from speculating out of bounds memory access:
+    While b2157399cc98 only focussed on masking array map access
+    for unprivileged users for tail calls and data access such
+    that the user provided index gets sanitized from BPF program
+    and syscall side, there is still a more generic form affected
+    from BPF programs that applies to most maps that hold user
+    data in relation to dynamic map access when dealing with
+    unknown scalars or "slow" known scalars as access offset, for
+    example:
+    
+      - Load a map value pointer into R6
+      - Load an index into R7
+      - Do a slow computation (e.g. with a memory dependency) that
+        loads a limit into R8 (e.g. load the limit from a map for
+        high latency, then mask it to make the verifier happy)
+      - Exit if R7 >= R8 (mispredicted branch)
+      - Load R0 = R6[R7]
+      - Load R0 = R6[R0]
+    
+    For unknown scalars there are two options in the BPF verifier
+    where we could derive knowledge from in order to guarantee
+    safe access to the memory: i) While </>/<=/>= variants won't
+    allow to derive any lower or upper bounds from the unknown
+    scalar where it would be safe to add it to the map value
+    pointer, it is possible through ==/!= test however. ii) another
+    option is to transform the unknown scalar into a known scalar,
+    for example, through ALU ops combination such as R &= <imm>
+    followed by R |= <imm> or any similar combination where the
+    original information from the unknown scalar would be destroyed
+    entirely leaving R with a constant. The initial slow load still
+    precedes the latter ALU ops on that register, so the CPU
+    executes speculatively from that point. Once we have the known
+    scalar, any compare operation would work then. A third option
+    only involving registers with known scalars could be crafted
+    as described in [0] where a CPU port (e.g. Slow Int unit)
+    would be filled with many dependent computations such that
+    the subsequent condition depending on its outcome has to wait
+    for evaluation on its execution port and thereby executing
+    speculatively if the speculated code can be scheduled on a
+    different execution port, or any other form of mistraining
+    as described in [1], for example. Given this is not limited
+    to only unknown scalars, not only map but also stack access
+    is affected since both is accessible for unprivileged users
+    and could potentially be used for out of bounds access under
+    speculation.
+    
+    In order to prevent any of these cases, the verifier is now
+    sanitizing pointer arithmetic on the offset such that any
+    out of bounds speculation would be masked in a way where the
+    pointer arithmetic result in the destination register will
+    stay unchanged, meaning offset masked into zero similar as
+    in array_index_nospec() case. With regards to implementation,
+    there are three options that were considered: i) new insn
+    for sanitation, ii) push/pop insn and sanitation as inlined
+    BPF, iii) reuse of ax register and sanitation as inlined BPF.
+    
+    Option i) has the downside that we end up using from reserved
+    bits in the opcode space, but also that we would require
+    each JIT to emit masking as native arch opcodes meaning
+    mitigation would have slow adoption till everyone implements
+    it eventually which is counter-productive. Option ii) and iii)
+    have both in common that a temporary register is needed in
+    order to implement the sanitation as inlined BPF since we
+    are not allowed to modify the source register. While a push /
+    pop insn in ii) would be useful to have in any case, it
+    requires once again that every JIT needs to implement it
+    first. While possible, amount of changes needed would also
+    be unsuitable for a -stable patch. Therefore, the path which
+    has fewer changes, less BPF instructions for the mitigation
+    and does not require anything to be changed in the JITs is
+    option iii) which this work is pursuing. The ax register is
+    already mapped to a register in all JITs (modulo arm32 where
+    it's mapped to stack as various other BPF registers there)
+    and used in constant blinding for JITs-only so far. It can
+    be reused for verifier rewrites under certain constraints.
+    The interpreter's tmp "register" has therefore been remapped
+    into extending the register set with hidden ax register and
+    reusing that for a number of instructions that needed the
+    prior temporary variable internally (e.g. div, mod). This
+    allows for zero increase in stack space usage in the interpreter,
+    and enables (restricted) generic use in rewrites otherwise as
+    long as such a patchlet does not make use of these instructions.
+    The sanitation mask is dynamic and relative to the offset the
+    map value or stack pointer currently holds.
+    
+    There are various cases that need to be taken under consideration
+    for the masking, e.g. such operation could look as follows:
+    ptr += val or val += ptr or ptr -= val. Thus, the value to be
+    sanitized could reside either in source or in destination
+    register, and the limit is different depending on whether
+    the ALU op is addition or subtraction and depending on the
+    current known and bounded offset. The limit is derived as
+    follows: limit := max_value_size - (smin_value + off). For
+    subtraction: limit := umax_value + off. This holds because
+    we do not allow any pointer arithmetic that would
+    temporarily go out of bounds or would have an unknown
+    value with mixed signed bounds where it is unclear at
+    verification time whether the actual runtime value would
+    be either negative or positive. For example, we have a
+    derived map pointer value with constant offset and bounded
+    one, so limit based on smin_value works because the verifier
+    requires that statically analyzed arithmetic on the pointer
+    must be in bounds, and thus it checks if resulting
+    smin_value + off and umax_value + off is still within map
+    value bounds at time of arithmetic in addition to time of
+    access. Similarly, for the case of stack access we derive
+    the limit as follows: MAX_BPF_STACK + off for subtraction
+    and -off for the case of addition where off := ptr_reg->off +
+    ptr_reg->var_off.value. Subtraction is a special case for
+    the masking which can be in form of ptr += -val, ptr -= -val,
+    or ptr -= val. In the first two cases where we know that
+    the value is negative, we need to temporarily negate the
+    value in order to do the sanitation on a positive value
+    where we later swap the ALU op, and restore original source
+    register if the value was in source.
+    
+    The sanitation of pointer arithmetic alone is still not fully
+    sufficient as is, since a scenario like the following could
+    happen ...
+    
+      PTR += 0x1000 (e.g. K-based imm)
+      PTR -= BIG_NUMBER_WITH_SLOW_COMPARISON
+      PTR += 0x1000
+      PTR -= BIG_NUMBER_WITH_SLOW_COMPARISON
+      [...]
+    
+    ... which under speculation could end up as ...
+    
+      PTR += 0x1000
+      PTR -= 0 [ truncated by mitigation ]
+      PTR += 0x1000
+      PTR -= 0 [ truncated by mitigation ]
+      [...]
+    
+    ... and therefore still access out of bounds. To prevent such
+    case, the verifier is also analyzing safety for potential out
+    of bounds access under speculative execution. Meaning, it is
+    also simulating pointer access under truncation. We therefore
+    "branch off" and push the current verification state after the
+    ALU operation with known 0 to the verification stack for later
+    analysis. Given the current path analysis succeeded it is
+    likely that the one under speculation can be pruned. In any
+    case, it is also subject to existing complexity limits and
+    therefore anything beyond this point will be rejected. In
+    terms of pruning, it needs to be ensured that the verification
+    state from speculative execution simulation must never prune
+    a non-speculative execution path, therefore, we mark verifier
+    state accordingly at the time of push_stack(). If verifier
+    detects out of bounds access under speculative execution from
+    one of the possible paths that includes a truncation, it will
+    reject such program.
+    
+    Given we mask every reg-based pointer arithmetic for
+    unprivileged programs, we've been looking into how it could
+    affect real-world programs in terms of size increase. As the
+    majority of programs are targeted for privileged-only use
+    case, we've unconditionally enabled masking (with its alu
+    restrictions on top of it) for privileged programs for the
+    sake of testing in order to check i) whether they get rejected
+    in its current form, and ii) by how much the number of
+    instructions and size will increase. We've tested this by
+    using Katran, Cilium and test_l4lb from the kernel selftests.
+    For Katran we've evaluated balancer_kern.o, Cilium bpf_lxc.o
+    and an older test object bpf_lxc_opt_-DUNKNOWN.o and l4lb
+    we've used test_l4lb.o as well as test_l4lb_noinline.o. We
+    found that none of the programs got rejected by the verifier
+    with this change, and that impact is rather minimal to none.
+    balancer_kern.o had 13,904 bytes (1,738 insns) xlated and
+    7,797 bytes JITed before and after the change. Most complex
+    program in bpf_lxc.o had 30,544 bytes (3,817 insns) xlated
+    and 18,538 bytes JITed before and after and none of the other
+    tail call programs in bpf_lxc.o had any changes either. For
+    the older bpf_lxc_opt_-DUNKNOWN.o object we found a small
+    increase from 20,616 bytes (2,576 insns) and 12,536 bytes JITed
+    before to 20,664 bytes (2,582 insns) and 12,558 bytes JITed
+    after the change. Other programs from that object file had
+    similar small increase. Both test_l4lb.o had no change and
+    remained at 6,544 bytes (817 insns) xlated and 3,401 bytes
+    JITed and for test_l4lb_noinline.o constant at 5,080 bytes
+    (634 insns) xlated and 3,313 bytes JITed. This can be explained
+    in that LLVM typically optimizes stack based pointer arithmetic
+    by using K-based operations and that use of dynamic map access
+    is not overly frequent. However, in future we may decide to
+    optimize the algorithm further under known guarantees from
+    branch and value speculation. Latter seems also unclear in
+    terms of prediction heuristics that today's CPUs apply as well
+    as whether there could be collisions in e.g. the predictor's
+    Value History/Pattern Table for triggering out of bounds access,
+    thus masking is performed unconditionally at this point but could
+    be subject to relaxation later on. We were generally also
+    brainstorming various other approaches for mitigation, but the
+    blocker was always lack of available registers at runtime and/or
+    overhead for runtime tracking of limits belonging to a specific
+    pointer. Thus, we found this to be minimally intrusive under
+    given constraints.
+    
+    With that in place, a simple example with sanitized access on
+    unprivileged load at post-verification time looks as follows:
+    
+      # bpftool prog dump xlated id 282
+      [...]
+      28: (79) r1 = *(u64 *)(r7 +0)
+      29: (79) r2 = *(u64 *)(r7 +8)
+      30: (57) r1 &= 15
+      31: (79) r3 = *(u64 *)(r0 +4608)
+      32: (57) r3 &= 1
+      33: (47) r3 |= 1
+      34: (2d) if r2 > r3 goto pc+19
+      35: (b4) (u32) r11 = (u32) 20479  |
+      36: (1f) r11 -= r2                | Dynamic sanitation for pointer
+      37: (4f) r11 |= r2                | arithmetic with registers
+      38: (87) r11 = -r11               | containing bounded or known
+      39: (c7) r11 s>>= 63              | scalars in order to prevent
+      40: (5f) r11 &= r2                | out of bounds speculation.
+      41: (0f) r4 += r11                |
+      42: (71) r4 = *(u8 *)(r4 +0)
+      43: (6f) r4 <<= r1
+      [...]
+    
+    For the case where the scalar sits in the destination register
+    as opposed to the source register, the following code is emitted
+    for the above example:
+    
+      [...]
+      16: (b4) (u32) r11 = (u32) 20479
+      17: (1f) r11 -= r2
+      18: (4f) r11 |= r2
+      19: (87) r11 = -r11
+      20: (c7) r11 s>>= 63
+      21: (5f) r2 &= r11
+      22: (0f) r2 += r0
+      23: (61) r0 = *(u32 *)(r2 +0)
+      [...]
+    
+    JIT blinding example with non-conflicting use of r10:
+    
+      [...]
+       d5:  je     0x0000000000000106    _
+       d7:  mov    0x0(%rax),%edi       |
+       da:  mov    $0xf153246,%r10d     | Index load from map value and
+       e0:  xor    $0xf153259,%r10      | (const blinded) mask with 0x1f.
+       e7:  and    %r10,%rdi            |_
+       ea:  mov    $0x2f,%r10d          |
+       f0:  sub    %rdi,%r10            | Sanitized addition. Both use r10
+       f3:  or     %rdi,%r10            | but do not interfere with each
+       f6:  neg    %r10                 | other. (Neither do these instructions
+       f9:  sar    $0x3f,%r10           | interfere with the use of ax as temp
+       fd:  and    %r10,%rdi            | in interpreter.)
+      100:  add    %rax,%rdi            |_
+      103:  mov    0x0(%rdi),%eax
+     [...]
+    
+    Tested that it fixes Jann's reproducer, and also checked that test_verifier
+    and test_progs suite with interpreter, JIT and JIT with hardening enabled
+    on x86-64 and arm64 runs successfully.
+    
+      [0] Speculose: Analyzing the Security Implications of Speculative
+          Execution in CPUs, Giorgi Maisuradze and Christian Rossow,
+          https://arxiv.org/pdf/1801.04084.pdf
+    
+      [1] A Systematic Evaluation of Transient Execution Attacks and
+          Defenses, Claudio Canella, Jo Van Bulck, Michael Schwarz,
+          Moritz Lipp, Benjamin von Berg, Philipp Ortner, Frank Piessens,
+          Dmitry Evtyushkin, Daniel Gruss,
+          https://arxiv.org/pdf/1811.05441.pdf
+    
+    Fixes: b2157399cc98 ("bpf: prevent out-of-bounds speculation")
+    Reported-by: Jann Horn <jannh@google.com>
+    Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+    Acked-by: Alexei Starovoitov <ast@kernel.org>
+    Signed-off-by: Alexei Starovoitov <ast@kernel.org>
+    Signed-off-by: Vallish Vaidyeshwara <vallish@amazon.com>
+    [some checkpatch cleanups and backported to 4.14 by sblbir]
+    Signed-off-by: Balbir Singh <sblbir@amzn.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 67c05d9414512e1f9040d29e37e3d5533d8c51dd
+Author: Daniel Borkmann <daniel@iogearbox.net>
+Date:   Wed Jan 10 23:25:05 2018 +0100
+
+    bpf, array: fix overflow in max_entries and undefined behavior in index_mask
+    
+    commit bbeb6e4323dad9b5e0ee9f60c223dd532e2403b1 upstream.
+    
+    syzkaller tried to alloc a map with 0xfffffffd entries out of a userns,
+    and thus unprivileged. With the recently added logic in b2157399cc98
+    ("bpf: prevent out-of-bounds speculation") we round this up to the next
+    power of two value for max_entries for unprivileged such that we can
+    apply proper masking into potentially zeroed out map slots.
+    
+    However, this will generate an index_mask of 0xffffffff, and therefore
+    a + 1 will let this overflow into new max_entries of 0. This will pass
+    allocation, etc, and later on map access we still enforce on the original
+    attr->max_entries value which was 0xfffffffd, therefore triggering GPF
+    all over the place. Thus bail out on overflow in such case.
+    
+    Moreover, on 32 bit archs roundup_pow_of_two() can also not be used,
+    since fls_long(max_entries - 1) can result in 32 and 1UL << 32 in 32 bit
+    space is undefined. Therefore, do this by hand in a 64 bit variable.
+    
+    This fixes all the issues triggered by syzkaller's reproducers.
+    
+    Fixes: b2157399cc98 ("bpf: prevent out-of-bounds speculation")
+    Reported-by: syzbot+b0efb8e572d01bce1ae0@syzkaller.appspotmail.com
+    Reported-by: syzbot+6c15e9744f75f2364773@syzkaller.appspotmail.com
+    Reported-by: syzbot+d2f5524fb46fd3b312ee@syzkaller.appspotmail.com
+    Reported-by: syzbot+61d23c95395cc90dbc2b@syzkaller.appspotmail.com
+    Reported-by: syzbot+0d363c942452cca68c01@syzkaller.appspotmail.com
+    Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+    Signed-off-by: Alexei Starovoitov <ast@kernel.org>
+    Cc: Jiri Slaby <jslaby@suse.cz>
+    Cc: Eric Dumazet <eric.dumazet@gmail.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking b00cb5a35082c1b8b0616283a2a8ac834989f0cd ......
+	 orig commit -> 3572f04c69ed4369da5d3c65d84fb18774aa60b6 ......
+checking 37928ffde45d9a638c6e8a04966e07f4ee845d1b ......
+	 orig commit -> 6ac43272768ca901daac4076a66c2c4e3c7b9321 ......
+		 6ac43272768ca901daac4076a66c2c4e3c7b9321 has problem. Fixes commit -> 3572f04c69ed4369da5d3c65d84fb18774aa60b6
+675f7ff35bd256e65d3d0f52718d8babf5d1002a
+commit b00cb5a35082c1b8b0616283a2a8ac834989f0cd
+Author: Ville Syrjälä <ville.syrjala@linux.intel.com>
+Date:   Thu Nov 16 18:02:15 2017 +0200
+
+    drm/i915: Fix init_clock_gating for resume
+    
+    commit 3572f04c69ed4369da5d3c65d84fb18774aa60b6 upstream.
+    
+    Moving the init_clock_gating() call from intel_modeset_init_hw() to
+    intel_modeset_gem_init() had an unintended effect of not applying
+    some workarounds on resume. This, for example, cause some kind of
+    corruption to appear at the top of my IVB Thinkpad X1 Carbon LVDS
+    screen after hibernation. Fix the problem by explicitly calling
+    init_clock_gating() from the resume path.
+    
+    I really hope this doesn't break something else again. At least
+    the problems reported at https://bugs.freedesktop.org/show_bug.cgi?id=103549
+    didn't make a comeback, even after a hibernate cycle.
+    
+    v2: Reorder the init_clock_gating vs. modeset_init_hw to match
+        the display reset path (Rodrigo)
+    
+    Cc: Chris Wilson <chris@chris-wilson.co.uk>
+    Cc: Rodrigo Vivi <rodrigo.vivi@intel.com>
+    Fixes: 6ac43272768c ("drm/i915: Move init_clock_gating() back to where it was")
+    Reviewed-by: Rodrigo Vivi <rodrigo.vivi@intel.com>
+    Reviewed-by: Chris Wilson <chris@chris-wilson.co.uk>
+    Link: https://patchwork.freedesktop.org/patch/msgid/20171116160215.25715-1-ville.syrjala@linux.intel.com
+    Signed-off-by: Ville Syrjälä <ville.syrjala@linux.intel.com>
+    (cherry picked from commit 675f7ff35bd256e65d3d0f52718d8babf5d1002a)
+    Signed-off-by: Jani Nikula <jani.nikula@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+commit b00cb5a35082c1b8b0616283a2a8ac834989f0cd
+Author: Ville Syrjälä <ville.syrjala@linux.intel.com>
+Date:   Thu Nov 16 18:02:15 2017 +0200
+
+    drm/i915: Fix init_clock_gating for resume
+    
+    commit 3572f04c69ed4369da5d3c65d84fb18774aa60b6 upstream.
+    
+    Moving the init_clock_gating() call from intel_modeset_init_hw() to
+    intel_modeset_gem_init() had an unintended effect of not applying
+    some workarounds on resume. This, for example, cause some kind of
+    corruption to appear at the top of my IVB Thinkpad X1 Carbon LVDS
+    screen after hibernation. Fix the problem by explicitly calling
+    init_clock_gating() from the resume path.
+    
+    I really hope this doesn't break something else again. At least
+    the problems reported at https://bugs.freedesktop.org/show_bug.cgi?id=103549
+    didn't make a comeback, even after a hibernate cycle.
+    
+    v2: Reorder the init_clock_gating vs. modeset_init_hw to match
+        the display reset path (Rodrigo)
+    
+    Cc: Chris Wilson <chris@chris-wilson.co.uk>
+    Cc: Rodrigo Vivi <rodrigo.vivi@intel.com>
+    Fixes: 6ac43272768c ("drm/i915: Move init_clock_gating() back to where it was")
+    Reviewed-by: Rodrigo Vivi <rodrigo.vivi@intel.com>
+    Reviewed-by: Chris Wilson <chris@chris-wilson.co.uk>
+    Link: https://patchwork.freedesktop.org/patch/msgid/20171116160215.25715-1-ville.syrjala@linux.intel.com
+    Signed-off-by: Ville Syrjälä <ville.syrjala@linux.intel.com>
+    (cherry picked from commit 675f7ff35bd256e65d3d0f52718d8babf5d1002a)
+    Signed-off-by: Jani Nikula <jani.nikula@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 08a56f347a28d697d2f3cec14bce5ec8ad290bd7 ......
+	 orig commit -> 4636bda86aa1f34f45c629477476a0dcfa04e597 ......
+checking 4675bdd85ca4c9b90f7f051c72856c857b4df43f ......
+	 orig commit -> 121d760d0788f95619049c63449d977065cab69d ......
+checking 9fc16b259ac276da269b97f66ad72a5b182c523a ......
+	 orig commit -> 0d9cac0ca0429830c40fe1a4e50e60f6221fd7b6 ......
+checking 2f6ff75e484bca49202cdc132787bc5d29d8a139 ......
+	 orig commit -> 98648ae6ef6bdcdcb88c46cad963906ab452e96d ......
+checking 02453a0f8f54a00aff82daa287627c328f121a18 ......
+	 orig commit -> ecba8297aafd50db6ae867e90844eead1611ef1c ......
+checking c8e754fe3b8e7961cd6127793ffbb38108b29629 ......
+	 orig commit -> 4ed11aeefda439c76ddae3ceebcfa4fad111f149 ......
+checking 5584082e854f3ac81bb9ad7ee663a4594ca21bdd ......
+	 orig commit -> 3073774e638ef18d222465fe92bfc8fccb90d288 ......
+checking fead4387523df571c01b5cb9f88609f0e49c3feb ......
+	 orig commit -> 6c7d47c33ed323f14f2a3b8de925e831dbaa4e69 ......
+checking 679090724f774c9865b10ebc2a4b6945ebf3cb1d ......
+	 orig commit -> 75f139aaf896d6fdeec2e468ddfa4b2fe469bf40 ......
+checking d98309da07fdce96f13534494f4c8210325f48fd ......
+	 orig commit -> b94b7373317164402ff7728d10f7023127a02b60 ......
+		 b94b7373317164402ff7728d10f7023127a02b60 has problem. Fixes commit -> 7e702d17ed138cf4ae7c00e8c00681ed464587c7
+commit ac2cc887653808e988f9d7ece50aacc755a4f879
+Author: Jia Zhang <zhang.jia@linux.alibaba.com>
+Date:   Tue Jan 23 11:41:32 2018 +0100
+
+    x86/microcode/intel: Extend BDW late-loading further with LLC size check
+    
+    commit 7e702d17ed138cf4ae7c00e8c00681ed464587c7 upstream.
+    
+    Commit b94b73733171 ("x86/microcode/intel: Extend BDW late-loading with a
+    revision check") reduced the impact of erratum BDF90 for Broadwell model
+    79.
+    
+    The impact can be reduced further by checking the size of the last level
+    cache portion per core.
+    
+    Tony: "The erratum says the problem only occurs on the large-cache SKUs.
+    So we only need to avoid the update if we are on a big cache SKU that is
+    also running old microcode."
+    
+    For more details, see erratum BDF90 in document #334165 (Intel Xeon
+    Processor E7-8800/4800 v4 Product Family Specification Update) from
+    September 2017.
+    
+    Fixes: b94b73733171 ("x86/microcode/intel: Extend BDW late-loading with a revision check")
+    Signed-off-by: Jia Zhang <zhang.jia@linux.alibaba.com>
+    Signed-off-by: Borislav Petkov <bp@suse.de>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Acked-by: Tony Luck <tony.luck@intel.com>
+    Link: https://lkml.kernel.org/r/1516321542-31161-1-git-send-email-zhang.jia@linux.alibaba.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 8ec160c5f0a7fbf153a4c0dd8cd520f476b46aa0 ......
+	 orig commit -> 943309d4aad6732b905f3f500e6e17e33c211494 ......
+checking 0b5e3dbf479614c79e03cc2ba361d261e8b0f340 ......
+	 orig commit -> 21acdf45f4958135940f0b4767185cf911d4b010 ......
+checking e068cdee6347eda64a2ecf60c14382bb465175a2 ......
+	 orig commit -> edd8ca8015800b354453b891d38960f3a474b7e4 ......
+checking 961becd84df940157cced59d2d3b6ab8be70fa9a ......
+	 orig commit -> 967a6a07e95c58eb9c1581d22a1d9c2d1929843f ......
+checking 3662493dbdad17c3d144cfb73d0c897ccc28cc52 ......
+	 orig commit -> 9a00674213a3f00394f4e3221b88f2d21fc05789 ......
+checking d01c7936966982fa6723ec80c018c5e89045fde3 ......
+	 orig commit -> 541676078b52f365f53d46ee5517d305cd1b6350 ......
+checking 208c17515130e2d97ab81a52ca0afb1c40722f7b ......
+	 orig commit -> 0b2122e4934c7783d336397864e34ee53aad0965 ......
+checking ce66902de86a310da28f4ea0a5da0c7bd7c6745b ......
+	 orig commit -> 90045fc9c78855bdc625a0ab185d97b72a937613 ......
+checking 0c21439334069b0cf8cac9f9115918b9b3a11287 ......
+	 orig commit -> ccc12b11c5332c84442ef120dcd631523be75089 ......
+checking 71e7f85e10f189f4aa0162d6eea4a7163a48e3a6 ......
+	 orig commit -> 3bb23421a504f01551b7cb9dff0e41dbf16656b0 ......
+checking 3ef57b767e1b70ca594d5c6f7de687326cedcc7f ......
+	 orig commit -> 8764a8267b128405cf383157d5e9a4a3735d2409 ......
+checking d7e3ea5326cb668f457624476d6dc924c6585658 ......
+	 orig commit -> 71891e2dab6b55a870f8f7735e44a2963860b5c6 ......
+checking d3ccc74c8998de058f40fecff71ada3dc49157b3 ......
+	 orig commit -> 862c03ee1deb7e19e0f9931682e0294ecd1fcaf9 ......
+		 862c03ee1deb7e19e0f9931682e0294ecd1fcaf9 has problem. Fixes commit -> 95ef498d977bf44ac094778fd448b98af158a3e6
+commit 3472170784d849018356e0bcb7d5c993ffc65699
+Author: Eric Dumazet <edumazet@google.com>
+Date:   Thu Jan 11 22:31:18 2018 -0800
+
+    ipv6: ip6_make_skb() needs to clear cork.base.dst
+    
+    
+    [ Upstream commit 95ef498d977bf44ac094778fd448b98af158a3e6 ]
+    
+    In my last patch, I missed fact that cork.base.dst was not initialized
+    in ip6_make_skb() :
+    
+    If ip6_setup_cork() returns an error, we might attempt a dst_release()
+    on some random pointer.
+    
+    Fixes: 862c03ee1deb ("ipv6: fix possible mem leaks in ipv6_make_skb()")
+    Signed-off-by: Eric Dumazet <edumazet@google.com>
+    Reported-by: syzbot <syzkaller@googlegroups.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 705813e942332a4eb63f0cfcb3cd054b4e1d34a7 ......
+	 orig commit -> 5133550296d43236439494aa955bfb765a89f615 ......
+checking db21b74346d7cbbf4cca94fac6b634b3e52e9d56 ......
+	 orig commit -> 879626e3a52630316d817cbda7cec9a5446d1d82 ......
+checking 47b5886f7310716dfb4b20f4cdc888fb59932b79 ......
+	 orig commit -> dfe8266b8dd10e12a731c985b725fcf7f0e537f0 ......
+checking d47da4eb8a60ce99149848ca03ca6c50e1a68bc4 ......
+	 orig commit -> b6c5734db07079c9410147b32407f2366d584e6c ......
+		 b6c5734db07079c9410147b32407f2366d584e6c has problem. Fixes commit -> a65925475571953da12a9bc2082aec29d4e2c0e7
+checking b4bab9461f89cde8ba11668cbb27a8a79b741416 ......
+	 orig commit -> cc35c3d1edf7a8373a1a5daa80a912dec96a9cd5 ......
+checking d48c6464c50ef8e7eac7a04bbd2afcc23f020b21 ......
+	 orig commit -> d1616f07e8f1a4a490d1791316d4a68906b284aa ......
+checking e7e73b10d690c5352cb11b1941a09e4f3dc4c8ce ......
+	 orig commit -> 3f38c683033a9a0a2738e7067f449deefabfa3ef ......
+checking 90437795272dfe4b5abaa6dcc612ed0b304b4fb5 ......
+	 orig commit -> e90f686b4358d7d7e5dbaa48b8e78c9a4e41826e ......
+checking 5edbe3c0249f54578636b71377861d579b1781cf ......
+	 orig commit -> 7d11f77f84b27cef452cee332f4e469503084737 ......
+checking 5d127d15ad2f9f33af788f1edf720ba29317f55b ......
+	 orig commit -> c095508770aebf1b9218e77026e48345d719b17c ......
+checking 5837f963300b63264dd1baf32e96063e807ca28c ......
+	 orig commit -> ac817f5ad066697e4d4d35ec68c974eba2c5f17a ......
+checking ecb89764ef039dfb651d868318e6ee3deb7e172f ......
+	 orig commit -> b8fd0823e0770c2d5fdbd865bccf0d5e058e5287 ......
+checking b841bff14947b92523a5858db9d401f0e9588ed0 ......
+	 orig commit -> 23263ec86a5f44312d2899323872468752324107 ......
+checking 58a8bb5eef0e2bedeef8d01f4176e604ff04a07a ......
+	 orig commit -> 78bbb15f2239bc8e663aa20bbe1987c91a0b75f6 ......
+checking 0ed11aaf6f2a72c1923c777c4edb670cfa286fcf ......
+	 orig commit -> 4ee2ec1b122599f7b10c849fa7915cebb37b7edb ......
+checking d2363bb2b5238dd5f02585b21102eacc5f4789bc ......
+	 orig commit -> 898dfe4687f460ba337a01c11549f87269a13fa2 ......
+checking 7ea0bfaa76e90d98ec1bd718c9c03df24881afd5 ......
+	 orig commit -> b088b53e20c7d09b5ab84c5688e609f478e5c417 ......
+checking cd32d7c4d2349ec5c0ffb0898c29bd3f28daf552 ......
+	 orig commit -> 9685347aa0a5c2869058ca6ab79fd8e93084a67f ......
+checking 0b9c7ed68db295f82e91654ba3ff3ee1346c358d ......
+	 orig commit -> 900498a34a3ac9c611e9b425094c8106bdd7dc1c ......
+checking 28ac4032652f7dcc65637bfa3f0c539ac6c772de ......
+	 orig commit -> 29159a4ed7044c52e3e2cf1a9fb55cec4745c60b ......
+checking 835004dc452aa5d0a2c25d65d9026f1d0a637ed4 ......
+	 orig commit -> 6708913750344a900f2e73bfe4a4d6dbbce4fe8d ......
+checking ef810a3d7d4e5c3d5a84e1169157adc11f81c6cd ......
+	 orig commit -> fb51f1cd06f9ced7b7085a2a4636375d520431ca ......
+checking f1069cfedae62190bc058a4c372fa60bcf37f75c ......
+	 orig commit -> fe08f34d066f4404934a509b6806db1a4f700c86 ......
+checking 5bdc95c0a0dc58c15dcd3ffb56497683f800c455 ......
+	 orig commit -> 252714155f04c5d16989cb3aadb85fd1b5772f99 ......
+checking 4659a641b36ed3f96c575ac1ef919a4d1c103936 ......
+	 orig commit -> d14587334580bc94d3ee11e8320e0c157f91ae8f ......
+checking 623b8f8e90f0bb73e9566a6744b5c0577284977e ......
+	 orig commit -> 96a236ed286776554fbd227c6d2876fd3b5dc65d ......
+checking 5042bde3ccbbd2326ac349a01109c8e56fc7bc4b ......
+	 orig commit -> 335ebf6fa35ca1c59b73f76fad19b249d3550e86 ......
+checking f73c380ab3fea85e4fbc66f5cc6f9e6551b89f24 ......
+	 orig commit -> bc52e9ca74b9a395897bb640c6671b2cbf716032 ......
+checking c7f500dd4ff1f9032e1f73cdb0d4bc8cb6515bb3 ......
+	 orig commit -> cbb40fadd31c6bbc59104e58ac95c6ef492d038b ......
+checking 203c1e538eb6abf6298c2a4214c92022a204fdbc ......
+	 orig commit -> 98b8e4e5c17bf87c1b18ed929472051dab39878c ......
+checking 38244295d9e7663919d606cb9a005f7dee3b7799 ......
+	 orig commit -> 0cb5b30698fdc8f6b4646012e3acb4ddce430788 ......
+		 0cb5b30698fdc8f6b4646012e3acb4ddce430788 has problem. Fixes commit -> 0e0ab73c9a0243736bcd779b30b717e23ba9a56d
+checking 0196bdf590e3b0530a538c162a3d8fe46a363b5b ......
+	 orig commit -> 74d0833c659a8a54735e5efdd44f4b225af68586 ......
+checking 3cb77e7b1cc0fdac101c44994555a1d0e056e99d ......
+	 orig commit -> c8c5a3a24d395b14447a9a89d61586a913840a3b ......
+checking 5baee6683437639d095234bbb86d29696a8293f6 ......
+	 orig commit -> 006501e039eec411842bb3150c41358867d320c2 ......
+checking 338ca3563dac0cf96b43936def3a6bc92bbc1c21 ......
+	 orig commit -> be07a6a1188372b6d19a3307ec33211fc9c9439d ......
+checking 323429be3b2f464b2e51f0c544e3dd6de4dadb79 ......
+	 orig commit -> 80b3ffce0196ea50068885d085ff981e4b8396f4 ......
+checking a38f387c48c3b364c927e9d983b116824820ed38 ......
+	 orig commit -> dc24d0edf33c3e15099688b6bbdf7bdc24bf6e91 ......
+checking bc511ace4e306b0b0451a6169efe3f5e85d9d6c4 ......
+	 orig commit -> a03fe72572c12e98f4173f8a535f32468e48b6ec ......
+checking a8caed0170147c55daf79793d72ed01b16610cf1 ......
+	 orig commit -> b67336eee3fcb8ecedc6c13e2bf88aacfa3151e2 ......
+checking 14af4f4c21968168209b37838bc8c571b562a0a6 ......
+	 orig commit -> a1ffa4670cb97ae3a4b3e8535d88be5f643f7c3b ......
+checking 68807cb2b38b2e10d01e5c033eb818836b250fd1 ......
+	 orig commit -> bec40c26041de61162f7be9d2ce548c756ce0f65 ......
+checking 83f8d47b31f52b40f0158581c41c086c00fcad5b ......
+	 orig commit -> d5b42e6607661b198d8b26a0c30969605b1bf5c7 ......
+checking b043ea189d0fbd2f7a0b8d177109f60f5cd767f2 ......
+	 orig commit -> b4c2951a4833e66f1bbfe65ddcd4fdcdfafe5e8f ......
+checking 653c41ac4729261cb356ee1aff0f3f4f342be1eb ......
+	 orig commit -> e39d200fa5bf5b94a0948db0dae44c1b73b84a56 ......
+checking 883a082e8bdbcacfa6594ca8f9198491466cba2c ......
+	 orig commit -> fbc7c07ec23c040179384a1f16b62b6030eb6bdd ......
