@@ -1,0 +1,216 @@
+Check from v4.9.22 to v4.9.23
+Commit count: 32
+checking c3582cc56eac9213b32cc2a2886b11e2e5027598 ......
+checking 0ade21a2ed74544840004f0242c7a1b8c8c4daac ......
+	 orig commit -> 888022c0473d079bff9b47fb50434b1f20f8f37f ......
+checking 27dedde6895c0364549ee593253700a923ccf710 ......
+	 orig commit -> 7c3945bc2073554bb2ecf983e073dee686679c53 ......
+checking 48b2f1dd5787c643aa321fc159c11c418407234d ......
+	 orig commit -> 291c566a28910614ce42d0ffe82196eddd6346f4 ......
+checking cee26997a604ee8c6bd98b6841da195e828598b6 ......
+	 orig commit -> 6496bbf0ec481966ef9ffe5b6660d8d1b55c60cc ......
+checking ec0c5f06dba45693ec5838ca888e85e6af62d710 ......
+	 orig commit -> 22547c4cc4fe20698a6a85a55b8788859134b8e4 ......
+checking d7045cbf4a061ca38a3080fbbfcf6a021f8a49c7 ......
+	 orig commit -> 36e1f3d107867b25c616c2fd294f5a1c9d4e5d09 ......
+checking 16fc98c2479f5477f2df220acd9cb53686e33f4c ......
+	 orig commit -> 2b6867c2ce76c596676bec7d2d525af525fdc6e2 ......
+		 2b6867c2ce76c596676bec7d2d525af525fdc6e2 has problem. Fixes commit -> eb73190f4fbeedf762394e92d6a4ec9ace684c88
+commit ba2ce02e0584e130c8c61c65e3c1a17fde012193
+Author: Eric Dumazet <edumazet@google.com>
+Date:   Fri Jun 1 09:23:02 2018 -0700
+
+    net/packet: refine check for priv area size
+    
+    [ Upstream commit eb73190f4fbeedf762394e92d6a4ec9ace684c88 ]
+    
+    syzbot was able to trick af_packet again [1]
+    
+    Various commits tried to address the problem in the past,
+    but failed to take into account V3 header size.
+    
+    [1]
+    
+    tpacket_rcv: packet too big, clamped from 72 to 4294967224. macoff=96
+    BUG: KASAN: use-after-free in prb_run_all_ft_ops net/packet/af_packet.c:1016 [inline]
+    BUG: KASAN: use-after-free in prb_fill_curr_block.isra.59+0x4e5/0x5c0 net/packet/af_packet.c:1039
+    Write of size 2 at addr ffff8801cb62000e by task kworker/1:2/2106
+    
+    CPU: 1 PID: 2106 Comm: kworker/1:2 Not tainted 4.17.0-rc7+ #77
+    Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+    Workqueue: ipv6_addrconf addrconf_dad_work
+    Call Trace:
+     __dump_stack lib/dump_stack.c:77 [inline]
+     dump_stack+0x1b9/0x294 lib/dump_stack.c:113
+     print_address_description+0x6c/0x20b mm/kasan/report.c:256
+     kasan_report_error mm/kasan/report.c:354 [inline]
+     kasan_report.cold.7+0x242/0x2fe mm/kasan/report.c:412
+     __asan_report_store2_noabort+0x17/0x20 mm/kasan/report.c:436
+     prb_run_all_ft_ops net/packet/af_packet.c:1016 [inline]
+     prb_fill_curr_block.isra.59+0x4e5/0x5c0 net/packet/af_packet.c:1039
+     __packet_lookup_frame_in_block net/packet/af_packet.c:1094 [inline]
+     packet_current_rx_frame net/packet/af_packet.c:1117 [inline]
+     tpacket_rcv+0x1866/0x3340 net/packet/af_packet.c:2282
+     dev_queue_xmit_nit+0x891/0xb90 net/core/dev.c:2018
+     xmit_one net/core/dev.c:3049 [inline]
+     dev_hard_start_xmit+0x16b/0xc10 net/core/dev.c:3069
+     __dev_queue_xmit+0x2724/0x34c0 net/core/dev.c:3584
+     dev_queue_xmit+0x17/0x20 net/core/dev.c:3617
+     neigh_resolve_output+0x679/0xad0 net/core/neighbour.c:1358
+     neigh_output include/net/neighbour.h:482 [inline]
+     ip6_finish_output2+0xc9c/0x2810 net/ipv6/ip6_output.c:120
+     ip6_finish_output+0x5fe/0xbc0 net/ipv6/ip6_output.c:154
+     NF_HOOK_COND include/linux/netfilter.h:277 [inline]
+     ip6_output+0x227/0x9b0 net/ipv6/ip6_output.c:171
+     dst_output include/net/dst.h:444 [inline]
+     NF_HOOK include/linux/netfilter.h:288 [inline]
+     ndisc_send_skb+0x100d/0x1570 net/ipv6/ndisc.c:491
+     ndisc_send_ns+0x3c1/0x8d0 net/ipv6/ndisc.c:633
+     addrconf_dad_work+0xbef/0x1340 net/ipv6/addrconf.c:4033
+     process_one_work+0xc1e/0x1b50 kernel/workqueue.c:2145
+     worker_thread+0x1cc/0x1440 kernel/workqueue.c:2279
+     kthread+0x345/0x410 kernel/kthread.c:240
+     ret_from_fork+0x3a/0x50 arch/x86/entry/entry_64.S:412
+    
+    The buggy address belongs to the page:
+    page:ffffea00072d8800 count:0 mapcount:-127 mapping:0000000000000000 index:0xffff8801cb620e80
+    flags: 0x2fffc0000000000()
+    raw: 02fffc0000000000 0000000000000000 ffff8801cb620e80 00000000ffffff80
+    raw: ffffea00072e3820 ffffea0007132d20 0000000000000002 0000000000000000
+    page dumped because: kasan: bad access detected
+    
+    Memory state around the buggy address:
+     ffff8801cb61ff00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+     ffff8801cb61ff80: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
+    >ffff8801cb620000: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+                          ^
+     ffff8801cb620080: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     ffff8801cb620100: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+    
+    Fixes: 2b6867c2ce76 ("net/packet: fix overflow in check for priv area size")
+    Fixes: dc808110bb62 ("packet: handle too big packets for PACKET_V3")
+    Fixes: f6fb8f100b80 ("af-packet: TPACKET_V3 flexible buffer implementation.")
+    Signed-off-by: Eric Dumazet <edumazet@google.com>
+    Reported-by: syzbot <syzkaller@googlegroups.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 0ee72d8f9b8e17b8e4ccfebc7a25cbc2d395cd6a ......
+	 orig commit -> f2a0409a08502d64fbe3990354dff5902b08d2fb ......
+	 orig commit -> bafb2f7d4755bf1571bd5e9a03b97f3fc4fe69ae ......
+checking 69fbc505c87bf90703d36860f5c911d3e93b17df ......
+	 orig commit -> 33fa46d7b310e06d2cb2ab5417c100af120bfb65 ......
+checking 75964d0f191466fed93a85298bf7a75a46abf597 ......
+	 orig commit -> 40c98cb57cdbc377456116ad4582c89e329721b0 ......
+checking 91f9f51b18360e072e99a1bb86629aedc046b89c ......
+	 orig commit -> c25f8064c1d5731a2ce5664def890140dcdd3e5c ......
+checking aa05503149b3c9dedde56217c14446e5bc6bae54 ......
+	 orig commit -> 3cc3434fd6307d06b53b98ce83e76bf9807689b9 ......
+checking e8fa51d31aee1714a02b1f5de72b0d624fd6b5cd ......
+	 orig commit -> dda45f701c9d7ad4ac0bb446e3a96f6df9a468d9 ......
+		 dda45f701c9d7ad4ac0bb446e3a96f6df9a468d9 has problem. Fixes commit -> c25f8064c1d5731a2ce5664def890140dcdd3e5c
+commit 91f9f51b18360e072e99a1bb86629aedc046b89c
+Author: Matt Redfearn <matt.redfearn@imgtec.com>
+Date:   Wed Jan 25 17:00:25 2017 +0000
+
+    MIPS: IRQ Stack: Fix erroneous jal to plat_irq_dispatch
+    
+    commit c25f8064c1d5731a2ce5664def890140dcdd3e5c upstream.
+    
+    Commit dda45f701c9d ("MIPS: Switch to the irq_stack in interrupts")
+    changed both the normal and vectored interrupt handlers. Unfortunately
+    the vectored version, "except_vec_vi_handler", was incorrectly modified
+    to unconditionally jal to plat_irq_dispatch, rather than doing a jalr to
+    the vectored handler that has been set up. This is ok for many platforms
+    which set the vectored handler to plat_irq_dispatch anyway, but will
+    cause problems with platforms that use other handlers.
+    
+    Fixes: dda45f701c9d ("MIPS: Switch to the irq_stack in interrupts")
+    Signed-off-by: Matt Redfearn <matt.redfearn@imgtec.com>
+    Cc: Ralf Baechle <ralf@linux-mips.org>
+    Cc: Paul Burton <paul.burton@imgtec.com>
+    Cc: linux-mips@linux-mips.org
+    Patchwork: https://patchwork.linux-mips.org/patch/15110/
+    Signed-off-by: James Hogan <james.hogan@imgtec.com>
+    Signed-off-by: Amit Pundir <amit.pundir@linaro.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking aa6b1dac465e7e5b1591482bbb51d332bfe13cc7 ......
+	 orig commit -> 510d86362a27577f5ee23f46cfb354ad49731e61 ......
+checking 86b54e48c468adb4bc9e795192d614ee76530571 ......
+	 orig commit -> d42d8d106b0275b027c1e8992c42aecf933436ea ......
+checking 742817bb77f97a52d86333c59cffd5e85de7df3d ......
+	 orig commit -> fe8bd18ffea5327344d4ec2bf11f47951212abd0 ......
+		 fe8bd18ffea5327344d4ec2bf11f47951212abd0 has problem. Fixes commit -> 72faa7a773ca59336f3c889e878de81445c5a85c
+commit 2ffcbeb5ac8b36d71385fb2d75d915dfda640272
+Author: Liu Xiang <liu.xiang6@zte.com.cn>
+Date:   Sat Feb 16 17:12:24 2019 +0800
+
+    MIPS: irq: Allocate accurate order pages for irq stack
+    
+    commit 72faa7a773ca59336f3c889e878de81445c5a85c upstream.
+    
+    The irq_pages is the number of pages for irq stack, but not the
+    order which is needed by __get_free_pages().
+    We can use get_order() to calculate the accurate order.
+    
+    Signed-off-by: Liu Xiang <liu.xiang6@zte.com.cn>
+    Signed-off-by: Paul Burton <paul.burton@mips.com>
+    Fixes: fe8bd18ffea5 ("MIPS: Introduce irq_stack")
+    Cc: linux-mips@vger.kernel.org
+    Cc: stable@vger.kernel.org # v4.11+
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 760327cb080bc4e0b47503fc0794ef94214a778d ......
+	 orig commit -> bd5d21310133921021d78995ad6346f908483124 ......
+checking 31c576a5fe506b173559cf956dfd7f792cbfd601 ......
+	 orig commit -> a083c8fd277b4122c804f18ec8c84165f345c71c ......
+checking f0df317b2bb383301bab159b96f1559f81ca51ef ......
+	 orig commit -> 93c7018ec16bb83399dd4db61c361a6d6aba0d5a ......
+checking cb794d57931b77c6a43b662333772a1ba3bd5342 ......
+	 orig commit -> 0488a6121dfe6cbd44de15ea3627913b7549a1e9 ......
+checking 938f8e856064c0a7890ab998ec66abf1d093fd18 ......
+	 orig commit -> e2474541032db65d02bf88b6a8c2f954654b443f ......
+		 e2474541032db65d02bf88b6a8c2f954654b443f has problem. Fixes commit -> f275a4659484716259cc46268d9043424e51cf0f
+ababb08938df7ac245d30a58b95b94ecf8dc04fc
+commit 08ae439c95d164e9c0022e0511f4fbb4deffd220
+Author: Stefan Wahren <stefan.wahren@i2se.com>
+Date:   Thu Feb 16 21:20:45 2017 +0000
+
+    i2c: bcm2835: Avoid possible NULL ptr dereference
+    
+    [ Upstream commit ababb08938df7ac245d30a58b95b94ecf8dc04fc ]
+    
+    Since commit e2474541032d ("bcm2835: Fix hang for writing messages
+    larger than 16 bytes") the interrupt handler is prone to a possible
+    NULL pointer dereference. This could happen if an interrupt fires
+    before curr_msg is set by bcm2835_i2c_xfer_msg() and randomly occurs
+    on the RPi 3. Even this is an unexpected behavior the driver must
+    handle that with an error instead of a crash.
+    
+    Reported-by: Peter Robinson <pbrobinson@gmail.com>
+    Fixes: e2474541032d ("bcm2835: Fix hang for writing messages larger than 16 bytes")
+    Signed-off-by: Stefan Wahren <stefan.wahren@i2se.com>
+    Acked-by: Noralf Trønnes <noralf@tronnes.org>
+    Signed-off-by: Wolfram Sang <wsa@the-dreams.de>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+checking f7513c9165bfe9671d83b940780602980e4ac913 ......
+	 orig commit -> eb68d0324dc4d88ab0d6159bdcd98c247a3a8954 ......
+checking 1b9921866dc5b7d1a1bfdc6236e671ca59d61623 ......
+	 orig commit -> 05973c2efb40122f2a9ecde2d065f7ea5068d024 ......
+checking dcac0d18e7e1ee4ae524ae9c672a35b86189a260 ......
+	 orig commit -> 4defb5f912a0ba60e07e91a4b62634814cd99b7f ......
+checking 17fda94d181c75d95dc9ab3db39813a0efeccafb ......
+	 orig commit -> 3d3d18f086cdda72ee18a454db70ca72c6e3246c ......
+		 3d3d18f086cdda72ee18a454db70ca72c6e3246c has problem. Fixes commit -> c053b5a506d3afc038c485a86e3d461f6c7fb207
+8f612d055183545070ca1009ac2eb1f2e044cc20
+checking 82dafcb93b0f7cd7563cbe6460a20b090a0d62d7 ......
+	 orig commit -> 8f68d591d4765b2e1ce9d916ac7bc5583285c4ad ......
+checking 954ce087072cceb25a9106ba85d98e3219e4af7a ......
+	 orig commit -> 0f5418e564ac6452b9086295646e602a9addc4bf ......
+checking 1cbf6296fb355b3906813852e025f1073db508ff ......
+	 orig commit -> 35a3abfd198e6c69a6644784bb09a2d951fc6b21 ......
+checking 1435e12e4af9056bb6465f536a28792759c34b5f ......
+	 orig commit -> 34dc8993eef63681b062871413a9484008a2a78f ......
+checking 988028e55b88a18eb625abde58861e85e22a41e3 ......
+	 orig commit -> edd06b8353772dca7afcd4640dafa83b521edd55 ......
+checking 8ac9915c3f86cc7fe6a6fab4e4a61d992b01db07 ......
+	 orig commit -> d253371c4c2f5fc2d884ef25f64decd7549aff5a ......
+	 orig commit -> 2c7d0602c815277f7cb7c932b091288710d8aba7 ......

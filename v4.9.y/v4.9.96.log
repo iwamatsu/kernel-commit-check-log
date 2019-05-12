@@ -1,0 +1,736 @@
+Check from v4.9.96 to v4.9.97
+Commit count: 75
+checking ba3cd5796223e0971d30e910e0d5b953576f8629 ......
+checking 4959a913ef6b274cedbc7fc06d5606aafd32ef80 ......
+	 orig commit -> 53fa1f6e8a5958da698a31edf366ffe90596b490 ......
+		 53fa1f6e8a5958da698a31edf366ffe90596b490 has problem. Fixes commit -> d693c008e3ca04db5916ff72e68ce661888a913b
+cecf3e3e0803462335e25d083345682518097334
+commit baf50485819036fdea6b2e7d21a46d9214484bfb
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Mon Jan 7 17:08:21 2019 +0100
+
+    ACPI / video: Extend chassis-type detection with a "Lunch Box" check
+    
+    [ Upstream commit d693c008e3ca04db5916ff72e68ce661888a913b ]
+    
+    Commit 53fa1f6e8a59 ("ACPI / video: Only default only_lcd to true on
+    Win8-ready _desktops_") introduced chassis type detection, limiting the
+    lcd_only check for the backlight to devices where the chassis-type
+    indicates their is no builtin LCD panel.
+    
+    The purpose of the lcd_only check is to avoid advertising a backlight
+    interface on desktops, since skylake and newer machines seem to always
+    have a backlight interface even if there is no LCD panel. The limiting
+    of this check to desktops only was done to avoid breaking backlight
+    support on some laptops which do not have the lcd flag set.
+    
+    The Fujitsu ESPRIMO Q910 which is a compact (NUC like) desktop machine
+    has a chassis type of 0x10 aka "Lunch Box". Without the lcd_only check
+    we end up falsely advertising backlight/brightness control on this
+    device. This commit extend the dmi_is_desktop check to return true
+    for type 0x10 to fix this.
+    
+    Fixes: 53fa1f6e8a59 ("ACPI / video: Only default only_lcd to true ...")
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit bca74850eef920fc97a9750521a80623591699d2
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Mon Jan 7 17:08:20 2019 +0100
+
+    ACPI / video: Refactor and fix dmi_is_desktop()
+    
+    [ Upstream commit cecf3e3e0803462335e25d083345682518097334 ]
+    
+    This commit refactors the chassis-type detection introduced by
+    commit 53fa1f6e8a59 ("ACPI / video: Only default only_lcd to true on
+    Win8-ready _desktops_") (where desktop means anything without a builtin
+    screen).
+    
+    The DMI chassis_type is an unsigned integer, so rather then doing a
+    whole bunch of string-compares on it, convert it to an int and feed
+    the result to a switch case.
+    
+    Note the switch case uses hex values, this is done because the spec
+    uses hex values too. This changes the check for "Main Server Chassis"
+    from checking for 11 decimal to 11 hexadecimal, this is a bug fix,
+    the original check for 11 decimal was wrong.
+    
+    Fixes: 53fa1f6e8a59 ("ACPI / video: Only default only_lcd to true ...")
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    [ rjw: Drop redundant return statements ]
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+commit baf50485819036fdea6b2e7d21a46d9214484bfb
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Mon Jan 7 17:08:21 2019 +0100
+
+    ACPI / video: Extend chassis-type detection with a "Lunch Box" check
+    
+    [ Upstream commit d693c008e3ca04db5916ff72e68ce661888a913b ]
+    
+    Commit 53fa1f6e8a59 ("ACPI / video: Only default only_lcd to true on
+    Win8-ready _desktops_") introduced chassis type detection, limiting the
+    lcd_only check for the backlight to devices where the chassis-type
+    indicates their is no builtin LCD panel.
+    
+    The purpose of the lcd_only check is to avoid advertising a backlight
+    interface on desktops, since skylake and newer machines seem to always
+    have a backlight interface even if there is no LCD panel. The limiting
+    of this check to desktops only was done to avoid breaking backlight
+    support on some laptops which do not have the lcd flag set.
+    
+    The Fujitsu ESPRIMO Q910 which is a compact (NUC like) desktop machine
+    has a chassis type of 0x10 aka "Lunch Box". Without the lcd_only check
+    we end up falsely advertising backlight/brightness control on this
+    device. This commit extend the dmi_is_desktop check to return true
+    for type 0x10 to fix this.
+    
+    Fixes: 53fa1f6e8a59 ("ACPI / video: Only default only_lcd to true ...")
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+checking bed2d7627a9d95ecf4662fbcd7dd30d762997b1a ......
+	 orig commit -> 783c3b53b9506db3e05daacfe34e0287eebb09d8 ......
+checking a714a5f3afdd8de38985a88fc6d29f81873369d1 ......
+	 orig commit -> 5d27a2bf6e14f5c7d1033ad1e993fcd0eba43e83 ......
+checking 04f87299884a26f64b643d810e68d56685d6ffc1 ......
+	 orig commit -> af2e460ade0b0180d0f3812ca4f4f59cc9597f3e ......
+checking 4bd744b86114a406efb563c8717e5bea7672d427 ......
+	 orig commit -> 9de4ee40547fd315d4a0ed1dd15a2fa3559ad707 ......
+checking 70f2351eca535c590dad1657a3761650c8515acb ......
+	 orig commit -> 94e5395d2403c8bc2504a7cbe4c4caaacb7b8b84 ......
+checking 2f7be1262873bb200ab18fe7627231c9da9f22b2 ......
+	 orig commit -> 9d0c75bf6e03d9bf80c55b0f677dc9b982958fd5 ......
+checking e2956fc8356549c7072a6b420b500bb5fe32c4fb ......
+	 orig commit -> aa8f8778493c85fff480cdf8b349b1e1dcb5f243 ......
+checking 55ca7b1d43a9d9958ce8544dee938e6c62c263ec ......
+	 orig commit -> 5171b37d959641bbc619781caf62e61f7b940871 ......
+checking 228ce13c3064fcc8b30d21f95a9c246a23196daa ......
+	 orig commit -> 7212303268918b9a203aebeacfdbd83b5e87b20d ......
+checking 581cb195c59f0da31878c10e40893ec2d1d7b122 ......
+	 orig commit -> 53b76cdf7e8fecec1d09e38aad2f8579882591a8 ......
+checking b031b84f3c39cfd0b69e7d40eebc20c3a6bd9193 ......
+	 orig commit -> 5e391dc5a8d801a2410d0032ad4a428d1d61800c ......
+checking 7b80c16871489c7aa4b283ebc12e226b27c4c73b ......
+	 orig commit -> 3a04ce7130a7e5dad4e78d45d50313747f8c830f ......
+checking 90e19ec22499f6182134f5a8b8461de2a0abe987 ......
+	 orig commit -> f7e43672683b097bb074a8fe7af9bc600a23f231 ......
+		 f7e43672683b097bb074a8fe7af9bc600a23f231 has problem. Fixes commit -> 3a04ce7130a7e5dad4e78d45d50313747f8c830f
+commit 7b80c16871489c7aa4b283ebc12e226b27c4c73b
+Author: Cong Wang <xiyou.wangcong@gmail.com>
+Date:   Thu Apr 19 21:54:34 2018 -0700
+
+    llc: fix NULL pointer deref for SOCK_ZAPPED
+    
+    
+    [ Upstream commit 3a04ce7130a7e5dad4e78d45d50313747f8c830f ]
+    
+    For SOCK_ZAPPED socket, we don't need to care about llc->sap,
+    so we should just skip these refcount functions in this case.
+    
+    Fixes: f7e43672683b ("llc: hold llc_sap before release_sock()")
+    Reported-by: kernel test robot <lkp@intel.com>
+    Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking e5d0f6a6935a6b58e2b343010a260b58594566bf ......
+	 orig commit -> f6cd14537ff9919081be19b9c53b9b19c0d3ea97 ......
+checking 2de74b91a85e4928600543841752b70af22d3d50 ......
+	 orig commit -> 1071ec9d453a38023579714b64a951a2fb982071 ......
+		 1071ec9d453a38023579714b64a951a2fb982071 has problem. Fixes commit -> d625329b06e46bd20baf9ee40847d11982569204
+commit f9a670e10d274274fda7fd74220dfd1048dd332e
+Author: Xin Long <lucien.xin@gmail.com>
+Date:   Thu Apr 26 14:13:57 2018 +0800
+
+    sctp: handle two v4 addrs comparison in sctp_inet6_cmp_addr
+    
+    [ Upstream commit d625329b06e46bd20baf9ee40847d11982569204 ]
+    
+    Since sctp ipv6 socket also supports v4 addrs, it's possible to
+    compare two v4 addrs in pf v6 .cmp_addr, sctp_inet6_cmp_addr.
+    
+    However after Commit 1071ec9d453a ("sctp: do not check port in
+    sctp_inet6_cmp_addr"), it no longer calls af1->cmp_addr, which
+    in this case is sctp_v4_cmp_addr, but calls __sctp_v6_cmp_addr
+    where it handles them as two v6 addrs. It would cause a out of
+    bounds crash.
+    
+    syzbot found this crash when trying to bind two v4 addrs to a
+    v6 socket.
+    
+    This patch fixes it by adding the process for two v4 addrs in
+    sctp_inet6_cmp_addr.
+    
+    Fixes: 1071ec9d453a ("sctp: do not check port in sctp_inet6_cmp_addr")
+    Reported-by: syzbot+cd494c1dd681d4d93ebb@syzkaller.appspotmail.com
+    Signed-off-by: Xin Long <lucien.xin@gmail.com>
+    Acked-by: Neil Horman <nhorman@tuxdriver.com>
+    Acked-by: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 9d33bfffd39bd1c2bf5d55f8b1f1e0cebf26f666 ......
+	 orig commit -> 7ce2367254e84753bceb07327aaf5c953cfce117 ......
+checking ecaae08d72bd353c548545e521b68b00749f479a ......
+	 orig commit -> a49e2f5d5fb141884452ddb428f551b123d436b5 ......
+checking 0b6693b49e4d36846ab0d638ff062920d0ec10e7 ......
+	 orig commit -> ec518f21cb1a1b1f8a516499ea05c60299e04963 ......
+checking b2a5207f8c45359d2404562e31fbca2b2fee6c56 ......
+	 orig commit -> a6361f0ca4b25460f2cdf3235ebe8115f622901e ......
+checking 8599a1fe10b8c3f6e17568a1c43bfaccfeaff75c ......
+	 orig commit -> 9cf2f437ca5b39828984064fad213e68fc17ef11 ......
+checking 3626fb04d050139b1fe1249f67c7c3efbe73b0ad ......
+	 orig commit -> 4fb0534fb7bbc2346ba7d3a072b538007f4135a5 ......
+		 4fb0534fb7bbc2346ba7d3a072b538007f4135a5 has problem. Fixes commit -> 2fdeee2549231b1f989f011bb18191f5660d3745
+commit 03ad40df95398ed7eaa647b5d2e2ff747945ae8b
+Author: Cong Wang <xiyou.wangcong@gmail.com>
+Date:   Mon Feb 11 21:59:51 2019 -0800
+
+    team: avoid complex list operations in team_nl_cmd_options_set()
+    
+    [ Upstream commit 2fdeee2549231b1f989f011bb18191f5660d3745 ]
+    
+    The current opt_inst_list operations inside team_nl_cmd_options_set()
+    is too complex to track:
+    
+        LIST_HEAD(opt_inst_list);
+        nla_for_each_nested(...) {
+            list_for_each_entry(opt_inst, &team->option_inst_list, list) {
+                if (__team_option_inst_tmp_find(&opt_inst_list, opt_inst))
+                    continue;
+                list_add(&opt_inst->tmp_list, &opt_inst_list);
+            }
+        }
+        team_nl_send_event_options_get(team, &opt_inst_list);
+    
+    as while we retrieve 'opt_inst' from team->option_inst_list, it could
+    be added to the local 'opt_inst_list' for multiple times. The
+    __team_option_inst_tmp_find() doesn't work, as the setter
+    team_mode_option_set() still calls team->ops.exit() which uses
+    ->tmp_list too in __team_options_change_check().
+    
+    Simplify the list operations by moving the 'opt_inst_list' and
+    team_nl_send_event_options_get() into the nla_for_each_nested() loop so
+    that it can be guranteed that we won't insert a same list entry for
+    multiple times. Therefore, __team_option_inst_tmp_find() can be removed
+    too.
+    
+    Fixes: 4fb0534fb7bb ("team: avoid adding twice the same option to the event list")
+    Fixes: 2fcdb2c9e659 ("team: allow to send multiple set events in one message")
+    Reported-by: syzbot+4d4af685432dc0e56c91@syzkaller.appspotmail.com
+    Reported-by: syzbot+68ee510075cf64260cc4@syzkaller.appspotmail.com
+    Cc: Jiri Pirko <jiri@resnulli.us>
+    Cc: Paolo Abeni <pabeni@redhat.com>
+    Signed-off-by: Cong Wang <xiyou.wangcong@gmail.com>
+    Acked-by: Jiri Pirko <jiri@mellanox.com>
+    Reviewed-by: Paolo Abeni <pabeni@redhat.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking f838259677f3ce937756018ce999339e07f8c351 ......
+	 orig commit -> 7e5a206ab686f098367b61aca989f5cdfa8114a3 ......
+checking e202fa9ea5a33723a6dd048e5e272335bfdf8113 ......
+	 orig commit -> b905ef9ab90115d001c1658259af4b1c65088779 ......
+checking 0e770d2927b7b5fed0859ac46861d00f762b2407 ......
+	 orig commit -> 7dd07c143a4b54d050e748bee4b4b9e94a7b1744 ......
+checking e9c46600cdf19bd790a0a2e2aeb6675f61d3aed5 ......
+	 orig commit -> eb1c28c05894a4b1f6b56c5bf072205e64cfa280 ......
+checking 06a02a81689074406d70979837518b1f747767af ......
+	 orig commit -> 9c438d7a3a52dcc2b9ed095cb87d3a5e83cf7e60 ......
+checking a43e7cba5444f062defc2145fe0b83b28ac35d5f ......
+	 orig commit -> ddea788c63094f7c483783265563dd5b50052e28 ......
+checking 037069f2c62510b23dbc67b6894a1c152562f7b5 ......
+	 orig commit -> 6cf09958f32b9667bb3ebadf74367c791112771b ......
+checking 906cd975f6d4bcfdf26a12f4e13e826d089a42a3 ......
+	 orig commit -> 6a3d1e81a434fc311f224b8be77258bafc18ccc6 ......
+checking fa90b9a2b63e2d84d169cb640f47fc6d9af17c6c ......
+	 orig commit -> d424986f1d6b16079b3231db0314923f4f8deed1 ......
+		 d424986f1d6b16079b3231db0314923f4f8deed1 has problem. Fixes commit -> 4253b0e0627ee3461e64c2495c616f1c8f6b127b
+commit b004790d7ec587024443c3194411f6a89a93a3d1
+Author: Martin Schwidefsky <schwidefsky@de.ibm.com>
+Date:   Wed May 23 18:21:50 2018 +0200
+
+    s390: move spectre sysfs attribute code
+    
+    [ Upstream commit 4253b0e0627ee3461e64c2495c616f1c8f6b127b ]
+    
+    The nospec-branch.c file is compiled without the gcc options to
+    generate expoline thunks. The return branch of the sysfs show
+    functions cpu_show_spectre_v1 and cpu_show_spectre_v2 is an indirect
+    branch as well. These need to be compiled with expolines.
+    
+    Move the sysfs functions for spectre reporting to a separate file
+    and loose an '.' for one of the messages.
+    
+    Cc: stable@vger.kernel.org # 4.16
+    Fixes: d424986f1d ("s390: add sysfs attributes for spectre")
+    Signed-off-by: Martin Schwidefsky <schwidefsky@de.ibm.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 4a51204f8b38e5533d0abf110dc922210b2b5f62 ......
+	 orig commit -> bc035599718412cfba9249aa713f90ef13f13ee9 ......
+checking 3e17958c6b3159cebc09f24344176e9a12b15e30 ......
+	 orig commit -> 6e179d64126b909f0b288fa63cdbf07c531e9b1d ......
+		 6e179d64126b909f0b288fa63cdbf07c531e9b1d has problem. Fixes commit -> 6a3d1e81a434fc311f224b8be77258bafc18ccc6
+commit 906cd975f6d4bcfdf26a12f4e13e826d089a42a3
+Author: Martin Schwidefsky <schwidefsky@de.ibm.com>
+Date:   Fri Apr 27 07:36:56 2018 +0200
+
+    s390: correct nospec auto detection init order
+    
+    [ Upstream commit 6a3d1e81a434fc311f224b8be77258bafc18ccc6 ]
+    
+    With CONFIG_EXPOLINE_AUTO=y the call of spectre_v2_auto_early() via
+    early_initcall is done *after* the early_param functions. This
+    overwrites any settings done with the nobp/no_spectre_v2/spectre_v2
+    parameters. The code patching for the kernel is done after the
+    evaluation of the early parameters but before the early_initcall
+    is done. The end result is a kernel image that is patched correctly
+    but the kernel modules are not.
+    
+    Make sure that the nospec auto detection function is called before the
+    early parameters are evaluated and before the code patching is done.
+    
+    Fixes: 6e179d64126b ("s390: add automatic detection of the spectre defense")
+    Signed-off-by: Martin Schwidefsky <schwidefsky@de.ibm.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 2afb4e9dfc0a44a4b616e4461fbf972e5ad4b0fe ......
+	 orig commit -> b2e2f43a01bace1a25bdbae04c9f9846882b727a ......
+checking 7634817fc5fad945d67c578f04c731ce25dc86bc ......
+	 orig commit -> d3f468963cd6fd6d2aa5e26aed8b24232096d0e1 ......
+checking 7ae60d00c31e5db697a1518ce94749a0852c1d0c ......
+	 orig commit -> d5feec04fe578c8dbd9e2e1439afc2f0af761ed4 ......
+checking 49a48a0ec7c1f078fc6215ccaf2a5d277c5495c0 ......
+	 orig commit -> 2cb370d615e9fbed9e95ed222c2c8f337181aa90 ......
+checking 2a0b0e13a8dedcc366fa59656fbcad45c632ac92 ......
+	 orig commit -> f315104ad8b0c32be13eac628569ae707c332cb5 ......
+checking 24fbc4eee899f1a8d291ffe47333a673a3ed6c01 ......
+	 orig commit -> f19fbd5ed642dc31c809596412dab1ed56f2f156 ......
+		 f19fbd5ed642dc31c809596412dab1ed56f2f156 has problem. Fixes commit -> 9f18fff63cfd6f559daa1eaae60640372c65f84b
+c50c84c3ac4d5db683904bdb3257798b6ef980ae
+23a4d7fd34856da8218c4cfc23dba7a6ec0a423a
+97489e0663fa700d6e7febddc43b58df98d7bcda
+467a3bf219cee12259182c5cb4821f88fd518a51
+6dd85fbb87d1d6b87a3b1f02ca28d7b2abd2e7ba
+6cf09958f32b9667bb3ebadf74367c791112771b
+dc24b7b49a53c7ee5502c877b133558acec0b3f8
+2cb370d615e9fbed9e95ed222c2c8f337181aa90
+commit b35421ab5735f08b58a7e0cee03228f91465ed99
+Author: Martin Schwidefsky <schwidefsky@de.ibm.com>
+Date:   Wed May 23 18:21:49 2018 +0200
+
+    s390/kernel: use expoline for indirect branches
+    
+    [ Upstream commit c50c84c3ac4d5db683904bdb3257798b6ef980ae ]
+    
+    The assember code in arch/s390/kernel uses a few more indirect branches
+    which need to be done with execute trampolines for CONFIG_EXPOLINE=y.
+    
+    Cc: stable@vger.kernel.org # 4.16
+    Fixes: f19fbd5ed6 ("s390: introduce execute-trampolines for branches")
+    Reviewed-by: Hendrik Brueckner <brueckner@linux.vnet.ibm.com>
+    Signed-off-by: Martin Schwidefsky <schwidefsky@de.ibm.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit caa47e1f7fb8c35137f1d683cd2f9d43775be009
+Author: Martin Schwidefsky <schwidefsky@de.ibm.com>
+Date:   Wed May 23 18:21:48 2018 +0200
+
+    s390/ftrace: use expoline for indirect branches
+    
+    [ Upstream commit 23a4d7fd34856da8218c4cfc23dba7a6ec0a423a ]
+    
+    The return from the ftrace_stub, _mcount, ftrace_caller and
+    return_to_handler functions is done with "br %r14" and "br %r1".
+    These are indirect branches as well and need to use execute
+    trampolines for CONFIG_EXPOLINE=y.
+    
+    The ftrace_caller function is a special case as it returns to the
+    start of a function and may only use %r0 and %r1. For a pre z10
+    machine the standard execute trampoline uses a LARL + EX to do
+    this, but this requires *two* registers in the range %r1..%r15.
+    To get around this the 'br %r1' located in the lowcore is used,
+    then the EX instruction does not need an address register.
+    But the lowcore trick may only be used for pre z14 machines,
+    with noexec=on the mapping for the first page may not contain
+    instructions. The solution for that is an ALTERNATIVE in the
+    expoline THUNK generated by 'GEN_BR_THUNK %r1' to switch to
+    EXRL, this relies on the fact that a machine that supports
+    noexec=on has EXRL as well.
+    
+    Cc: stable@vger.kernel.org # 4.16
+    Fixes: f19fbd5ed6 ("s390: introduce execute-trampolines for branches")
+    Signed-off-by: Martin Schwidefsky <schwidefsky@de.ibm.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit cba0d6c2d6301f32b0b5d86ad70f3fdd8574d43b
+Author: Martin Schwidefsky <schwidefsky@de.ibm.com>
+Date:   Wed May 23 18:21:47 2018 +0200
+
+    s390/lib: use expoline for indirect branches
+    
+    [ Upstream commit 97489e0663fa700d6e7febddc43b58df98d7bcda ]
+    
+    The return from the memmove, memset, memcpy, __memset16, __memset32 and
+    __memset64 functions are done with "br %r14". These are indirect branches
+    as well and need to use execute trampolines for CONFIG_EXPOLINE=y.
+    
+    Cc: stable@vger.kernel.org # 4.16
+    Fixes: f19fbd5ed6 ("s390: introduce execute-trampolines for branches")
+    Reviewed-by: Hendrik Brueckner <brueckner@linux.vnet.ibm.com>
+    Signed-off-by: Martin Schwidefsky <schwidefsky@de.ibm.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit f37bfc0d20a0031f82ec46c1107501c40c1626b2
+Author: Martin Schwidefsky <schwidefsky@de.ibm.com>
+Date:   Wed May 23 18:21:46 2018 +0200
+
+    s390/crc32-vx: use expoline for indirect branches
+    
+    [ Upstream commit 467a3bf219cee12259182c5cb4821f88fd518a51 ]
+    
+    The return from the crc32_le_vgfm_16/crc32c_le_vgfm_16 and the
+    crc32_be_vgfm_16 functions are done with "br %r14". These are indirect
+    branches as well and need to use execute trampolines for CONFIG_EXPOLINE=y.
+    
+    Cc: stable@vger.kernel.org # 4.16
+    Fixes: f19fbd5ed6 ("s390: introduce execute-trampolines for branches")
+    Reviewed-by: Hendrik Brueckner <brueckner@linux.vnet.ibm.com>
+    Signed-off-by: Martin Schwidefsky <schwidefsky@de.ibm.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 4a5c26ddfb8657402073f8b43393ede53ad82e6a
+Author: Martin Schwidefsky <schwidefsky@de.ibm.com>
+Date:   Wed May 23 18:21:45 2018 +0200
+
+    s390: move expoline assembler macros to a header
+    
+    [ Upstream commit 6dd85fbb87d1d6b87a3b1f02ca28d7b2abd2e7ba ]
+    
+    To be able to use the expoline branches in different assembler
+    files move the associated macros from entry.S to a new header
+    nospec-insn.h.
+    
+    While we are at it make the macros a bit nicer to use.
+    
+    Cc: stable@vger.kernel.org # 4.16
+    Fixes: f19fbd5ed6 ("s390: introduce execute-trampolines for branches")
+    Signed-off-by: Martin Schwidefsky <schwidefsky@de.ibm.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 037069f2c62510b23dbc67b6894a1c152562f7b5
+Author: Martin Schwidefsky <schwidefsky@de.ibm.com>
+Date:   Fri Apr 27 07:36:57 2018 +0200
+
+    s390: correct module section names for expoline code revert
+    
+    [ Upstream commit 6cf09958f32b9667bb3ebadf74367c791112771b ]
+    
+    The main linker script vmlinux.lds.S for the kernel image merges
+    the expoline code patch tables into two section ".nospec_call_table"
+    and ".nospec_return_table". This is *not* done for the modules,
+    there the sections retain their original names as generated by gcc:
+    ".s390_indirect_call", ".s390_return_mem" and ".s390_return_reg".
+    
+    The module_finalize code has to check for the compiler generated
+    section names, otherwise no code patching is done. This slows down
+    the module code in case of "spectre_v2=off".
+    
+    Cc: stable@vger.kernel.org # 4.16
+    Fixes: f19fbd5ed6 ("s390: introduce execute-trampolines for branches")
+    Signed-off-by: Martin Schwidefsky <schwidefsky@de.ibm.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 49a48a0ec7c1f078fc6215ccaf2a5d277c5495c0
+Author: Eugeniu Rosca <erosca@de.adit-jv.com>
+Date:   Fri Apr 27 07:36:49 2018 +0200
+
+    s390: Replace IS_ENABLED(EXPOLINE_*) with IS_ENABLED(CONFIG_EXPOLINE_*)
+    
+    [ Upstream commit 2cb370d615e9fbed9e95ed222c2c8f337181aa90 ]
+    
+    I've accidentally stumbled upon the IS_ENABLED(EXPOLINE_*) lines, which
+    obviously always evaluate to false. Fix this.
+    
+    Fixes: f19fbd5ed642 ("s390: introduce execute-trampolines for branches")
+    Signed-off-by: Eugeniu Rosca <erosca@de.adit-jv.com>
+    Signed-off-by: Martin Schwidefsky <schwidefsky@de.ibm.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+commit b35421ab5735f08b58a7e0cee03228f91465ed99
+Author: Martin Schwidefsky <schwidefsky@de.ibm.com>
+Date:   Wed May 23 18:21:49 2018 +0200
+
+    s390/kernel: use expoline for indirect branches
+    
+    [ Upstream commit c50c84c3ac4d5db683904bdb3257798b6ef980ae ]
+    
+    The assember code in arch/s390/kernel uses a few more indirect branches
+    which need to be done with execute trampolines for CONFIG_EXPOLINE=y.
+    
+    Cc: stable@vger.kernel.org # 4.16
+    Fixes: f19fbd5ed6 ("s390: introduce execute-trampolines for branches")
+    Reviewed-by: Hendrik Brueckner <brueckner@linux.vnet.ibm.com>
+    Signed-off-by: Martin Schwidefsky <schwidefsky@de.ibm.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit caa47e1f7fb8c35137f1d683cd2f9d43775be009
+Author: Martin Schwidefsky <schwidefsky@de.ibm.com>
+Date:   Wed May 23 18:21:48 2018 +0200
+
+    s390/ftrace: use expoline for indirect branches
+    
+    [ Upstream commit 23a4d7fd34856da8218c4cfc23dba7a6ec0a423a ]
+    
+    The return from the ftrace_stub, _mcount, ftrace_caller and
+    return_to_handler functions is done with "br %r14" and "br %r1".
+    These are indirect branches as well and need to use execute
+    trampolines for CONFIG_EXPOLINE=y.
+    
+    The ftrace_caller function is a special case as it returns to the
+    start of a function and may only use %r0 and %r1. For a pre z10
+    machine the standard execute trampoline uses a LARL + EX to do
+    this, but this requires *two* registers in the range %r1..%r15.
+    To get around this the 'br %r1' located in the lowcore is used,
+    then the EX instruction does not need an address register.
+    But the lowcore trick may only be used for pre z14 machines,
+    with noexec=on the mapping for the first page may not contain
+    instructions. The solution for that is an ALTERNATIVE in the
+    expoline THUNK generated by 'GEN_BR_THUNK %r1' to switch to
+    EXRL, this relies on the fact that a machine that supports
+    noexec=on has EXRL as well.
+    
+    Cc: stable@vger.kernel.org # 4.16
+    Fixes: f19fbd5ed6 ("s390: introduce execute-trampolines for branches")
+    Signed-off-by: Martin Schwidefsky <schwidefsky@de.ibm.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit cba0d6c2d6301f32b0b5d86ad70f3fdd8574d43b
+Author: Martin Schwidefsky <schwidefsky@de.ibm.com>
+Date:   Wed May 23 18:21:47 2018 +0200
+
+    s390/lib: use expoline for indirect branches
+    
+    [ Upstream commit 97489e0663fa700d6e7febddc43b58df98d7bcda ]
+    
+    The return from the memmove, memset, memcpy, __memset16, __memset32 and
+    __memset64 functions are done with "br %r14". These are indirect branches
+    as well and need to use execute trampolines for CONFIG_EXPOLINE=y.
+    
+    Cc: stable@vger.kernel.org # 4.16
+    Fixes: f19fbd5ed6 ("s390: introduce execute-trampolines for branches")
+    Reviewed-by: Hendrik Brueckner <brueckner@linux.vnet.ibm.com>
+    Signed-off-by: Martin Schwidefsky <schwidefsky@de.ibm.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit f37bfc0d20a0031f82ec46c1107501c40c1626b2
+Author: Martin Schwidefsky <schwidefsky@de.ibm.com>
+Date:   Wed May 23 18:21:46 2018 +0200
+
+    s390/crc32-vx: use expoline for indirect branches
+    
+    [ Upstream commit 467a3bf219cee12259182c5cb4821f88fd518a51 ]
+    
+    The return from the crc32_le_vgfm_16/crc32c_le_vgfm_16 and the
+    crc32_be_vgfm_16 functions are done with "br %r14". These are indirect
+    branches as well and need to use execute trampolines for CONFIG_EXPOLINE=y.
+    
+    Cc: stable@vger.kernel.org # 4.16
+    Fixes: f19fbd5ed6 ("s390: introduce execute-trampolines for branches")
+    Reviewed-by: Hendrik Brueckner <brueckner@linux.vnet.ibm.com>
+    Signed-off-by: Martin Schwidefsky <schwidefsky@de.ibm.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 4a5c26ddfb8657402073f8b43393ede53ad82e6a
+Author: Martin Schwidefsky <schwidefsky@de.ibm.com>
+Date:   Wed May 23 18:21:45 2018 +0200
+
+    s390: move expoline assembler macros to a header
+    
+    [ Upstream commit 6dd85fbb87d1d6b87a3b1f02ca28d7b2abd2e7ba ]
+    
+    To be able to use the expoline branches in different assembler
+    files move the associated macros from entry.S to a new header
+    nospec-insn.h.
+    
+    While we are at it make the macros a bit nicer to use.
+    
+    Cc: stable@vger.kernel.org # 4.16
+    Fixes: f19fbd5ed6 ("s390: introduce execute-trampolines for branches")
+    Signed-off-by: Martin Schwidefsky <schwidefsky@de.ibm.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 633b4eb03bab15247214eae6a544dabf01688511
+Author: Martin Schwidefsky <schwidefsky@de.ibm.com>
+Date:   Tue Apr 24 11:18:49 2018 +0200
+
+    s390: remove indirect branch from do_softirq_own_stack
+    
+    commit 9f18fff63cfd6f559daa1eaae60640372c65f84b upstream.
+    
+    The inline assembly to call __do_softirq on the irq stack uses
+    an indirect branch. This can be replaced with a normal relative
+    branch.
+    
+    Cc: stable@vger.kernel.org # 4.16
+    Fixes: f19fbd5ed6 ("s390: introduce execute-trampolines for branches")
+    Reviewed-by: Hendrik Brueckner <brueckner@linux.vnet.ibm.com>
+    Signed-off-by: Martin Schwidefsky <schwidefsky@de.ibm.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 037069f2c62510b23dbc67b6894a1c152562f7b5
+Author: Martin Schwidefsky <schwidefsky@de.ibm.com>
+Date:   Fri Apr 27 07:36:57 2018 +0200
+
+    s390: correct module section names for expoline code revert
+    
+    [ Upstream commit 6cf09958f32b9667bb3ebadf74367c791112771b ]
+    
+    The main linker script vmlinux.lds.S for the kernel image merges
+    the expoline code patch tables into two section ".nospec_call_table"
+    and ".nospec_return_table". This is *not* done for the modules,
+    there the sections retain their original names as generated by gcc:
+    ".s390_indirect_call", ".s390_return_mem" and ".s390_return_reg".
+    
+    The module_finalize code has to check for the compiler generated
+    section names, otherwise no code patching is done. This slows down
+    the module code in case of "spectre_v2=off".
+    
+    Cc: stable@vger.kernel.org # 4.16
+    Fixes: f19fbd5ed6 ("s390: introduce execute-trampolines for branches")
+    Signed-off-by: Martin Schwidefsky <schwidefsky@de.ibm.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking a1f44e7917a67bcd48a3c4bf5c13fd150850dc25 ......
+	 orig commit -> 6b73044b2b0081ee3dd1cd6eaab7dee552601efb ......
+checking 07f65a834a814fb1a1b428b26a671f9196031b60 ......
+	 orig commit -> d768bd892fc8f066cd3aa000eb1867bcf32db0ee ......
+checking 46bd2c0ffd5cf7642a9dd87b294be9d2e51adb69 ......
+	 orig commit -> cf1489984641369611556bf00c48f945c77bcf02 ......
+checking 2dcf46aa49acc4c432ebefe3d4d413f428adc120 ......
+	 orig commit -> e2dd833389cc4069a96b57bdd24227b5f52288f5 ......
+checking c225febe980f6f112fc0bfce58148d8b390d4cbf ......
+	 orig commit -> 7041d28115e91f2144f811ffe8a195c696b1e1d0 ......
+		 7041d28115e91f2144f811ffe8a195c696b1e1d0 has problem. Fixes commit -> d3f468963cd6fd6d2aa5e26aed8b24232096d0e1
+commit 7634817fc5fad945d67c578f04c731ce25dc86bc
+Author: Christian Borntraeger <borntraeger@de.ibm.com>
+Date:   Fri Apr 27 07:36:51 2018 +0200
+
+    s390/entry.S: fix spurious zeroing of r0
+    
+    [ Upstream commit d3f468963cd6fd6d2aa5e26aed8b24232096d0e1 ]
+    
+    when a system call is interrupted we might call the critical section
+    cleanup handler that re-does some of the operations. When we are between
+    .Lsysc_vtime and .Lsysc_do_svc we might also redo the saving of the
+    problem state registers r0-r7:
+    
+    .Lcleanup_system_call:
+    [...]
+    0:      # update accounting time stamp
+            mvc     __LC_LAST_UPDATE_TIMER(8),__LC_SYNC_ENTER_TIMER
+            # set up saved register r11
+            lg      %r15,__LC_KERNEL_STACK
+            la      %r9,STACK_FRAME_OVERHEAD(%r15)
+            stg     %r9,24(%r11)            # r11 pt_regs pointer
+            # fill pt_regs
+            mvc     __PT_R8(64,%r9),__LC_SAVE_AREA_SYNC
+    --->    stmg    %r0,%r7,__PT_R0(%r9)
+    
+    The problem is now, that we might have already zeroed out r0.
+    The fix is to move the zeroing of r0 after sysc_do_svc.
+    
+    Reported-by: Farhan Ali <alifm@linux.vnet.ibm.com>
+    Fixes: 7041d28115e91 ("s390: scrub registers on kernel entry and KVM exit")
+    Signed-off-by: Christian Borntraeger <borntraeger@de.ibm.com>
+    Signed-off-by: Martin Schwidefsky <schwidefsky@de.ibm.com>
+    
+    Signed-off-by: Martin Schwidefsky <schwidefsky@de.ibm.com>
+    
+    Signed-off-by: Martin Schwidefsky <schwidefsky@de.ibm.com>
+    
+    Signed-off-by: Martin Schwidefsky <schwidefsky@de.ibm.com>
+    
+    Signed-off-by: Martin Schwidefsky <schwidefsky@de.ibm.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 4d9c2b611ff27fa1556414adf104418cba230daa ......
+	 orig commit -> 35b3fde6203b932b2b1a5b53b3d8808abc9c4f60 ......
+checking 420fd816bd206f266cf3a1300d5590790b5cdcb8 ......
+	 orig commit -> 049a2c2d486e8cc82c5cd79fa479c5b105b109e9 ......
+checking d69aa5e682c3ada69902936e6b7d8cd18827297a ......
+	 orig commit -> 686140a1a9c41d85a4212a1c26d671139b76404b ......
+checking c8b1584e5e37fdbf654113a746076d37e9a93206 ......
+	 orig commit -> 821cdad5c46cae94ce65b9a98614c70a6ff021f8 ......
+checking 237b5a362399bdd81422ef9f9ac9b9f034161efd ......
+	 orig commit -> 55cc11da69895a680940c1733caabc37be685f5e ......
+checking b5145685a8bbe0756e5ab8440b5012d74c0daf5b ......
+	 orig commit -> f5a26acf0162477af6ee4c11b4fb9cffe5d3e257 ......
+checking 403e7bd6ed4aa2515b05b6f5942a8bbad322d3e8 ......
+	 orig commit -> 90841047a01b452cc8c3f9b990698b264143334a ......
+checking 21670a464c6b05d92d24e64332e4c57b984d8701 ......
+	 orig commit -> 8cfd36a0b53aeb4ec21d81eb79706697b84dfc3d ......
+		 8cfd36a0b53aeb4ec21d81eb79706697b84dfc3d has problem. Fixes commit -> 628980e5c8f038f730582c6ee50b7410741cd96e
+checking 2d1264b5e665909a3217a16c362802c14ee807c0 ......
+	 orig commit -> 5e1df40f40ee45a97bb1066c3d71f0ae920a9672 ......
+checking 9ffa6fb2583b2c9afdb83c14948a9e3e2192bf1f ......
+	 orig commit -> 75a4598209cbe45540baa316c3b51d9db222e96e ......
+checking 9acdfe4eecf29d38fd7c7d342b120f430c950400 ......
+	 orig commit -> 78b562fbfa2cf0a9fcb23c3154756b690f4905c1 ......
+checking ac6f0cb331e2ddc5d40b9059908218349064ec5c ......
+	 orig commit -> 5af44ca53d019de47efe6dbc4003dd518e5197ed ......
+checking fdc2090bdadf829d5459570f4e908d47e6ec6a1c ......
+	 orig commit -> e2d054998b151e85b6305aa72264f67097bd78e9 ......
+	 orig commit -> 1d6b3c9ba756a5134fd7ad1959acac776d17404b ......
+checking cff3a5f282ff1813352a146c487f4d8b472c250e ......
+	 orig commit -> dbfcef6b0f4012c57bc0b6e0e660d5ed12a5eaed ......
+checking ff738afb8a847414f73b729cb25df624bd743089 ......
+	 orig commit -> a34d0a0da1abae46a5f6ebd06fb0ec484ca099d9 ......
+checking faf6fd7539a104a6ad2d263090738ab46c1828c5 ......
+	 orig commit -> de96ec2a77c6d06a423c2c495bb4a2f4299f3d9e ......
+checking d539f0aa5d1c07f312136363a020b7bde0d31094 ......
+	 orig commit -> d08876f524a605d64c7ca32cb8e9f5be3839e82e ......
+checking f9437fa5d27bd475017107a59a246c7eb4045b57 ......
+	 orig commit -> a1b94355ea3fde5e13db7ff37c0272fcde4e29b2 ......
+checking 98b62bd6823dc7da57a940b84c5e16fd459dc50e ......
+	 orig commit -> 74c82dae6c474933f2be401976e1530b5f623221 ......
+checking 5955f16e49ecf3d9ab8ffe2c46756ba4c228ebb2 ......
+	 orig commit -> a3078e593b74fe196e69f122f03ff0b32f652c53 ......
+checking 4dcd6ce1dff4903a6f3a928962dd03b0a7ecef15 ......
+	 orig commit -> 94e46a4f2d5eb14059e42f313c098d4854847376 ......
+checking 9e565114f4bc9459606dfc59d84df11fa6dc75a4 ......
+	 orig commit -> df6b074dbe248d8c43a82131e8fd429e401841a5 ......
+checking c274101cd18bcf4d93941edc911b89fdb8065816 ......
+	 orig commit -> 17539f2f4f0b7fa906b508765c8ada07a1e45f52 ......
+checking bd8505f3f3d408da000957452d119b97f6eb2bba ......
+	 orig commit -> f7f6d915a10f7f2bce17e3b1b7d3376562395a28 ......
+checking 53defab7a561973cc3b815b87ce0ddbb9bc3ee18 ......
+	 orig commit -> a086bb8317303dd74725dca933b9b29575159382 ......
+checking fbd45e2957fbf7ed392deab29cd3050a1ab2562f ......
+	 orig commit -> 22e94bd6779e1140350c0792e85c79552ec43673 ......
+		 22e94bd6779e1140350c0792e85c79552ec43673 has problem. Fixes commit -> a086bb8317303dd74725dca933b9b29575159382
+commit 53defab7a561973cc3b815b87ce0ddbb9bc3ee18
+Author: Jean Delvare <jdelvare@suse.de>
+Date:   Wed Apr 11 18:03:31 2018 +0200
+
+    i2c: i801: Save register SMBSLVCMD value only once
+    
+    commit a086bb8317303dd74725dca933b9b29575159382 upstream.
+    
+    Saving the original value of register SMBSLVCMD in
+    i801_enable_host_notify() doesn't work, because this function is
+    called not only at probe time but also at resume time. Do it in
+    i801_probe() instead, so that the saved value is not overwritten at
+    resume time.
+    
+    Signed-off-by: Jean Delvare <jdelvare@suse.de>
+    Fixes: 22e94bd6779e ("i2c: i801: store and restore the SLVCMD register at load and unload")
+    Reviewed-by: Benjamin Tissoires <benjamin.tissoires@redhat.com>
+    Tested-by: Jason Andryuk <jandryuk@gmail.com>
+    Signed-off-by: Wolfram Sang <wsa@the-dreams.de>
+    Cc: stable@vger.kernel.org      # v4.10+
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 9c87602abe12b555e5176403dc7e8b4ddb8ace33 ......
+	 orig commit -> 7eb2c4dd54ff841f2fe509a84973eb25fa20bda2 ......
+checking 5ddab9f7be78b36ded2a7a93d45642dff46fd409 ......
+	 orig commit -> c0db1b677e1d584fab5d7ac76a32e1c0157542e0 ......
+checking 01eabcde1be5b9d0d88e98d67a97589b275a8ba6 ......
+	 orig commit -> d3878e164dcd3925a237a20e879432400e369172 ......
+checking 193038d913f47563594814c1011a3c40e15b86ac ......
+	 orig commit -> 1d0cffa674cfa7d185a302c8c6850fc50b893bed ......

@@ -1,0 +1,244 @@
+Check from v4.9.117 to v4.9.118
+Commit count: 31
+checking e01202b36f03f9284ffb51e911f6710d0a62c815 ......
+checking 0ff94fb99e0ba3f60bb0e63f51db266a6b025d65 ......
+	 orig commit -> c170e5a8d222537e98aa8d4fddb667ff7a2ee114 ......
+checking e79a2db21eec75851baa05e62139f466e9d2c166 ......
+	 orig commit -> a6a00918d4ad8718c3ccde38c02cec17f116b2fd ......
+checking 804f510bf2182da8bdbe0135538c8f3f14670a67 ......
+	 orig commit -> 46d8c4b28652d35dc6cfb5adf7f54e102fc04384 ......
+checking 020a90f653dd02dbbae389da91f510d5f33984dc ......
+	 orig commit -> 63aff65573d73eb8dda4732ad4ef222dd35e4862 ......
+checking 1d433144592dffefbb9cbc9b0d853473c1b3157c ......
+	 orig commit -> 89da619bc18d79bca5304724c11d4ba3b67ce2c6 ......
+checking 9a492f8c716465a8ed40590f7cbcd2ad6ff1b6c3 ......
+	 orig commit -> c8e8cd579bb4265651df8223730105341e61a2d1 ......
+checking 18d971807db59b4f31a4cdde30c2353f9d4048d1 ......
+	 orig commit -> 72c05f32f4a5055c9c8fe889bb6903ec959c0aad ......
+checking 52cd8f3790cf1e71b6b38b63735042a014a3ff8a ......
+	 orig commit -> 71755ee5350b63fb1f283de8561cdb61b47f4d1d ......
+checking 3abef06039cb43e0fe44f3714969af0b9a744dc5 ......
+	 orig commit -> d512584780d3e6a7cacb2f482834849453d444a1 ......
+checking c9bd4fd4b744089f368f3d85655e904a76c93c25 ......
+	 orig commit -> b7d0f08e9129c45ed41bc0cfa8e77067881e45fd ......
+		 b7d0f08e9129c45ed41bc0cfa8e77067881e45fd has problem. Fixes commit -> 6dea7e1881fd86b80da64e476ac398008daed857
+81a8b0799632627b587af31ecd06112397e4ec36
+commit ee3cf5aee221029dce651ab0cf4c736ba92ade62
+Author: Jose Abreu <jose.abreu@synopsys.com>
+Date:   Wed Jan 9 10:05:56 2019 +0100
+
+    net: stmmac: Fix PCI module removal leak
+    
+    [ Upstream commit 6dea7e1881fd86b80da64e476ac398008daed857 ]
+    
+    Since commit b7d0f08e9129, the enable / disable of PCI device is not
+    managed which will result in IO regions not being automatically unmapped.
+    As regions continue mapped it is currently not possible to remove and
+    then probe again the PCI module of stmmac.
+    
+    Fix this by manually unmapping regions on remove callback.
+    
+    Changes from v1:
+    - Fix build error
+    
+    Cc: Joao Pinto <jpinto@synopsys.com>
+    Cc: David S. Miller <davem@davemloft.net>
+    Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>
+    Cc: Alexandre Torgue <alexandre.torgue@st.com>
+    Fixes: b7d0f08e9129 ("net: stmmac: Fix WoL for PCI-based setups")
+    Signed-off-by: Jose Abreu <joabreu@synopsys.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+commit ee3cf5aee221029dce651ab0cf4c736ba92ade62
+Author: Jose Abreu <jose.abreu@synopsys.com>
+Date:   Wed Jan 9 10:05:56 2019 +0100
+
+    net: stmmac: Fix PCI module removal leak
+    
+    [ Upstream commit 6dea7e1881fd86b80da64e476ac398008daed857 ]
+    
+    Since commit b7d0f08e9129, the enable / disable of PCI device is not
+    managed which will result in IO regions not being automatically unmapped.
+    As regions continue mapped it is currently not possible to remove and
+    then probe again the PCI module of stmmac.
+    
+    Fix this by manually unmapping regions on remove callback.
+    
+    Changes from v1:
+    - Fix build error
+    
+    Cc: Joao Pinto <jpinto@synopsys.com>
+    Cc: David S. Miller <davem@davemloft.net>
+    Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>
+    Cc: Alexandre Torgue <alexandre.torgue@st.com>
+    Fixes: b7d0f08e9129 ("net: stmmac: Fix WoL for PCI-based setups")
+    Signed-off-by: Jose Abreu <joabreu@synopsys.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+checking 67f0a2887bcb587d4116d5896aaea8432ad04696 ......
+	 orig commit -> bc5b6c0b62b932626a135f516a41838c510c6eba ......
+checking ab9a0f80bce707fa4f8b4d63ad1f3b2a89079caa ......
+	 orig commit -> a94c689e6c9e72e722f28339e12dff191ee5a265 ......
+checking d59dcdf13ee5b27a54940a05474230bda3a50edb ......
+	 orig commit -> 4672694bd4f1aebdab0ad763ae4716e89cb15221 ......
+checking c5282a032fa2823b588b16f6f4bfa5fa2d350671 ......
+	 orig commit -> 56e2c94f055d328f5f6b0a5c1721cca2f2d4e0a1 ......
+checking 7142fdb6a924bc4fb1f1661b585d01ff095ef41b ......
+	 orig commit -> 7e2556e40026a1b0c16f37446ab398d5a5a892e4 ......
+		 7e2556e40026a1b0c16f37446ab398d5a5a892e4 has problem. Fixes commit -> 001e465f09a18857443489a57e74314a3368c805
+commit 59a70d1e7a4e5daf72a785ca3eb8bb25cb6341d1
+Author: Willem de Bruijn <willemb@google.com>
+Date:   Tue Jan 8 12:32:42 2019 -0500
+
+    bonding: update nest level on unlink
+    
+    [ Upstream commit 001e465f09a18857443489a57e74314a3368c805 ]
+    
+    A network device stack with multiple layers of bonding devices can
+    trigger a false positive lockdep warning. Adding lockdep nest levels
+    fixes this. Update the level on both enslave and unlink, to avoid the
+    following series of events ..
+    
+        ip netns add test
+        ip netns exec test bash
+        ip link set dev lo addr 00:11:22:33:44:55
+        ip link set dev lo down
+    
+        ip link add dev bond1 type bond
+        ip link add dev bond2 type bond
+    
+        ip link set dev lo master bond1
+        ip link set dev bond1 master bond2
+    
+        ip link set dev bond1 nomaster
+        ip link set dev bond2 master bond1
+    
+    .. from still generating a splat:
+    
+        [  193.652127] ======================================================
+        [  193.658231] WARNING: possible circular locking dependency detected
+        [  193.664350] 4.20.0 #8 Not tainted
+        [  193.668310] ------------------------------------------------------
+        [  193.674417] ip/15577 is trying to acquire lock:
+        [  193.678897] 00000000a40e3b69 (&(&bond->stats_lock)->rlock#3/3){+.+.}, at: bond_get_stats+0x58/0x290
+        [  193.687851]
+                   but task is already holding lock:
+        [  193.693625] 00000000807b9d9f (&(&bond->stats_lock)->rlock#2/2){+.+.}, at: bond_get_stats+0x58/0x290
+    
+        [..]
+    
+        [  193.851092]        lock_acquire+0xa7/0x190
+        [  193.855138]        _raw_spin_lock_nested+0x2d/0x40
+        [  193.859878]        bond_get_stats+0x58/0x290
+        [  193.864093]        dev_get_stats+0x5a/0xc0
+        [  193.868140]        bond_get_stats+0x105/0x290
+        [  193.872444]        dev_get_stats+0x5a/0xc0
+        [  193.876493]        rtnl_fill_stats+0x40/0x130
+        [  193.880797]        rtnl_fill_ifinfo+0x6c5/0xdc0
+        [  193.885271]        rtmsg_ifinfo_build_skb+0x86/0xe0
+        [  193.890091]        rtnetlink_event+0x5b/0xa0
+        [  193.894320]        raw_notifier_call_chain+0x43/0x60
+        [  193.899225]        netdev_change_features+0x50/0xa0
+        [  193.904044]        bond_compute_features.isra.46+0x1ab/0x270
+        [  193.909640]        bond_enslave+0x141d/0x15b0
+        [  193.913946]        do_set_master+0x89/0xa0
+        [  193.918016]        do_setlink+0x37c/0xda0
+        [  193.921980]        __rtnl_newlink+0x499/0x890
+        [  193.926281]        rtnl_newlink+0x48/0x70
+        [  193.930238]        rtnetlink_rcv_msg+0x171/0x4b0
+        [  193.934801]        netlink_rcv_skb+0xd1/0x110
+        [  193.939103]        rtnetlink_rcv+0x15/0x20
+        [  193.943151]        netlink_unicast+0x3b5/0x520
+        [  193.947544]        netlink_sendmsg+0x2fd/0x3f0
+        [  193.951942]        sock_sendmsg+0x38/0x50
+        [  193.955899]        ___sys_sendmsg+0x2ba/0x2d0
+        [  193.960205]        __x64_sys_sendmsg+0xad/0x100
+        [  193.964687]        do_syscall_64+0x5a/0x460
+        [  193.968823]        entry_SYSCALL_64_after_hwframe+0x49/0xbe
+    
+    Fixes: 7e2556e40026 ("bonding: avoid lockdep confusion in bond_get_stats()")
+    Reported-by: syzbot <syzkaller@googlegroups.com>
+    Signed-off-by: Willem de Bruijn <willemb@google.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 047f9d6a5672be91225422169f85f54df1d10c2c ......
+	 orig commit -> 35a2897c2a306cca344ca5c0b43416707018f434 ......
+checking d4c9c7c1eef0074bc9d34203da6e5089e7c647e0 ......
+	 orig commit -> d68b42e30bbacd24354d644f430d088435b15e83 ......
+checking 019ea5193fe4f9668671aa400a42b9305ad748c9 ......
+	 orig commit -> 15ecbe94a45ef88491ca459b26efdd02f91edb6d ......
+checking 095ab5f46c0e084804c86406e45de3b01ac46058 ......
+	 orig commit -> f4c9f85f3b2cb7669830cd04d0be61192a4d2436 ......
+checking 65d986cb5e14b686988258f8aa3784df7a3c969b ......
+	 orig commit -> 522040ea5fdd1c33bbf75e1d7c7c0422b96a94ef ......
+		 522040ea5fdd1c33bbf75e1d7c7c0422b96a94ef has problem. Fixes commit -> 15ecbe94a45ef88491ca459b26efdd02f91edb6d
+commit 019ea5193fe4f9668671aa400a42b9305ad748c9
+Author: Eric Dumazet <edumazet@google.com>
+Date:   Wed Jun 27 08:47:21 2018 -0700
+
+    tcp: add one more quick ack after after ECN events
+    
+    [ Upstream commit 15ecbe94a45ef88491ca459b26efdd02f91edb6d ]
+    
+    Larry Brakmo proposal ( https://patchwork.ozlabs.org/patch/935233/
+    tcp: force cwnd at least 2 in tcp_cwnd_reduction) made us rethink
+    about our recent patch removing ~16 quick acks after ECN events.
+    
+    tcp_enter_quickack_mode(sk, 1) makes sure one immediate ack is sent,
+    but in the case the sender cwnd was lowered to 1, we do not want
+    to have a delayed ack for the next packet we will receive.
+    
+    Fixes: 522040ea5fdd ("tcp: do not aggressively quick ack after ECN events")
+    Signed-off-by: Eric Dumazet <edumazet@google.com>
+    Reported-by: Neal Cardwell <ncardwell@google.com>
+    Cc: Lawrence Brakmo <brakmo@fb.com>
+    Acked-by: Neal Cardwell <ncardwell@google.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 90cf17d66500d9d30a144449b78ada0d2ff2b9d1 ......
+	 orig commit -> 9a9c9b51e54618861420093ae6e9b50a961914c5 ......
+checking 8ca41e4efcfe241cad0fffe22e558399c0eabbd2 ......
+	 orig commit -> a3893637e1eb0ef5eb1bbc52b3a8d2dfa317a35d ......
+checking b03ca669d5c152c26781ec821429564d98d5bd79 ......
+	 orig commit -> 822fb18a82abaf4ee7058793d95d340f5dab7bfc ......
+		 822fb18a82abaf4ee7058793d95d340f5dab7bfc has problem. Fixes commit -> 8edfe2e992b75aee3da9316e9697c531194c2f53
+commit 03ae5ff3460b4240cff9af8083aafba0380f5971
+Author: Juergen Gross <jgross@suse.com>
+Date:   Fri Sep 7 14:21:30 2018 +0200
+
+    xen/netfront: fix waiting for xenbus state change
+    
+    commit 8edfe2e992b75aee3da9316e9697c531194c2f53 upstream.
+    
+    Commit 822fb18a82aba ("xen-netfront: wait xenbus state change when load
+    module manually") added a new wait queue to wait on for a state change
+    when the module is loaded manually. Unfortunately there is no wakeup
+    anywhere to stop that waiting.
+    
+    Instead of introducing a new wait queue rename the existing
+    module_unload_q to module_wq and use it for both purposes (loading and
+    unloading).
+    
+    As any state change of the backend might be intended to stop waiting
+    do the wake_up_all() in any case when netback_changed() is called.
+    
+    Fixes: 822fb18a82aba ("xen-netfront: wait xenbus state change when load module manually")
+    Cc: <stable@vger.kernel.org> #4.18
+    Signed-off-by: Juergen Gross <jgross@suse.com>
+    Reviewed-by: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking b3e349fd557f1fd9652d535e47b96da049cdbf2a ......
+	 orig commit -> 383d470936c05554219094a4d364d964cb324827 ......
+checking f6488f40a8e40fa464a9433d5990c8ebfccdd72b ......
+	 orig commit -> 9939a46d90c6c76f4533d534dbadfa7b39dc6acc ......
+checking 32363930dfd2eb8449d062cb590918021f8d7502 ......
+	 orig commit -> b0753408aadf32c7ece9e6b765017881e54af833 ......
+checking a9deaa19715d5c2b355fff98c4d54049d337311d ......
+	 orig commit -> 136f55f660192ce04af091642efc75d85e017364 ......
+checking 31a9d4dd852843af8b815b2dc621c0142fa40f56 ......
+	 orig commit -> 7f3fc7ddf719cd6faaf787722c511f6918ac6aab ......
+checking 6fff429df7c51b82d0b143c44a59ac38702a06a8 ......
+	 orig commit -> 101f0cd4f2216d32f1b8a75a2154cf3997484ee2 ......
+checking e364f1a2ccc1c8d5dd0f43063c81507076c854a5 ......
+	 orig commit -> 9fc12023d6f51551d6ca9ed7e02ecc19d79caf17 ......

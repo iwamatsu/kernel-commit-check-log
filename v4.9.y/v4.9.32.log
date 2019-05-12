@@ -1,0 +1,1088 @@
+Check from v4.9.32 to v4.9.33
+Commit count: 109
+checking 050639ef5810e8ad17fb6a426eff3c63e616350c ......
+checking bdc9a03fd9ce07caa7319e463db8cce0d76a4856 ......
+	 orig commit -> b5c3206190f1fddd100b3060eb15f0d775ffeab8 ......
+checking 933b9b11f7ca7153137ed8afccd4d32a5b73499f ......
+	 orig commit -> 4e3aed844547f63614363a386de126e6304e55fb ......
+checking 4f59a7a895c4658af84a8f7e88438973940e2a54 ......
+	 orig commit -> 8f4d38099b3098eae75f7755e1801931f8141350 ......
+checking 8e1a4006ff9218057f2e47d3bf5415bdcdbcd3b6 ......
+	 orig commit -> c0e7bb38c07cbd8269549ee0a0566021a3c729de ......
+checking a2f68276822cd3a09ed9ae23e5c5e1cd8259af65 ......
+	 orig commit -> e5c86679d5e864947a52fb31e45a425dea3e7fa9 ......
+checking 57211e84dda0583b85326c07909c442ba950e0f0 ......
+	 orig commit -> 59e8970b3798e4cbe575ed9cf4d53098760a2a86 ......
+checking c5ea7aa57e2420725a283d2df893a2bbe54c5cfc ......
+	 orig commit -> c78c31496111f497b4a03f955c100091185da8b6 ......
+checking 13a87589af5f9d85493917048f4243691d35f89c ......
+	 orig commit -> 933e6dcaa0f65eb2f624ad760274020874a1f35e ......
+checking bbf61096e42c18e51b8e72a6dd4ceb276610c48c ......
+	 orig commit -> 9c1e0228ab35e52d30abf4b5629c28350833fbcb ......
+checking a4fa249385b6db208032a5445cea05891001b7b4 ......
+	 orig commit -> f449c7a2d822c2d81b5bcb2c50eec80796766726 ......
+checking c47538f610160c8f9e3bd3e6816a624d28220b0c ......
+	 orig commit -> 5ce6b04ce96896e8a79e6f60740ced911eaac7a4 ......
+checking fefdd79403e89b0c673965343b92e2e01e2713a8 ......
+	 orig commit -> 35d0ac9070ef619e3bf44324375878a1c540387b ......
+checking f68a45776a62fce560e4e28f89c5009895066ae1 ......
+	 orig commit -> 93f955aad4bacee5acebad141d1a03cd51f27b4e ......
+checking 1d6e36d730ed6a328f793da1ac907c8d80ca2eb0 ......
+	 orig commit -> d094c4d5f5c7e1b225e94227ca3f007be3adc4e8 ......
+		 d094c4d5f5c7e1b225e94227ca3f007be3adc4e8 has problem. Fixes commit -> fd849b7c41f0fabfe783d0691a63c5518e8ebc99
+557d054c01da0337ca81de9e9d9206d57245b57e
+commit 2f48581af308e6007e306b5b97744cbc7250e42a
+Author: Ying Xue <ying.xue@windriver.com>
+Date:   Tue Aug 22 12:28:41 2017 +0200
+
+    tipc: fix a race condition of releasing subscriber object
+    
+    [ Upstream commit fd849b7c41f0fabfe783d0691a63c5518e8ebc99 ]
+    
+    No matter whether a request is inserted into workqueue as a work item
+    to cancel a subscription or to delete a subscription's subscriber
+    asynchronously, the work items may be executed in different workers.
+    As a result, it doesn't mean that one request which is raised prior to
+    another request is definitely handled before the latter. By contrast,
+    if the latter request is executed before the former request, below
+    error may happen:
+    
+    [  656.183644] BUG: spinlock bad magic on CPU#0, kworker/u8:0/12117
+    [  656.184487] general protection fault: 0000 [#1] SMP
+    [  656.185160] Modules linked in: tipc ip6_udp_tunnel udp_tunnel 9pnet_virtio 9p 9pnet virtio_net virtio_pci virtio_ring virtio [last unloaded: ip6_udp_tunnel]
+    [  656.187003] CPU: 0 PID: 12117 Comm: kworker/u8:0 Not tainted 4.11.0-rc7+ #6
+    [  656.187920] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+    [  656.188690] Workqueue: tipc_rcv tipc_recv_work [tipc]
+    [  656.189371] task: ffff88003f5cec40 task.stack: ffffc90004448000
+    [  656.190157] RIP: 0010:spin_bug+0xdd/0xf0
+    [  656.190678] RSP: 0018:ffffc9000444bcb8 EFLAGS: 00010202
+    [  656.191375] RAX: 0000000000000034 RBX: ffff88003f8d1388 RCX: 0000000000000000
+    [  656.192321] RDX: ffff88003ba13708 RSI: ffff88003ba0cd08 RDI: ffff88003ba0cd08
+    [  656.193265] RBP: ffffc9000444bcd0 R08: 0000000000000030 R09: 000000006b6b6b6b
+    [  656.194208] R10: ffff8800bde3e000 R11: 00000000000001b4 R12: 6b6b6b6b6b6b6b6b
+    [  656.195157] R13: ffffffff81a3ca64 R14: ffff88003f8d1388 R15: ffff88003f8d13a0
+    [  656.196101] FS:  0000000000000000(0000) GS:ffff88003ba00000(0000) knlGS:0000000000000000
+    [  656.197172] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+    [  656.197935] CR2: 00007f0b3d2e6000 CR3: 000000003ef9e000 CR4: 00000000000006f0
+    [  656.198873] Call Trace:
+    [  656.199210]  do_raw_spin_lock+0x66/0xa0
+    [  656.199735]  _raw_spin_lock_bh+0x19/0x20
+    [  656.200258]  tipc_subscrb_subscrp_delete+0x28/0xf0 [tipc]
+    [  656.200990]  tipc_subscrb_rcv_cb+0x45/0x260 [tipc]
+    [  656.201632]  tipc_receive_from_sock+0xaf/0x100 [tipc]
+    [  656.202299]  tipc_recv_work+0x2b/0x60 [tipc]
+    [  656.202872]  process_one_work+0x157/0x420
+    [  656.203404]  worker_thread+0x69/0x4c0
+    [  656.203898]  kthread+0x138/0x170
+    [  656.204328]  ? process_one_work+0x420/0x420
+    [  656.204889]  ? kthread_create_on_node+0x40/0x40
+    [  656.205527]  ret_from_fork+0x29/0x40
+    [  656.206012] Code: 48 8b 0c 25 00 c5 00 00 48 c7 c7 f0 24 a3 81 48 81 c1 f0 05 00 00 65 8b 15 61 ef f5 7e e8 9a 4c 09 00 4d 85 e4 44 8b 4b 08 74 92 <45> 8b 84 24 40 04 00 00 49 8d 8c 24 f0 05 00 00 eb 8d 90 0f 1f
+    [  656.208504] RIP: spin_bug+0xdd/0xf0 RSP: ffffc9000444bcb8
+    [  656.209798] ---[ end trace e2a800e6eb0770be ]---
+    
+    In above scenario, the request of deleting subscriber was performed
+    earlier than the request of canceling a subscription although the
+    latter was issued before the former, which means tipc_subscrb_delete()
+    was called before tipc_subscrp_cancel(). As a result, when
+    tipc_subscrb_subscrp_delete() called by tipc_subscrp_cancel() was
+    executed to cancel a subscription, the subscription's subscriber
+    refcnt had been decreased to 1. After tipc_subscrp_delete() where
+    the subscriber was freed because its refcnt was decremented to zero,
+    but the subscriber's lock had to be released, as a consequence, panic
+    happened.
+    
+    By contrast, if we increase subscriber's refcnt before
+    tipc_subscrb_subscrp_delete() is called in tipc_subscrp_cancel(),
+    the panic issue can be avoided.
+    
+    Fixes: d094c4d5f5c7 ("tipc: add subscription refcount to avoid invalid delete")
+    Reported-by: Parthasarathy Bhuvaragan <parthasarathy.bhuvaragan@ericsson.com>
+    Signed-off-by: Ying Xue <ying.xue@windriver.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit e6e8067ec34ad422125a54f88a0884dbb296009f
+Author: Ying Xue <ying.xue@windriver.com>
+Date:   Tue Mar 21 10:47:49 2017 +0100
+
+    tipc: fix nametbl deadlock at tipc_nametbl_unsubscribe
+    
+    
+    [ Upstream commit 557d054c01da0337ca81de9e9d9206d57245b57e ]
+    
+    Until now, tipc_nametbl_unsubscribe() is called at subscriptions
+    reference count cleanup. Usually the subscriptions cleanup is
+    called at subscription timeout or at subscription cancel or at
+    subscriber delete.
+    
+    We have ignored the possibility of this being called from other
+    locations, which causes deadlock as we try to grab the
+    tn->nametbl_lock while holding it already.
+    
+       CPU1:                             CPU2:
+    ----------                     ----------------
+    tipc_nametbl_publish
+    spin_lock_bh(&tn->nametbl_lock)
+    tipc_nametbl_insert_publ
+    tipc_nameseq_insert_publ
+    tipc_subscrp_report_overlap
+    tipc_subscrp_get
+    tipc_subscrp_send_event
+                                 tipc_close_conn
+                                 tipc_subscrb_release_cb
+                                 tipc_subscrb_delete
+                                 tipc_subscrp_put
+    tipc_subscrp_put
+    tipc_subscrp_kref_release
+    tipc_nametbl_unsubscribe
+    spin_lock_bh(&tn->nametbl_lock)
+    <<grab nametbl_lock again>>
+    
+       CPU1:                              CPU2:
+    ----------                     ----------------
+    tipc_nametbl_stop
+    spin_lock_bh(&tn->nametbl_lock)
+    tipc_purge_publications
+    tipc_nameseq_remove_publ
+    tipc_subscrp_report_overlap
+    tipc_subscrp_get
+    tipc_subscrp_send_event
+                                 tipc_close_conn
+                                 tipc_subscrb_release_cb
+                                 tipc_subscrb_delete
+                                 tipc_subscrp_put
+    tipc_subscrp_put
+    tipc_subscrp_kref_release
+    tipc_nametbl_unsubscribe
+    spin_lock_bh(&tn->nametbl_lock)
+    <<grab nametbl_lock again>>
+    
+    In this commit, we advance the calling of tipc_nametbl_unsubscribe()
+    from the refcount cleanup to the intended callers.
+    
+    Fixes: d094c4d5f5c7 ("tipc: add subscription refcount to avoid invalid delete")
+    Reported-by: John Thompson <thompa.atl@gmail.com>
+    Acked-by: Jon Maloy <jon.maloy@ericsson.com>
+    Signed-off-by: Ying Xue <ying.xue@windriver.com>
+    Signed-off-by: Parthasarathy Bhuvaragan <parthasarathy.bhuvaragan@ericsson.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <alexander.levin@verizon.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+commit 2f48581af308e6007e306b5b97744cbc7250e42a
+Author: Ying Xue <ying.xue@windriver.com>
+Date:   Tue Aug 22 12:28:41 2017 +0200
+
+    tipc: fix a race condition of releasing subscriber object
+    
+    [ Upstream commit fd849b7c41f0fabfe783d0691a63c5518e8ebc99 ]
+    
+    No matter whether a request is inserted into workqueue as a work item
+    to cancel a subscription or to delete a subscription's subscriber
+    asynchronously, the work items may be executed in different workers.
+    As a result, it doesn't mean that one request which is raised prior to
+    another request is definitely handled before the latter. By contrast,
+    if the latter request is executed before the former request, below
+    error may happen:
+    
+    [  656.183644] BUG: spinlock bad magic on CPU#0, kworker/u8:0/12117
+    [  656.184487] general protection fault: 0000 [#1] SMP
+    [  656.185160] Modules linked in: tipc ip6_udp_tunnel udp_tunnel 9pnet_virtio 9p 9pnet virtio_net virtio_pci virtio_ring virtio [last unloaded: ip6_udp_tunnel]
+    [  656.187003] CPU: 0 PID: 12117 Comm: kworker/u8:0 Not tainted 4.11.0-rc7+ #6
+    [  656.187920] Hardware name: Bochs Bochs, BIOS Bochs 01/01/2011
+    [  656.188690] Workqueue: tipc_rcv tipc_recv_work [tipc]
+    [  656.189371] task: ffff88003f5cec40 task.stack: ffffc90004448000
+    [  656.190157] RIP: 0010:spin_bug+0xdd/0xf0
+    [  656.190678] RSP: 0018:ffffc9000444bcb8 EFLAGS: 00010202
+    [  656.191375] RAX: 0000000000000034 RBX: ffff88003f8d1388 RCX: 0000000000000000
+    [  656.192321] RDX: ffff88003ba13708 RSI: ffff88003ba0cd08 RDI: ffff88003ba0cd08
+    [  656.193265] RBP: ffffc9000444bcd0 R08: 0000000000000030 R09: 000000006b6b6b6b
+    [  656.194208] R10: ffff8800bde3e000 R11: 00000000000001b4 R12: 6b6b6b6b6b6b6b6b
+    [  656.195157] R13: ffffffff81a3ca64 R14: ffff88003f8d1388 R15: ffff88003f8d13a0
+    [  656.196101] FS:  0000000000000000(0000) GS:ffff88003ba00000(0000) knlGS:0000000000000000
+    [  656.197172] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+    [  656.197935] CR2: 00007f0b3d2e6000 CR3: 000000003ef9e000 CR4: 00000000000006f0
+    [  656.198873] Call Trace:
+    [  656.199210]  do_raw_spin_lock+0x66/0xa0
+    [  656.199735]  _raw_spin_lock_bh+0x19/0x20
+    [  656.200258]  tipc_subscrb_subscrp_delete+0x28/0xf0 [tipc]
+    [  656.200990]  tipc_subscrb_rcv_cb+0x45/0x260 [tipc]
+    [  656.201632]  tipc_receive_from_sock+0xaf/0x100 [tipc]
+    [  656.202299]  tipc_recv_work+0x2b/0x60 [tipc]
+    [  656.202872]  process_one_work+0x157/0x420
+    [  656.203404]  worker_thread+0x69/0x4c0
+    [  656.203898]  kthread+0x138/0x170
+    [  656.204328]  ? process_one_work+0x420/0x420
+    [  656.204889]  ? kthread_create_on_node+0x40/0x40
+    [  656.205527]  ret_from_fork+0x29/0x40
+    [  656.206012] Code: 48 8b 0c 25 00 c5 00 00 48 c7 c7 f0 24 a3 81 48 81 c1 f0 05 00 00 65 8b 15 61 ef f5 7e e8 9a 4c 09 00 4d 85 e4 44 8b 4b 08 74 92 <45> 8b 84 24 40 04 00 00 49 8d 8c 24 f0 05 00 00 eb 8d 90 0f 1f
+    [  656.208504] RIP: spin_bug+0xdd/0xf0 RSP: ffffc9000444bcb8
+    [  656.209798] ---[ end trace e2a800e6eb0770be ]---
+    
+    In above scenario, the request of deleting subscriber was performed
+    earlier than the request of canceling a subscription although the
+    latter was issued before the former, which means tipc_subscrb_delete()
+    was called before tipc_subscrp_cancel(). As a result, when
+    tipc_subscrb_subscrp_delete() called by tipc_subscrp_cancel() was
+    executed to cancel a subscription, the subscription's subscriber
+    refcnt had been decreased to 1. After tipc_subscrp_delete() where
+    the subscriber was freed because its refcnt was decremented to zero,
+    but the subscriber's lock had to be released, as a consequence, panic
+    happened.
+    
+    By contrast, if we increase subscriber's refcnt before
+    tipc_subscrb_subscrp_delete() is called in tipc_subscrp_cancel(),
+    the panic issue can be avoided.
+    
+    Fixes: d094c4d5f5c7 ("tipc: add subscription refcount to avoid invalid delete")
+    Reported-by: Parthasarathy Bhuvaragan <parthasarathy.bhuvaragan@ericsson.com>
+    Signed-off-by: Ying Xue <ying.xue@windriver.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+checking 9f8df4f86a3fa3ca546955f696d7b602fc1eb3d6 ......
+	 orig commit -> fc0adfc8fd18b61b6f7a3f28b429e134d6f3a008 ......
+checking c7a552e771cccacf4da117b93088e3cf25b1e038 ......
+	 orig commit -> 4c887aa65d38633885010277f3482400681be719 ......
+checking 2552e2c11575c72114a2f8902a7488c810c41691 ......
+	 orig commit -> 78f824d4312a8944f5340c6b161bba3bf2c81096 ......
+checking 8cb6045ec40d90d8074dd072c2ec9d0fc7b91956 ......
+	 orig commit -> bf02454a741b58682a82c314a9a46bed930ed2f7 ......
+checking ae36f6a65af6f4eaca01cc5b68d8ecb266dbcc17 ......
+	 orig commit -> 0516ffd88fa0d006ee80389ce14a9ca5ae45e845 ......
+checking b13b3b706a9dc03dd1a1c31f8268cd5193c1858c ......
+	 orig commit -> b94f51183b0617e7b9b4fb4137d4cf1cab7547c2 ......
+checking 0ce66ee6aec12f38ab6992233e92b9960b55e0c6 ......
+	 orig commit -> 249e52e35580fcfe5dad53a7dcd7c1252788749c ......
+checking b969a240448bfd8e6b0fb180a405e5cc881bf503 ......
+	 orig commit -> 73ce0511c43686095efd2f65ef564aab952e07bc ......
+		 73ce0511c43686095efd2f65ef564aab952e07bc has problem. Fixes commit -> 81bd415c91eb966118d773dddf254aebf3022411
+checking dbd9eee1aaaf2cb40b2bc7b794d4a6f7afc7870a ......
+	 orig commit -> 15a77c6fe494f4b1757d30cd137fe66ab06a38c3 ......
+checking 9618fba264999372c641b5cb3db777c6a216caa5 ......
+	 orig commit -> 3ba4bceef23206349d4130ddf140819b365de7c8 ......
+checking e23b1c05a50ffc7cabe12b9bc4fdfa55e32d9614 ......
+	 orig commit -> 4180c4c170a5a33b9987b314d248a9d572d89ab0 ......
+checking 918684681dc207da5de3344b17814a2b50d677f9 ......
+	 orig commit -> 545d58f677b21401f6de1ac12c25cc109f903ace ......
+checking 013bbbc3e9025411e1327e825e736a501ba044f3 ......
+	 orig commit -> f598f82e204ec0b17797caaf1b0311c52d43fb9a ......
+checking 093d494c6d1db5d8bda26b64212edac62cb7d49a ......
+	 orig commit -> 3705ccfdd1e8b539225ce20e3925a945cc788d67 ......
+checking 5e4cafca06bfc6477b237161b7ddea7d14228803 ......
+	 orig commit -> 3ba7b7795b7e8889af1377904c55c7fae9e0c775 ......
+checking fb72eca1333c374e6eefff7f6e99917c44c4f231 ......
+	 orig commit -> 6f29a130613191d3c6335169febe002cba00edf5 ......
+		 6f29a130613191d3c6335169febe002cba00edf5 has problem. Fixes commit -> 912964eacb111551db73429719eb5fadcab0ff8a
+commit 168bd51ec5efbb92eb9bcdefb1327ef22e4898a9
+Author: Xin Long <lucien.xin@gmail.com>
+Date:   Tue Feb 7 20:56:08 2017 +0800
+
+    sctp: check af before verify address in sctp_addr_id2transport
+    
+    
+    [ Upstream commit 912964eacb111551db73429719eb5fadcab0ff8a ]
+    
+    Commit 6f29a1306131 ("sctp: sctp_addr_id2transport should verify the
+    addr before looking up assoc") invoked sctp_verify_addr to verify the
+    addr.
+    
+    But it didn't check af variable beforehand, once users pass an address
+    with family = 0 through sockopt, sctp_get_af_specific will return NULL
+    and NULL pointer dereference will be caused by af->sockaddr_len.
+    
+    This patch is to fix it by returning NULL if af variable is NULL.
+    
+    Fixes: 6f29a1306131 ("sctp: sctp_addr_id2transport should verify the addr before looking up assoc")
+    Signed-off-by: Xin Long <lucien.xin@gmail.com>
+    Acked-by: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <alexander.levin@verizon.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking bf812fe92683cd52581824dc2c6767cbf04a72fb ......
+	 orig commit -> 5207f3996338e1db71363fe381c81aaf1e54e4e3 ......
+checking 12a583ddf02a976080f36f75139a9167a9975e68 ......
+	 orig commit -> 90c694bb71819fb5bd3501ac397307d7e41ddeca ......
+		 90c694bb71819fb5bd3501ac397307d7e41ddeca has problem. Fixes commit -> e2dc9b6e38fa3919e63d6d7905da70ca41cbf908
+commit 3e6250bcd163d96062d156c1d6c2cbd83f2e66ad
+Author: Michael Chan <michael.chan@broadcom.com>
+Date:   Fri Oct 13 21:09:30 2017 -0400
+
+    bnxt_en: Don't use rtnl lock to protect link change logic in workqueue.
+    
+    [ Upstream commit e2dc9b6e38fa3919e63d6d7905da70ca41cbf908 ]
+    
+    As a further improvement to the PF/VF link change logic, use a private
+    mutex instead of the rtnl lock to protect link change logic.  With the
+    new mutex, we don't have to take the rtnl lock in the workqueue when
+    we have to handle link related functions.  If the VF and PF drivers
+    are running on the same host and both take the rtnl lock and one is
+    waiting for the other, it will cause timeout.  This patch fixes these
+    timeouts.
+    
+    Fixes: 90c694bb7181 ("bnxt_en: Fix RTNL lock usage on bnxt_update_link().")
+    Signed-off-by: Michael Chan <michael.chan@broadcom.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+checking 66deb409251c6e88de9cdffc5a952670fe544410 ......
+	 orig commit -> 0eaa24b971ae251ae9d3be23f77662a655532063 ......
+checking e89ffe41e9a67901034accd1d19dbeefb390fafb ......
+	 orig commit -> 286ef9d64ea7435a1e323d12b44a309e15cbff0e ......
+checking 710ea9b028de2c5cd0565407d31b633972074182 ......
+	 orig commit -> a551ee94ea723b4af9b827c7460f108bc13425ee ......
+checking cb7188295d18dcfbca1586d176f88113e2eae7f5 ......
+	 orig commit -> 8b901f6bbcf12a20e43105d161bedde093431e61 ......
+checking e9ace99c4bb097a44b20b3e6d356e4dd9b5f0c02 ......
+	 orig commit -> de9bf29dd6e4a8a874cb92f8901aed50a9d0b1d3 ......
+checking c1a7106b3b0149c263998d801619f3023af03234 ......
+	 orig commit -> 2c561b2b728ca4013e76d6439bde2c137503745e ......
+checking 9507910ca46d5b549198a6bf1787e3db5b3a651b ......
+	 orig commit -> 248b213ad908b88db15941202ef7cb7eb137c1a0 ......
+checking 4242f0bce47e744d28b3c98c34f5c792fefb62ef ......
+	 orig commit -> 7489bdadb7d17d3c81e39b85688500f700beb790 ......
+checking 993ba7ffcf6e0aa5e4b3ed193a99fc8f4e073325 ......
+	 orig commit -> 26afec39306926654e9cd320f19bbf3685bb0997 ......
+checking 6149abe7f4042e5720544d4e5675d7a45a827ce7 ......
+	 orig commit -> 748ff8408f8e208f279ba221e5c12612fbb4dddb ......
+checking 5a0d41409b4dbfb50243ddee7a8b62ba838c5295 ......
+	 orig commit -> 406dab8450ec76eca88a1af2fc15d18a2b36ca49 ......
+checking d1626825968346dc975640cff8f823a5fc92a6c6 ......
+	 orig commit -> a47b70ea86bdeb3091341f5ae3ef580f1a1ad822 ......
+		 a47b70ea86bdeb3091341f5ae3ef580f1a1ad822 has problem. Fixes commit -> 79514ef670e9e575a1fe36922268c439d0f0ca8a
+commit f9f73c58feefa8a5dda019df9c549c6e355e15be
+Author: Eugeniu Rosca <erosca@de.adit-jv.com>
+Date:   Tue Jun 6 00:08:10 2017 +0200
+
+    ravb: Fix use-after-free on `ifconfig eth0 down`
+    
+    
+    [ Upstream commit 79514ef670e9e575a1fe36922268c439d0f0ca8a ]
+    
+    Commit a47b70ea86bd ("ravb: unmap descriptors when freeing rings") has
+    introduced the issue seen in [1] reproduced on H3ULCB board.
+    
+    Fix this by relocating the RX skb ringbuffer free operation, so that
+    swiotlb page unmapping can be done first. Freeing of aligned TX buffers
+    is not relevant to the issue seen in [1]. Still, reposition TX free
+    calls as well, to have all kfree() operations performed consistently
+    _after_ dma_unmap_*()/dma_free_*().
+    
+    [1] Console screenshot with the problem reproduced:
+    
+    salvator-x login: root
+    root@salvator-x:~# ifconfig eth0 up
+    Micrel KSZ9031 Gigabit PHY e6800000.ethernet-ffffffff:00: \
+           attached PHY driver [Micrel KSZ9031 Gigabit PHY]   \
+           (mii_bus:phy_addr=e6800000.ethernet-ffffffff:00, irq=235)
+    IPv6: ADDRCONF(NETDEV_UP): eth0: link is not ready
+    root@salvator-x:~#
+    root@salvator-x:~# ifconfig eth0 down
+    
+    ==================================================================
+    BUG: KASAN: use-after-free in swiotlb_tbl_unmap_single+0xc4/0x35c
+    Write of size 1538 at addr ffff8006d884f780 by task ifconfig/1649
+    
+    CPU: 0 PID: 1649 Comm: ifconfig Not tainted 4.12.0-rc4-00004-g112eb07287d1 #32
+    Hardware name: Renesas H3ULCB board based on r8a7795 (DT)
+    Call trace:
+    [<ffff20000808f11c>] dump_backtrace+0x0/0x3a4
+    [<ffff20000808f4d4>] show_stack+0x14/0x1c
+    [<ffff20000865970c>] dump_stack+0xf8/0x150
+    [<ffff20000831f8b0>] print_address_description+0x7c/0x330
+    [<ffff200008320010>] kasan_report+0x2e0/0x2f4
+    [<ffff20000831eac0>] check_memory_region+0x20/0x14c
+    [<ffff20000831f054>] memcpy+0x48/0x68
+    [<ffff20000869ed50>] swiotlb_tbl_unmap_single+0xc4/0x35c
+    [<ffff20000869fcf4>] unmap_single+0x90/0xa4
+    [<ffff20000869fd14>] swiotlb_unmap_page+0xc/0x14
+    [<ffff2000080a2974>] __swiotlb_unmap_page+0xcc/0xe4
+    [<ffff2000088acdb8>] ravb_ring_free+0x514/0x870
+    [<ffff2000088b25dc>] ravb_close+0x288/0x36c
+    [<ffff200008aaf8c4>] __dev_close_many+0x14c/0x174
+    [<ffff200008aaf9b4>] __dev_close+0xc8/0x144
+    [<ffff200008ac2100>] __dev_change_flags+0xd8/0x194
+    [<ffff200008ac221c>] dev_change_flags+0x60/0xb0
+    [<ffff200008ba2dec>] devinet_ioctl+0x484/0x9d4
+    [<ffff200008ba7b78>] inet_ioctl+0x190/0x194
+    [<ffff200008a78c44>] sock_do_ioctl+0x78/0xa8
+    [<ffff200008a7a128>] sock_ioctl+0x110/0x3c4
+    [<ffff200008365a70>] vfs_ioctl+0x90/0xa0
+    [<ffff200008365dbc>] do_vfs_ioctl+0x148/0xc38
+    [<ffff2000083668f0>] SyS_ioctl+0x44/0x74
+    [<ffff200008083770>] el0_svc_naked+0x24/0x28
+    
+    The buggy address belongs to the page:
+    page:ffff7e001b6213c0 count:0 mapcount:0 mapping:          (null) index:0x0
+    flags: 0x4000000000000000()
+    raw: 4000000000000000 0000000000000000 0000000000000000 00000000ffffffff
+    raw: 0000000000000000 ffff7e001b6213e0 0000000000000000 0000000000000000
+    page dumped because: kasan: bad access detected
+    
+    Memory state around the buggy address:
+     ffff8006d884f680: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     ffff8006d884f700: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+    >ffff8006d884f780: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+                       ^
+     ffff8006d884f800: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+     ffff8006d884f880: ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff ff
+    ==================================================================
+    Disabling lock debugging due to kernel taint
+    root@salvator-x:~#
+    
+    Fixes: a47b70ea86bd ("ravb: unmap descriptors when freeing rings")
+    Signed-off-by: Eugeniu Rosca <erosca@de.adit-jv.com>
+    Acked-by: Sergei Shtylyov <sergei.shtylyov@cogentembedded.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <alexander.levin@verizon.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 47c362f147aaee88c7da3fdce6e99212376bbe44 ......
+	 orig commit -> 6c971c09f38704513c426ba6515f22fb3d6c87d5 ......
+checking bfa4d2e461dab77476f4570bf9ac0213b6cbe484 ......
+	 orig commit -> 9a2eba337cacefc95b97c2726e3efdd435b3460e ......
+		 9a2eba337cacefc95b97c2726e3efdd435b3460e has problem. Fixes commit -> d77ef138ff572409ab93d492e5e6c826ee6fb21d
+commit 2493cdf2f279433d6526ac1031072d0f3c6afb9f
+Author: Lyude Paul <lyude@redhat.com>
+Date:   Wed Aug 15 15:00:11 2018 -0400
+
+    drm/nouveau/drm/nouveau: Fix bogus drm_kms_helper_poll_enable() placement
+    
+    commit d77ef138ff572409ab93d492e5e6c826ee6fb21d upstream.
+    
+    Turns out this part is my fault for not noticing when reviewing
+    9a2eba337cace ("drm/nouveau: Fix drm poll_helper handling"). Currently
+    we call drm_kms_helper_poll_enable() from nouveau_display_hpd_work().
+    This makes basically no sense however, because that means we're calling
+    drm_kms_helper_poll_enable() every time we schedule the hotplug
+    detection work. This is also against the advice mentioned in
+    drm_kms_helper_poll_enable()'s documentation:
+    
+     Note that calls to enable and disable polling must be strictly ordered,
+     which is automatically the case when they're only call from
+     suspend/resume callbacks.
+    
+    Of course, hotplugs can't really be ordered. They could even happen
+    immediately after we called drm_kms_helper_poll_disable() in
+    nouveau_display_fini(), which can lead to all sorts of issues.
+    
+    Additionally; enabling polling /after/ we call
+    drm_helper_hpd_irq_event() could also mean that we'd miss a hotplug
+    event anyway, since drm_helper_hpd_irq_event() wouldn't bother trying to
+    probe connectors so long as polling is disabled.
+    
+    So; simply move this back into nouveau_display_init() again. The race
+    condition that both of these patches attempted to work around has
+    already been fixed properly in
+    
+      d61a5c106351 ("drm/nouveau: Fix deadlock on runtime suspend")
+    
+    Fixes: 9a2eba337cace ("drm/nouveau: Fix drm poll_helper handling")
+    Signed-off-by: Lyude Paul <lyude@redhat.com>
+    Acked-by: Karol Herbst <kherbst@redhat.com>
+    Acked-by: Daniel Vetter <daniel@ffwll.ch>
+    Cc: Lukas Wunner <lukas@wunner.de>
+    Cc: Peter Ujfalusi <peter.ujfalusi@ti.com>
+    Cc: stable@vger.kernel.org
+    Signed-off-by: Ben Skeggs <bskeggs@redhat.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking c94e2edacea7f3f3567e14d5cb8bee58ffc536d9 ......
+	 orig commit -> cae9ff036eea577856d5b12860b4c79c5e71db4a ......
+		 cae9ff036eea577856d5b12860b4c79c5e71db4a has problem. Fixes commit -> 9a2eba337cacefc95b97c2726e3efdd435b3460e
+commit bfa4d2e461dab77476f4570bf9ac0213b6cbe484
+Author: Peter Ujfalusi <peter.ujfalusi@ti.com>
+Date:   Mon May 15 12:04:31 2017 +0300
+
+    drm/nouveau: Fix drm poll_helper handling
+    
+    
+    [ Upstream commit 9a2eba337cacefc95b97c2726e3efdd435b3460e ]
+    
+    Commit cae9ff036eea effectively disabled the drm poll_helper by checking
+    the wrong flag to see if the driver should enable the poll or not:
+    mode_config.poll_enabled is only set to true by poll_init and it is not
+    indicating if the poll is enabled or not.
+    nouveau_display_create() will initialize the poll and going to disable it
+    right away. After poll_init() the mode_config.poll_enabled will be true,
+    but the poll itself is disabled.
+    
+    To avoid the race caused by calling the poll_enable() from different paths,
+    this patch will enable the poll from one place, in the
+    nouveau_display_hpd_work().
+    
+    In case the pm_runtime is disabled we will enable the poll in
+    nouveau_drm_load() once.
+    
+    Fixes: cae9ff036eea ("drm/nouveau: Don't enabling polling twice on runtime resume")
+    Signed-off-by: Peter Ujfalusi <peter.ujfalusi@ti.com>
+    Reviewed-by: Lyude <lyude@redhat.com>
+    Signed-off-by: Ben Skeggs <bskeggs@redhat.com>
+    Signed-off-by: Sasha Levin <alexander.levin@verizon.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking c7a29cf6c34a7873eb8e92b9a60b1a863ea72f6d ......
+	 orig commit -> 15266ae38fe09dae07bd8812cb7a7717b1e1d992 ......
+checking d2beb1a9dd824bcf442e025cbf7fd1e3b4cf8db2 ......
+	 orig commit -> 81280d0e24e76c35f40f997af26c779bcb10b04d ......
+checking ef66745a1bd231a2c53639de27e4d6bcd00be4cc ......
+	 orig commit -> 3a6536c51d5db3adf58dcd466a3aee6233b58544 ......
+checking eb846414674ce1accb0e64fff88287f541422312 ......
+	 orig commit -> ab729823ec16aef384f09fd2cffe0b3d3f6e6cba ......
+checking 7dddbfcd96e265bc6e28d456d48e9fab4c57b232 ......
+	 orig commit -> 9d162ed69f51cbd9ee5a0c7e82aba7acc96362ff ......
+		 9d162ed69f51cbd9ee5a0c7e82aba7acc96362ff has problem. Fixes commit -> cf626c3b252b2c9d131be0dd66096ec3bf729e54
+commit 3325615d2b500b9c84f908adbdb843a31acc3126
+Author: Sean Nyekjaer <sean.nyekjaer@prevas.dk>
+Date:   Fri Jan 27 21:39:03 2017 +0100
+
+    net: phy: micrel: KSZ8795 do not set SUPPORTED_[Asym_]Pause
+    
+    
+    [ Upstream commit cf626c3b252b2c9d131be0dd66096ec3bf729e54 ]
+    
+    As pr commit "net: phy: phy drivers should not set SUPPORTED_[Asym_]Pause"
+    this phy driver should not set these feature bits.
+    
+    Signed-off-by: Sean Nyekjaer <sean.nyekjaer@prevas.dk>
+    Fixes: 9d162ed69f51 ("net: phy: micrel: add support for KSZ8795")
+    Reviewed-by: Florian Fainelli <f.fainelli@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <alexander.levin@verizon.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 2f970b437e86a13c13b958d5fefdfc256fa7266a ......
+	 orig commit -> 83b5d1e3d3013dbf90645a5d07179d018c8243fa ......
+checking 4038524f7fef3beb83d61c54b428a4fd3b2d4388 ......
+	 orig commit -> eff596da48784316ccb83bef82bc1213b512d5e0 ......
+checking b445ecbdff838e534077a62133f1e9b6354b3840 ......
+	 orig commit -> 5403dc703ff277f8a2a12a83ac820750485f13b3 ......
+checking 2bcbe747629e2b1ec7f162878d8969613a1c65c6 ......
+	 orig commit -> 39cb2c9a316e77f6dfba96c543e55b6672d5a37e ......
+checking e6549f36278cf03bfc8ecf7daa1ae77055398c13 ......
+	 orig commit -> d1156b489fa734d1af763d6a07b1637c01bb0aed ......
+checking a15bbf44ab2fbde580b00005b3c1922c4904d6ab ......
+	 orig commit -> e82d02580af45663fad6d3596e4344c606e81e10 ......
+checking 326fdffd7078257706e4126c256e144bd3859eff ......
+	 orig commit -> e6e7b48b295afa5a5ab440de0a94d9ad8b3ce2d0 ......
+checking 82b6693bd4153dc437255dabaa4f9d0d0f8c9da2 ......
+	 orig commit -> e73ab00e9a0f1731f34d0620a9c55f5c30c4ad4e ......
+checking d934fe02ba176b5e88d8b67d603cd94fc930f3ce ......
+	 orig commit -> f9f96fc10c09ca16e336854c08bc1563eed97985 ......
+checking 62614714e30a963ff325d7b5547b24d650153817 ......
+	 orig commit -> 827e1579e1d5cb66e340e7be1944b825b542bbdf ......
+checking 3564d41e5c84e5c71ec1172958cbafc19575a550 ......
+	 orig commit -> 4af0e5bb95ee3ba5ea4bd7dbb94e1648a5279cc9 ......
+checking 581e4003bf126ef479734a25f7f57c365d7c790a ......
+	 orig commit -> d585df1c5ccf995fcee910705ad7a9cdd11d4152 ......
+		 d585df1c5ccf995fcee910705ad7a9cdd11d4152 has problem. Fixes commit -> 4cbe4dac82e423ecc9a0ba46af24a860853259f4
+commit fd27dbcae9371d0f15b3f0fcb69a544e41d819ba
+Author: Jack Morgenstein <jackm@dev.mellanox.co.il>
+Date:   Mon Mar 13 19:29:08 2017 +0200
+
+    net/mlx4_core: Avoid delays during VF driver device shutdown
+    
+    
+    [ Upstream commit 4cbe4dac82e423ecc9a0ba46af24a860853259f4 ]
+    
+    Some Hypervisors detach VFs from VMs by instantly causing an FLR event
+    to be generated for a VF.
+    
+    In the mlx4 case, this will cause that VF's comm channel to be disabled
+    before the VM has an opportunity to invoke the VF device's "shutdown"
+    method.
+    
+    For such Hypervisors, there is a race condition between the VF's
+    shutdown method and its internal-error detection/reset thread.
+    
+    The internal-error detection/reset thread (which runs every 5 seconds) also
+    detects a disabled comm channel. If the internal-error detection/reset
+    flow wins the race, we still get delays (while that flow tries repeatedly
+    to detect comm-channel recovery).
+    
+    The cited commit fixed the command timeout problem when the
+    internal-error detection/reset flow loses the race.
+    
+    This commit avoids the unneeded delays when the internal-error
+    detection/reset flow wins.
+    
+    Fixes: d585df1c5ccf ("net/mlx4_core: Avoid command timeouts during VF driver device shutdown")
+    Signed-off-by: Jack Morgenstein <jackm@dev.mellanox.co.il>
+    Reported-by: Simon Xiao <sixiao@microsoft.com>
+    Signed-off-by: Tariq Toukan <tariqt@mellanox.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <alexander.levin@verizon.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking c33f1bd7f28999950918912b25d2ed9514669edf ......
+	 orig commit -> 96692b097ba76d0c637ae8af47b29c73da33c9d0 ......
+checking cf336eea809d10ea9df4e7096d7d916c3d07eeaf ......
+	 orig commit -> c966b6279f610a24ac1d42dcbe30e10fa61220b2 ......
+checking 16f733d8db525e0c3519888071b2e644b12717f7 ......
+	 orig commit -> 90427ef5d2a4b9a24079889bf16afdcdaebc4240 ......
+		 90427ef5d2a4b9a24079889bf16afdcdaebc4240 has problem. Fixes commit -> 0e9a709560dbcfbace8bf4019dc5298619235891
+commit adfe95fe5b4290693a57f1682fcf3c4f61951086
+Author: Peter Dawson <petedaws@gmail.com>
+Date:   Fri May 26 06:35:18 2017 +1000
+
+    ip6_tunnel, ip6_gre: fix setting of DSCP on encapsulated packets
+    
+    
+    [ Upstream commit 0e9a709560dbcfbace8bf4019dc5298619235891 ]
+    
+    This fix addresses two problems in the way the DSCP field is formulated
+     on the encapsulating header of IPv6 tunnels.
+    Bugzilla: https://bugzilla.kernel.org/show_bug.cgi?id=195661
+    
+    1) The IPv6 tunneling code was manipulating the DSCP field of the
+     encapsulating packet using the 32b flowlabel. Since the flowlabel is
+     only the lower 20b it was incorrect to assume that the upper 12b
+     containing the DSCP and ECN fields would remain intact when formulating
+     the encapsulating header. This fix handles the 'inherit' and
+     'fixed-value' DSCP cases explicitly using the extant dsfield u8 variable.
+    
+    2) The use of INET_ECN_encapsulate(0, dsfield) in ip6_tnl_xmit was
+     incorrect and resulted in the DSCP value always being set to 0.
+    
+    Commit 90427ef5d2a4 ("ipv6: fix flow labels when the traffic class
+     is non-0") caused the regression by masking out the flowlabel
+     which exposed the incorrect handling of the DSCP portion of the
+     flowlabel in ip6_tunnel and ip6_gre.
+    
+    Fixes: 90427ef5d2a4 ("ipv6: fix flow labels when the traffic class is non-0")
+    Signed-off-by: Peter Dawson <peter.a.dawson@boeing.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <alexander.levin@verizon.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 0542f979124662c219e0c8c66f6ad1e784bf20dc ......
+	 orig commit -> 62deb8187d116581c88c69a2dd9b5c16588545d4 ......
+checking 34f1a4626badd6d88f07f222378ba304330be717 ......
+	 orig commit -> 6bdded59c8933940ac7e5b416448276ac89d1144 ......
+checking 11696dcea28222967af5ed8105695ec1751fe061 ......
+	 orig commit -> e26bfebdfc0d212d366de9990a096665d5c0209a ......
+checking f4d2d05ffb8b3c4286feeaade7f27a3b18c59d18 ......
+	 orig commit -> 1a2a14444d32b89b28116daea86f63ced1716668 ......
+checking 3a6ebd3f963c9d2fda47714562606a495fee0b2c ......
+	 orig commit -> 6d9f66ac7fec2a6ccd649e5909806dfe36f1fc25 ......
+checking ea14fabd43a5e52739d55fda2a95d7218fd700ee ......
+	 orig commit -> cafe8df8b9bc9aa3dffa827c1a6757c6cd36f657 ......
+		 cafe8df8b9bc9aa3dffa827c1a6757c6cd36f657 has problem. Fixes commit -> 6d9f66ac7fec2a6ccd649e5909806dfe36f1fc25
+commit 3a6ebd3f963c9d2fda47714562606a495fee0b2c
+Author: Florian Fainelli <f.fainelli@gmail.com>
+Date:   Wed Feb 8 19:05:26 2017 -0800
+
+    net: phy: Fix PHY module checks and NULL deref in phy_attach_direct()
+    
+    
+    [ Upstream commit 6d9f66ac7fec2a6ccd649e5909806dfe36f1fc25 ]
+    
+    The Generic PHY drivers gets assigned after we checked that the current
+    PHY driver is NULL, so we need to check a few things before we can
+    safely dereference d->driver. This would be causing a NULL deference to
+    occur when a system binds to the Generic PHY driver. Update
+    phy_attach_direct() to do the following:
+    
+    - grab the driver module reference after we have assigned the Generic
+      PHY drivers accordingly, and remember we came from the generic PHY
+      path
+    
+    - update the error path to clean up the module reference in case the
+      Generic PHY probe function fails
+    
+    - split the error path involving phy_detacht() to avoid double free/put
+      since phy_detach() does all the clean up
+    
+    - finally, have phy_detach() drop the module reference count before we
+      call device_release_driver() for the Generic PHY driver case
+    
+    Fixes: cafe8df8b9bc ("net: phy: Fix lack of reference count on PHY driver")
+    Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <alexander.levin@verizon.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 2fba4f5b70f304fd05f257bc0cbf0a236e144ac5 ......
+	 orig commit -> 3808d34838184fd29088d6b3a364ba2f1c018fb6 ......
+checking 8de6ea44af5c55f61848ca3dab6f0b6642ef4c33 ......
+	 orig commit -> 29905b52fad0854351f57bab867647e4982285bf ......
+checking 5331baaeb7e6a7448c5e2d1e48e91260cc99b710 ......
+	 orig commit -> 4f40c6e5627ea73b4e7c615c59631f38cc880885 ......
+checking 8936b74fd339be61f85c2ec74e311093d855bb07 ......
+	 orig commit -> 253fd0f02040a19c6fe80e4171659fa3482a422d ......
+checking 3ec4141c68de07ec94e5781bf4a17f48e644fc3a ......
+	 orig commit -> 35f860f9ba6aac56cc38e8b18916d833a83f1157 ......
+		 35f860f9ba6aac56cc38e8b18916d833a83f1157 has problem. Fixes commit -> 7292ae3d5a18fb922be496e6bb687647193569b4
+commit 21eaaa76b701df5becdc6163cb88eeb7915ba629
+Author: Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>
+Date:   Mon Mar 20 20:15:53 2017 +0300
+
+    jump label: fix passing kbuild_cflags when checking for asm goto support
+    
+    commit 7292ae3d5a18fb922be496e6bb687647193569b4 upstream.
+    
+    The latest change of asm goto support check added passing of KBUILD_CFLAGS
+    to compiler.  When these flags reference gcc plugins that are not built yet,
+    the check fails.
+    
+    When one runs "make bzImage" followed by "make modules", the kernel is always
+    built with HAVE_JUMP_LABEL disabled, while the modules are built depending on
+    CONFIG_JUMP_LABEL.  If HAVE_JUMP_LABEL macro happens to be different, modules
+    are built with undefined references, e.g.:
+    
+    ERROR: "static_key_slow_inc" [net/netfilter/xt_TEE.ko] undefined!
+    ERROR: "static_key_slow_dec" [net/netfilter/xt_TEE.ko] undefined!
+    ERROR: "static_key_slow_dec" [net/netfilter/nft_meta.ko] undefined!
+    ERROR: "static_key_slow_inc" [net/netfilter/nft_meta.ko] undefined!
+    ERROR: "nf_hooks_needed" [net/netfilter/ipvs/ip_vs.ko] undefined!
+    ERROR: "nf_hooks_needed" [net/ipv6/ipv6.ko] undefined!
+    ERROR: "static_key_count" [net/ipv6/ipv6.ko] undefined!
+    ERROR: "static_key_slow_inc" [net/ipv6/ipv6.ko] undefined!
+    
+    This change moves the check before all these references are added
+    to KBUILD_CFLAGS.  This is correct because subsequent KBUILD_CFLAGS
+    modifications are not relevant to this check.
+    
+    Reported-by: Anton V. Boyarshinov <boyarsh@altlinux.org>
+    Fixes: 35f860f9ba6a ("jump label: pass kbuild_cflags when checking for asm goto support")
+    Signed-off-by: Gleb Fotengauer-Malinovskiy <glebfm@altlinux.org>
+    Signed-off-by: Dmitry V. Levin <ldv@altlinux.org>
+    Acked-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
+    Acked-by: David Lin <dtwlin@google.com>
+    Signed-off-by: Masahiro Yamada <yamada.masahiro@socionext.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 36d9659cde0dcb48c711d3dd460467d76c0b84eb ......
+	 orig commit -> a9306a63631493afc75893a4ac405d4e1cbae6aa ......
+checking 40f6d71c0a0900c2b76cab421ee4ccfc6f425a35 ......
+	 orig commit -> 5aff1d245e8cc1ab5c4517d916edaed9e3f7f973 ......
+checking 1cadd394bbf94976bcffeab54e94f1d083e2d390 ......
+	 orig commit -> a088d1d73a4bcfd7bc482f8d08375b9b665dc3e5 ......
+checking d536202202eef1102a90ece32d91c20dffdbeede ......
+	 orig commit -> 930a42ded3fede7ca3acafc9153f4f2d0f56a92c ......
+checking d385ed7ad30737aa649034ded83afdbef65217d1 ......
+	 orig commit -> a11a7f71cac209c7c9cca66eb506e1ebb033a3b3 ......
+checking d7b2b380c08d7e9b6caf1584656b98c47eb665f2 ......
+	 orig commit -> 075ad765ef7541b2860de8408c165a92b78aefa3 ......
+checking baaa84b43608a922e6be101982388e50aa0a4422 ......
+	 orig commit -> ed5bd7dc88edf4a4a9c67130742b1b59aa017a5f ......
+checking c419fe260b549c543119ea7e2db4916b9aac26f3 ......
+	 orig commit -> f83e6862047e1e371bdc5d512dd6cabe8a3965b8 ......
+checking 47a5aabc34247d75c7bfa87f4e3f884f055dded6 ......
+	 orig commit -> f43128c75202f29ee71aa83e6c320a911137c189 ......
+checking c1a4306f24a092f55ee9bbdff0c0a8741e9c833c ......
+	 orig commit -> bbb27fc33d44e7b8d96369810654df4ee1837566 ......
+checking 7a6fcf38fabb404dd6fa589fa257c104c217c662 ......
+	 orig commit -> 5a70348e1187c5bf1cbd0ec51843f36befed1c2d ......
+checking 9217eeefee159b9dec3bd111022e471e66eb48ca ......
+	 orig commit -> 764895d3039e903dac3a70f219949efe43d036a0 ......
+checking bed8b8627a3339f30c62534581deb8a37c7b8b8a ......
+	 orig commit -> b85ea006b6bebb692628f11882af41c3e12e1e09 ......
+checking 008798746e6e1d68a24674690e355b5619711fc4 ......
+	 orig commit -> 7ba1b689038726d34e3244c1ac9e2e18c2ea4787 ......
+checking ae0b63eb344efec8aab9759ec3fcc94c799227e1 ......
+	 orig commit -> db5d0b597bc27bbddf40f2f8359a73be4eb77104 ......
+checking 4544ba3173b7e4f15c8c921997847390e5652268 ......
+	 orig commit -> e722af6391949e8851310441bb0cec157d25611d ......
+checking 74e24d1ea1a4fc8e1d4faa43263229aa45513cd3 ......
+	 orig commit -> 4872e57c812dd312bf8193b5933fa60585cda42f ......
+checking 2557969fb4f703f1364a58fabde53e6567b46120 ......
+	 orig commit -> 6a25478077d987edc5e2f880590a2bc5fcab4441 ......
+checking 44bc7cae603167feb86b7f8f0684df62ffaac7f4 ......
+	 orig commit -> 9dbbfb0ab6680c6a85609041011484e6658e7d3c ......
+checking cb351da6f2badf45d87cf0d21826d81a77f5e433 ......
+	 orig commit -> ec5e3b0a1d41fbda0cc33a45bc9e54e91d9d12c7 ......
+		 ec5e3b0a1d41fbda0cc33a45bc9e54e91d9d12c7 has problem. Fixes commit -> 00ea1ceebe0d9f2dc1cc2b7bd575a00100c27869
+commit 98184bbb8daea6af32208d63831e66023db4bb58
+Author: Willem de Bruijn <willemb@google.com>
+Date:   Sat Feb 18 19:00:45 2017 -0500
+
+    ipv6: release dst on error in ip6_dst_lookup_tail
+    
+    commit 00ea1ceebe0d9f2dc1cc2b7bd575a00100c27869 upstream.
+    
+    If ip6_dst_lookup_tail has acquired a dst and fails the IPv4-mapped
+    check, release the dst before returning an error.
+    
+    Fixes: ec5e3b0a1d41 ("ipv6: Inhibit IPv4-mapped src address on the wire.")
+    Signed-off-by: Willem de Bruijn <willemb@google.com>
+    Acked-by: Eric Dumazet <edumazet@google.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Cc: Ben Hutchings <ben.hutchings@codethink.co.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 12ec2560d467812424ff8eb6f7fccc83f64aae3d ......
+	 orig commit -> 052d2369d1b479cdbbe020fdd6d057d3c342db74 ......
+checking 116589a5a7e0f3dc91a50b9d39365306b2198680 ......
+	 orig commit -> e70ac171658679ecf6bea4bbd9e9325cd6079d2b ......
+checking a2901d01a6c7aac1b1e0603bc7d8fce448760195 ......
+	 orig commit -> cd224553641848dd17800fe559e4ff5d208553e8 ......
+checking bff3001afae781cc24dc816bc3e0f9c6f6a02296 ......
+	 orig commit -> acf138f1b00bdd1b7cd9894562ed0c2a1670888e ......
+checking 65e72723add09f7e260863b1f68f24d62c3cf96a ......
+	 orig commit -> 28f4d16570dcf440e54a4d72666d5be452f27d0e ......
+checking b5a1aa812a161dce89d296e599a003de17cccefa ......
+	 orig commit -> 75224c93fa985f4a6fb983f53208f5c5aa555fbf ......
+checking d864e675c78983b287848a3df64c1d9dfed263da ......
+	 orig commit -> da2f27e9e615d1c799c9582b15262458da61fddc ......
+checking 220b67a16fde7187fae7efcc6809d658e4c49525 ......
+	 orig commit -> 223220356d5ebc05ead9a8d697abb0c0a906fc81 ......
+checking 7a7b2d5f65a7a12c4f5d43fb10913ca908102833 ......
+	 orig commit -> 6ab92afc95c9bd6877cb42e7b24f65be887a5440 ......
+	 orig commit -> bac2a909a096c9110525c18cbb8ce73c660d5f71 ......
+	 orig commit -> d14d2a8453d650bea32a1c5271af1458cd283a0f ......
+		 d14d2a8453d650bea32a1c5271af1458cd283a0f has problem. Fixes commit -> 6ab92afc95c9bd6877cb42e7b24f65be887a5440
+adfdf85d795f4d4f487b61ee0b169d64c6e19081
+commit 7a7b2d5f65a7a12c4f5d43fb10913ca908102833
+Author: Imre Deak <imre.deak@intel.com>
+Date:   Tue May 2 15:04:09 2017 +0300
+
+    drm/i915: Prevent the system suspend complete optimization
+    
+    commit 6ab92afc95c9bd6877cb42e7b24f65be887a5440 upstream.
+    
+    Since
+    
+    commit bac2a909a096c9110525c18cbb8ce73c660d5f71
+    Author: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Date:   Wed Jan 21 02:17:42 2015 +0100
+    
+        PCI / PM: Avoid resuming PCI devices during system suspend
+    
+    PCI devices will default to allowing the system suspend complete
+    optimization where devices are not woken up during system suspend if
+    they were already runtime suspended. This however breaks the i915/HDA
+    drivers for two reasons:
+    
+    - The i915 driver has system suspend specific steps that it needs to
+      run, that bring the device to a different state than its runtime
+      suspended state.
+    
+    - The HDA driver's suspend handler requires power that it will request
+      from the i915 driver's power domain handler. This in turn requires the
+      i915 driver to runtime resume itself, but this won't be possible if the
+      suspend complete optimization is in effect: in this case the i915
+      runtime PM is disabled and trying to get an RPM reference returns
+      -EACCESS.
+    
+    Solve this by requiring the PCI/PM core to resume the device during
+    system suspend which in effect disables the suspend complete optimization.
+    
+    Regardless of the above commit the optimization stayed disabled for DRM
+    devices until
+    
+    commit d14d2a8453d650bea32a1c5271af1458cd283a0f
+    Author: Lukas Wunner <lukas@wunner.de>
+    Date:   Wed Jun 8 12:49:29 2016 +0200
+    
+        drm: Remove dev_pm_ops from drm_class
+    
+    so this patch is in practice a fix for this commit. Another reason for
+    the bug staying hidden for so long is that the optimization for a device
+    is disabled if it's disabled for any of its children devices. i915 may
+    have a backlight device as its child which doesn't support runtime PM
+    and so doesn't allow the optimization either.  So if this backlight
+    device got registered the bug stayed hidden.
+    
+    Credits to Marta, Tomi and David who enabled pstore logging,
+    that caught one instance of this issue across a suspend/
+    resume-to-ram and Ville who rememberd that the optimization was enabled
+    for some devices at one point.
+    
+    The first WARN triggered by the problem:
+    
+    [ 6250.746445] WARNING: CPU: 2 PID: 17384 at drivers/gpu/drm/i915/intel_runtime_pm.c:2846 intel_runtime_pm_get+0x6b/0xd0 [i915]
+    [ 6250.746448] pm_runtime_get_sync() failed: -13
+    [ 6250.746451] Modules linked in: snd_hda_intel i915 vgem snd_hda_codec_hdmi x86_pkg_temp_thermal intel_powerclamp coretemp crct10dif_pclmul crc32_pclmul
+    snd_hda_codec_realtek snd_hda_codec_generic ghash_clmulni_intel e1000e snd_hda_codec snd_hwdep snd_hda_core ptp mei_me pps_core snd_pcm lpc_ich mei prime_
+    numbers i2c_hid i2c_designware_platform i2c_designware_core [last unloaded: i915]
+    [ 6250.746512] CPU: 2 PID: 17384 Comm: kworker/u8:0 Tainted: G     U  W       4.11.0-rc5-CI-CI_DRM_334+ #1
+    [ 6250.746515] Hardware name:                  /NUC5i5RYB, BIOS RYBDWi35.86A.0362.2017.0118.0940 01/18/2017
+    [ 6250.746521] Workqueue: events_unbound async_run_entry_fn
+    [ 6250.746525] Call Trace:
+    [ 6250.746530]  dump_stack+0x67/0x92
+    [ 6250.746536]  __warn+0xc6/0xe0
+    [ 6250.746542]  ? pci_restore_standard_config+0x40/0x40
+    [ 6250.746546]  warn_slowpath_fmt+0x46/0x50
+    [ 6250.746553]  ? __pm_runtime_resume+0x56/0x80
+    [ 6250.746584]  intel_runtime_pm_get+0x6b/0xd0 [i915]
+    [ 6250.746610]  intel_display_power_get+0x1b/0x40 [i915]
+    [ 6250.746646]  i915_audio_component_get_power+0x15/0x20 [i915]
+    [ 6250.746654]  snd_hdac_display_power+0xc8/0x110 [snd_hda_core]
+    [ 6250.746661]  azx_runtime_resume+0x218/0x280 [snd_hda_intel]
+    [ 6250.746667]  pci_pm_runtime_resume+0x76/0xa0
+    [ 6250.746672]  __rpm_callback+0xb4/0x1f0
+    [ 6250.746677]  ? pci_restore_standard_config+0x40/0x40
+    [ 6250.746682]  rpm_callback+0x1f/0x80
+    [ 6250.746686]  ? pci_restore_standard_config+0x40/0x40
+    [ 6250.746690]  rpm_resume+0x4ba/0x740
+    [ 6250.746698]  __pm_runtime_resume+0x49/0x80
+    [ 6250.746703]  pci_pm_suspend+0x57/0x140
+    [ 6250.746709]  dpm_run_callback+0x6f/0x330
+    [ 6250.746713]  ? pci_pm_freeze+0xe0/0xe0
+    [ 6250.746718]  __device_suspend+0xf9/0x370
+    [ 6250.746724]  ? dpm_watchdog_set+0x60/0x60
+    [ 6250.746730]  async_suspend+0x1a/0x90
+    [ 6250.746735]  async_run_entry_fn+0x34/0x160
+    [ 6250.746741]  process_one_work+0x1f2/0x6d0
+    [ 6250.746749]  worker_thread+0x49/0x4a0
+    [ 6250.746755]  kthread+0x107/0x140
+    [ 6250.746759]  ? process_one_work+0x6d0/0x6d0
+    [ 6250.746763]  ? kthread_create_on_node+0x40/0x40
+    [ 6250.746768]  ret_from_fork+0x2e/0x40
+    [ 6250.746778] ---[ end trace 102a62fd2160f5e6 ]---
+    
+    v2:
+    - Use the new pci_dev->needs_resume flag, to avoid any overhead during
+      the ->pm_prepare hook. (Rafael)
+    
+    v3:
+    - Update commit message to reference the actual regressing commit.
+      (Lukas)
+    
+    v4:
+    - Rebase on v4 of patch 1/2.
+    
+    Fixes: d14d2a8453d6 ("drm: Remove dev_pm_ops from drm_class")
+    References: https://bugs.freedesktop.org/show_bug.cgi?id=100378
+    References: https://bugs.freedesktop.org/show_bug.cgi?id=100770
+    Cc: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Cc: Marta Lofstedt <marta.lofstedt@intel.com>
+    Cc: David Weinehall <david.weinehall@linux.intel.com>
+    Cc: Tomi Sarvela <tomi.p.sarvela@intel.com>
+    Cc: Ville Syrjälä <ville.syrjala@linux.intel.com>
+    Cc: Mika Kuoppala <mika.kuoppala@intel.com>
+    Cc: Chris Wilson <chris@chris-wilson.co.uk>
+    Cc: Takashi Iwai <tiwai@suse.de>
+    Cc: Bjorn Helgaas <bhelgaas@google.com>
+    Cc: Lukas Wunner <lukas@wunner.de>
+    Cc: linux-pci@vger.kernel.org
+    Signed-off-by: Imre Deak <imre.deak@intel.com>
+    Reviewed-by: Chris Wilson <chris@chris-wilson.co.uk>
+    Reported-and-tested-by: Marta Lofstedt <marta.lofstedt@intel.com>
+    Link: http://patchwork.freedesktop.org/patch/msgid/1493726649-32094-2-git-send-email-imre.deak@intel.com
+    (cherry picked from commit adfdf85d795f4d4f487b61ee0b169d64c6e19081)
+    Signed-off-by: Jani Nikula <jani.nikula@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+commit 7a7b2d5f65a7a12c4f5d43fb10913ca908102833
+Author: Imre Deak <imre.deak@intel.com>
+Date:   Tue May 2 15:04:09 2017 +0300
+
+    drm/i915: Prevent the system suspend complete optimization
+    
+    commit 6ab92afc95c9bd6877cb42e7b24f65be887a5440 upstream.
+    
+    Since
+    
+    commit bac2a909a096c9110525c18cbb8ce73c660d5f71
+    Author: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Date:   Wed Jan 21 02:17:42 2015 +0100
+    
+        PCI / PM: Avoid resuming PCI devices during system suspend
+    
+    PCI devices will default to allowing the system suspend complete
+    optimization where devices are not woken up during system suspend if
+    they were already runtime suspended. This however breaks the i915/HDA
+    drivers for two reasons:
+    
+    - The i915 driver has system suspend specific steps that it needs to
+      run, that bring the device to a different state than its runtime
+      suspended state.
+    
+    - The HDA driver's suspend handler requires power that it will request
+      from the i915 driver's power domain handler. This in turn requires the
+      i915 driver to runtime resume itself, but this won't be possible if the
+      suspend complete optimization is in effect: in this case the i915
+      runtime PM is disabled and trying to get an RPM reference returns
+      -EACCESS.
+    
+    Solve this by requiring the PCI/PM core to resume the device during
+    system suspend which in effect disables the suspend complete optimization.
+    
+    Regardless of the above commit the optimization stayed disabled for DRM
+    devices until
+    
+    commit d14d2a8453d650bea32a1c5271af1458cd283a0f
+    Author: Lukas Wunner <lukas@wunner.de>
+    Date:   Wed Jun 8 12:49:29 2016 +0200
+    
+        drm: Remove dev_pm_ops from drm_class
+    
+    so this patch is in practice a fix for this commit. Another reason for
+    the bug staying hidden for so long is that the optimization for a device
+    is disabled if it's disabled for any of its children devices. i915 may
+    have a backlight device as its child which doesn't support runtime PM
+    and so doesn't allow the optimization either.  So if this backlight
+    device got registered the bug stayed hidden.
+    
+    Credits to Marta, Tomi and David who enabled pstore logging,
+    that caught one instance of this issue across a suspend/
+    resume-to-ram and Ville who rememberd that the optimization was enabled
+    for some devices at one point.
+    
+    The first WARN triggered by the problem:
+    
+    [ 6250.746445] WARNING: CPU: 2 PID: 17384 at drivers/gpu/drm/i915/intel_runtime_pm.c:2846 intel_runtime_pm_get+0x6b/0xd0 [i915]
+    [ 6250.746448] pm_runtime_get_sync() failed: -13
+    [ 6250.746451] Modules linked in: snd_hda_intel i915 vgem snd_hda_codec_hdmi x86_pkg_temp_thermal intel_powerclamp coretemp crct10dif_pclmul crc32_pclmul
+    snd_hda_codec_realtek snd_hda_codec_generic ghash_clmulni_intel e1000e snd_hda_codec snd_hwdep snd_hda_core ptp mei_me pps_core snd_pcm lpc_ich mei prime_
+    numbers i2c_hid i2c_designware_platform i2c_designware_core [last unloaded: i915]
+    [ 6250.746512] CPU: 2 PID: 17384 Comm: kworker/u8:0 Tainted: G     U  W       4.11.0-rc5-CI-CI_DRM_334+ #1
+    [ 6250.746515] Hardware name:                  /NUC5i5RYB, BIOS RYBDWi35.86A.0362.2017.0118.0940 01/18/2017
+    [ 6250.746521] Workqueue: events_unbound async_run_entry_fn
+    [ 6250.746525] Call Trace:
+    [ 6250.746530]  dump_stack+0x67/0x92
+    [ 6250.746536]  __warn+0xc6/0xe0
+    [ 6250.746542]  ? pci_restore_standard_config+0x40/0x40
+    [ 6250.746546]  warn_slowpath_fmt+0x46/0x50
+    [ 6250.746553]  ? __pm_runtime_resume+0x56/0x80
+    [ 6250.746584]  intel_runtime_pm_get+0x6b/0xd0 [i915]
+    [ 6250.746610]  intel_display_power_get+0x1b/0x40 [i915]
+    [ 6250.746646]  i915_audio_component_get_power+0x15/0x20 [i915]
+    [ 6250.746654]  snd_hdac_display_power+0xc8/0x110 [snd_hda_core]
+    [ 6250.746661]  azx_runtime_resume+0x218/0x280 [snd_hda_intel]
+    [ 6250.746667]  pci_pm_runtime_resume+0x76/0xa0
+    [ 6250.746672]  __rpm_callback+0xb4/0x1f0
+    [ 6250.746677]  ? pci_restore_standard_config+0x40/0x40
+    [ 6250.746682]  rpm_callback+0x1f/0x80
+    [ 6250.746686]  ? pci_restore_standard_config+0x40/0x40
+    [ 6250.746690]  rpm_resume+0x4ba/0x740
+    [ 6250.746698]  __pm_runtime_resume+0x49/0x80
+    [ 6250.746703]  pci_pm_suspend+0x57/0x140
+    [ 6250.746709]  dpm_run_callback+0x6f/0x330
+    [ 6250.746713]  ? pci_pm_freeze+0xe0/0xe0
+    [ 6250.746718]  __device_suspend+0xf9/0x370
+    [ 6250.746724]  ? dpm_watchdog_set+0x60/0x60
+    [ 6250.746730]  async_suspend+0x1a/0x90
+    [ 6250.746735]  async_run_entry_fn+0x34/0x160
+    [ 6250.746741]  process_one_work+0x1f2/0x6d0
+    [ 6250.746749]  worker_thread+0x49/0x4a0
+    [ 6250.746755]  kthread+0x107/0x140
+    [ 6250.746759]  ? process_one_work+0x6d0/0x6d0
+    [ 6250.746763]  ? kthread_create_on_node+0x40/0x40
+    [ 6250.746768]  ret_from_fork+0x2e/0x40
+    [ 6250.746778] ---[ end trace 102a62fd2160f5e6 ]---
+    
+    v2:
+    - Use the new pci_dev->needs_resume flag, to avoid any overhead during
+      the ->pm_prepare hook. (Rafael)
+    
+    v3:
+    - Update commit message to reference the actual regressing commit.
+      (Lukas)
+    
+    v4:
+    - Rebase on v4 of patch 1/2.
+    
+    Fixes: d14d2a8453d6 ("drm: Remove dev_pm_ops from drm_class")
+    References: https://bugs.freedesktop.org/show_bug.cgi?id=100378
+    References: https://bugs.freedesktop.org/show_bug.cgi?id=100770
+    Cc: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Cc: Marta Lofstedt <marta.lofstedt@intel.com>
+    Cc: David Weinehall <david.weinehall@linux.intel.com>
+    Cc: Tomi Sarvela <tomi.p.sarvela@intel.com>
+    Cc: Ville Syrjälä <ville.syrjala@linux.intel.com>
+    Cc: Mika Kuoppala <mika.kuoppala@intel.com>
+    Cc: Chris Wilson <chris@chris-wilson.co.uk>
+    Cc: Takashi Iwai <tiwai@suse.de>
+    Cc: Bjorn Helgaas <bhelgaas@google.com>
+    Cc: Lukas Wunner <lukas@wunner.de>
+    Cc: linux-pci@vger.kernel.org
+    Signed-off-by: Imre Deak <imre.deak@intel.com>
+    Reviewed-by: Chris Wilson <chris@chris-wilson.co.uk>
+    Reported-and-tested-by: Marta Lofstedt <marta.lofstedt@intel.com>
+    Link: http://patchwork.freedesktop.org/patch/msgid/1493726649-32094-2-git-send-email-imre.deak@intel.com
+    (cherry picked from commit adfdf85d795f4d4f487b61ee0b169d64c6e19081)
+    Signed-off-by: Jani Nikula <jani.nikula@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking b372d35a522617967911b72e209d35a0c4161fe6 ......
+	 orig commit -> 4d071c3238987325b9e50e33051a40d1cce311cc ......

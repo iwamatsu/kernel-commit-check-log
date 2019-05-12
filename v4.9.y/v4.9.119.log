@@ -1,0 +1,1527 @@
+Check from v4.9.119 to v4.9.120
+Commit count: 114
+checking 93e02ae4200184bab43ce29966e895826a756a37 ......
+checking 7f5d090ffe9e7603265e7991aacec64d86cf70ab ......
+	 orig commit -> f8b64d08dde2714c62751d18ba77f4aeceb161d3 ......
+checking 4edf4ad2e7ee7d527fd8288c22d6ee608eae705c ......
+	 orig commit -> b89b41d0b8414690ec0030c134b8bde209e6d06c ......
+		 b89b41d0b8414690ec0030c134b8bde209e6d06c has problem. Fixes commit -> aac64f7de999d5a7fff55f49434fdd87df919829
+checking b4f17de89e7aaecfc67a173ca8607899ee8707c3 ......
+	 orig commit -> 6c26fcd2abfe0a56bbd95271fce02df2896cfd24 ......
+checking 16848eb10e9e0989e5898dec204f0967c483f044 ......
+	 orig commit -> 792adb90fa724ce07c0171cbc96b9215af4b1045 ......
+checking aee0861fbe95f2311c81b8162bbd1eb196cdf5f2 ......
+	 orig commit -> 269777aa530f3438ec1781586cdac0b5fe47b061 ......
+checking 59a6e1f27602b24f7919e188ff54561e0653620b ......
+	 orig commit -> d0055f351e647f33f3b0329bff022213bf8aa085 ......
+checking da540c063b06b18f77168c8a52ee5a9c783a7481 ......
+	 orig commit -> 07d981ad4cf1e78361c6db1c28ee5ba105f96cc1 ......
+checking 760f9488c13b7d2da69b152a55069e0267ca1477 ......
+	 orig commit -> 30ec26da9967d0d785abc24073129a34c3211777 ......
+checking d21c27185b6f2c32d4b029d1b5c0661702099baf ......
+	 orig commit -> e24f14b0ff985f3e09e573ba1134bfdf42987e05 ......
+checking e79d049743f1466084df5708cd0e052b0d586548 ......
+	 orig commit -> 1063711b57393c1999248cccb57bebfaf16739e7 ......
+checking 7e464373357dd6ff33a1a7373d5e596ed1dbb219 ......
+	 orig commit -> 958f79b9ee55dfaf00c8106ed1c22a2919e0028b ......
+checking 5ebf3f8d5b56412973ca3f2363dae52f795c6700 ......
+	 orig commit -> 0768f91530ff46683e0b372df14fd79fe8d156e5 ......
+checking 4656dfb6b5ddb2c7e6120b8a8d0b144445bf5914 ......
+	 orig commit -> f22cc87f6c1f771b57c407555cfefd811cdd9507 ......
+		 f22cc87f6c1f771b57c407555cfefd811cdd9507 has problem. Fixes commit -> f19f5c49bbc3ffcc9126cc245fc1b24cc29f4a37
+commit 7e5cac813b40cfd2ec77f7653287b388e3e59291
+Author: Sean Christopherson <sean.j.christopherson@intel.com>
+Date:   Fri Aug 17 10:27:36 2018 -0700
+
+    x86/speculation/l1tf: Exempt zeroed PTEs from inversion
+    
+    commit f19f5c49bbc3ffcc9126cc245fc1b24cc29f4a37 upstream.
+    
+    It turns out that we should *not* invert all not-present mappings,
+    because the all zeroes case is obviously special.
+    
+    clear_page() does not undergo the XOR logic to invert the address bits,
+    i.e. PTE, PMD and PUD entries that have not been individually written
+    will have val=0 and so will trigger __pte_needs_invert(). As a result,
+    {pte,pmd,pud}_pfn() will return the wrong PFN value, i.e. all ones
+    (adjusted by the max PFN mask) instead of zero. A zeroed entry is ok
+    because the page at physical address 0 is reserved early in boot
+    specifically to mitigate L1TF, so explicitly exempt them from the
+    inversion when reading the PFN.
+    
+    Manifested as an unexpected mprotect(..., PROT_NONE) failure when called
+    on a VMA that has VM_PFNMAP and was mmap'd to as something other than
+    PROT_NONE but never used. mprotect() sends the PROT_NONE request down
+    prot_none_walk(), which walks the PTEs to check the PFNs.
+    prot_none_pte_entry() gets the bogus PFN from pte_pfn() and returns
+    -EACCES because it thinks mprotect() is trying to adjust a high MMIO
+    address.
+    
+    [ This is a very modified version of Sean's original patch, but all
+      credit goes to Sean for doing this and also pointing out that
+      sometimes the __pte_needs_invert() function only gets the protection
+      bits, not the full eventual pte.  But zero remains special even in
+      just protection bits, so that's ok.   - Linus ]
+    
+    Fixes: f22cc87f6c1f ("x86/speculation/l1tf: Invert all not present mappings")
+    Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+    Acked-by: Andi Kleen <ak@linux.intel.com>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Cc: Josh Poimboeuf <jpoimboe@redhat.com>
+    Cc: Michal Hocko <mhocko@suse.com>
+    Cc: Vlastimil Babka <vbabka@suse.cz>
+    Cc: Dave Hansen <dave.hansen@intel.com>
+    Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking c504b9fce7ba7a2ff96f857d609c69e291553ef0 ......
+	 orig commit -> bc2d8d262cba5736332cbc866acb11b1c5748aa9 ......
+checking f56c8ee659c926bdba42c0d45405433e1a00eb2e ......
+	 orig commit -> 5b76a3cff011df2dcb6186c965a2e4d809a05ad4 ......
+		 5b76a3cff011df2dcb6186c965a2e4d809a05ad4 has problem. Fixes commit -> 60ca05c3b44566b70d64fbb8e87a6e0c67725468
+1eb46908b35dfbac0ec1848d4b1e39667e0187e9
+commit 61341a364d5594352f6e11b2254cb2e540d0c476
+Author: Guenter Roeck <linux@roeck-us.net>
+Date:   Wed Aug 15 08:38:33 2018 -0700
+
+    x86/l1tf: Fix build error seen if CONFIG_KVM_INTEL is disabled
+    
+    commit 1eb46908b35dfbac0ec1848d4b1e39667e0187e9 upstream.
+    
+    allmodconfig+CONFIG_INTEL_KVM=n results in the following build error.
+    
+      ERROR: "l1tf_vmx_mitigation" [arch/x86/kvm/kvm.ko] undefined!
+    
+    Fixes: 5b76a3cff011 ("KVM: VMX: Tell the nested hypervisor to skip L1D flush on vmentry")
+    Reported-by: Meelis Roos <mroos@linux.ee>
+    Cc: Meelis Roos <mroos@linux.ee>
+    Cc: Paolo Bonzini <pbonzini@redhat.com>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+commit 61341a364d5594352f6e11b2254cb2e540d0c476
+Author: Guenter Roeck <linux@roeck-us.net>
+Date:   Wed Aug 15 08:38:33 2018 -0700
+
+    x86/l1tf: Fix build error seen if CONFIG_KVM_INTEL is disabled
+    
+    commit 1eb46908b35dfbac0ec1848d4b1e39667e0187e9 upstream.
+    
+    allmodconfig+CONFIG_INTEL_KVM=n results in the following build error.
+    
+      ERROR: "l1tf_vmx_mitigation" [arch/x86/kvm/kvm.ko] undefined!
+    
+    Fixes: 5b76a3cff011 ("KVM: VMX: Tell the nested hypervisor to skip L1D flush on vmentry")
+    Reported-by: Meelis Roos <mroos@linux.ee>
+    Cc: Meelis Roos <mroos@linux.ee>
+    Cc: Paolo Bonzini <pbonzini@redhat.com>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 383f160027af7f3e3c32c2988980652e708a2119 ......
+	 orig commit -> 8e0b2b916662e09dd4d09e5271cdf214c6b80e62 ......
+checking ee782edd87b482e66cc283cc23d1e984792874e8 ......
+	 orig commit -> ea156d192f5257a5bf393d33910d3b481bf8a401 ......
+checking ce2c755166f9503b1671bd2822d04939afce5b34 ......
+	 orig commit -> cd28325249a1ca0d771557ce823e0308ad629f98 ......
+checking 7a1eac80b5127b20abfcaaf92062c236078f812a ......
+	 orig commit -> 518e7b94817abed94becfe6a44f1ece0d4745afe ......
+checking 8a01dd38e5e1b06f9be73eb5eb80b267a236f29d ......
+	 orig commit -> 66421c1ec340096b291af763ed5721314cdd9c5c ......
+checking 1a155ef3c958b4916594eca132472c9af1c642f7 ......
+	 orig commit -> d1d93fa90f1afa926cb060b7f78ab01a65705b4d ......
+checking 62d88fc0fb6bc888d30a5bd074afd5a0ae59a1af ......
+	 orig commit -> 801e459a6f3a63af9d447e6249088c76ae16efc4 ......
+checking d9f378f64c0ae3d76c1828742557c6c0ccc9e977 ......
+	 orig commit -> 58331136136935c631c2b5f06daf4c3006416e91 ......
+checking 77a83b3a622a0fbdcb7c0d81c853649dbc0eb7a2 ......
+	 orig commit -> 18b57ce2eb8c8b9a24174a89250cf5f57c76ecdc ......
+checking 2c5a3a05474011cb84a1b6c45543d56c324cadca ......
+	 orig commit -> ffcba43ff66c7dab34ec700debd491d2a4d319b4 ......
+checking 8574df1a8741f6cce1f2fbdd921b07adeec8d932 ......
+	 orig commit -> 447ae316670230d7d29430e2cbf1f5db4f49d14c ......
+		 447ae316670230d7d29430e2cbf1f5db4f49d14c has problem. Fixes commit -> 704ae091b061082b37a9968621af4c290c641d50
+340fd4cff43f18bace9358d4decdc9b6ed0715be
+0a957467c5fd46142bc9c52758ffc552d4c5e2f7
+commit 2efb5989dd72b8e4348876ee6ab9d7422f5de530
+Author: Randy Dunlap <rdunlap@infradead.org>
+Date:   Wed Aug 15 09:12:07 2018 -0700
+
+    platform/x86: intel_punit_ipc: fix build errors
+    
+    [ Upstream commit 340fd4cff43f18bace9358d4decdc9b6ed0715be ]
+    
+    Fix build errors by #including <linux/io.h>.
+    
+    ../drivers/platform/x86/intel_punit_ipc.c: In function 'ipc_read_status':
+    ../drivers/platform/x86/intel_punit_ipc.c:55:2: error: implicit declaration of function 'readl' [-Werror=implicit-function-declaration]
+      return readl(ipcdev->base[type][BASE_IFACE]);
+    ../drivers/platform/x86/intel_punit_ipc.c: In function 'ipc_write_cmd':
+    ../drivers/platform/x86/intel_punit_ipc.c:60:2: error: implicit declaration of function 'writel' [-Werror=implicit-function-declaration]
+      writel(cmd, ipcdev->base[type][BASE_IFACE]);
+    
+    Fixes: 447ae3166702 ("x86: Don't include linux/irq.h from asm/hardirq.h")
+    Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+    Cc: Zha Qipeng <qipeng.zha@intel.com>
+    Cc: platform-driver-x86@vger.kernel.org
+    Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+    Signed-off-by: Sasha Levin <alexander.levin@microsoft.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit cc83ba490ddae49dc2c8ccdf2f32ae2ac4aeb562
+Author: Guenter Roeck <linux@roeck-us.net>
+Date:   Wed Aug 15 13:22:27 2018 -0700
+
+    x86: i8259: Add missing include file
+    
+    commit 0a957467c5fd46142bc9c52758ffc552d4c5e2f7 upstream.
+    
+    i8259.h uses inb/outb and thus needs to include asm/io.h to avoid the
+    following build error, as seen with x86_64:defconfig and CONFIG_SMP=n.
+    
+      In file included from drivers/rtc/rtc-cmos.c:45:0:
+      arch/x86/include/asm/i8259.h: In function 'inb_pic':
+      arch/x86/include/asm/i8259.h:32:24: error:
+            implicit declaration of function 'inb'
+    
+      arch/x86/include/asm/i8259.h: In function 'outb_pic':
+      arch/x86/include/asm/i8259.h:45:2: error:
+            implicit declaration of function 'outb'
+    
+    Reported-by: Sebastian Gottschall <s.gottschall@dd-wrt.com>
+    Suggested-by: Sebastian Gottschall <s.gottschall@dd-wrt.com>
+    Fixes: 447ae3166702 ("x86: Don't include linux/irq.h from asm/hardirq.h")
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+commit 2efb5989dd72b8e4348876ee6ab9d7422f5de530
+Author: Randy Dunlap <rdunlap@infradead.org>
+Date:   Wed Aug 15 09:12:07 2018 -0700
+
+    platform/x86: intel_punit_ipc: fix build errors
+    
+    [ Upstream commit 340fd4cff43f18bace9358d4decdc9b6ed0715be ]
+    
+    Fix build errors by #including <linux/io.h>.
+    
+    ../drivers/platform/x86/intel_punit_ipc.c: In function 'ipc_read_status':
+    ../drivers/platform/x86/intel_punit_ipc.c:55:2: error: implicit declaration of function 'readl' [-Werror=implicit-function-declaration]
+      return readl(ipcdev->base[type][BASE_IFACE]);
+    ../drivers/platform/x86/intel_punit_ipc.c: In function 'ipc_write_cmd':
+    ../drivers/platform/x86/intel_punit_ipc.c:60:2: error: implicit declaration of function 'writel' [-Werror=implicit-function-declaration]
+      writel(cmd, ipcdev->base[type][BASE_IFACE]);
+    
+    Fixes: 447ae3166702 ("x86: Don't include linux/irq.h from asm/hardirq.h")
+    Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+    Cc: Zha Qipeng <qipeng.zha@intel.com>
+    Cc: platform-driver-x86@vger.kernel.org
+    Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+    Signed-off-by: Sasha Levin <alexander.levin@microsoft.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit cc83ba490ddae49dc2c8ccdf2f32ae2ac4aeb562
+Author: Guenter Roeck <linux@roeck-us.net>
+Date:   Wed Aug 15 13:22:27 2018 -0700
+
+    x86: i8259: Add missing include file
+    
+    commit 0a957467c5fd46142bc9c52758ffc552d4c5e2f7 upstream.
+    
+    i8259.h uses inb/outb and thus needs to include asm/io.h to avoid the
+    following build error, as seen with x86_64:defconfig and CONFIG_SMP=n.
+    
+      In file included from drivers/rtc/rtc-cmos.c:45:0:
+      arch/x86/include/asm/i8259.h: In function 'inb_pic':
+      arch/x86/include/asm/i8259.h:32:24: error:
+            implicit declaration of function 'inb'
+    
+      arch/x86/include/asm/i8259.h: In function 'outb_pic':
+      arch/x86/include/asm/i8259.h:45:2: error:
+            implicit declaration of function 'outb'
+    
+    Reported-by: Sebastian Gottschall <s.gottschall@dd-wrt.com>
+    Suggested-by: Sebastian Gottschall <s.gottschall@dd-wrt.com>
+    Fixes: 447ae3166702 ("x86: Don't include linux/irq.h from asm/hardirq.h")
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking e371c92e168df9c0713bd4085fbb8501d88b297a ......
+	 orig commit -> 45b575c00d8e72d69d75dd8c112f044b7b01b069 ......
+checking 5766dc12985ca8fdba999d7b5d35035f252b27cf ......
+	 orig commit -> 9aee5f8a7e30330d0a8f4c626dc924ca5590aba5 ......
+checking 90bc306b76b8923e365b8e59ddc6968441594970 ......
+	 orig commit -> 5b6ccc6c3b1a477fbac9ec97a0b4c1c48e765209 ......
+checking 936f566260c2ae883e41301edafa1afb2ba11241 ......
+	 orig commit -> 427362a142441f08051369db6fbe7f61c73b3dca ......
+checking 698ac1bc17c413fd340c243d64fb15cbaadf7178 ......
+	 orig commit -> 379fd0c7e6a391e5565336a646f19f218fb98c6c ......
+checking 8b1969db5567d49dd32c1f93fa9d7295a2c238a0 ......
+	 orig commit -> 73d5e2b472640b1fcdb61ae8be389912ef211bda ......
+		 73d5e2b472640b1fcdb61ae8be389912ef211bda has problem. Fixes commit -> b284909abad48b07d3071a9fc9b5692b3e64914b
+bc2d8d262cba5736332cbc866acb11b1c5748aa9
+commit c504b9fce7ba7a2ff96f857d609c69e291553ef0
+Author: Thomas Gleixner <tglx@linutronix.de>
+Date:   Tue Aug 7 08:19:57 2018 +0200
+
+    cpu/hotplug: Fix SMT supported evaluation
+    
+    commit bc2d8d262cba5736332cbc866acb11b1c5748aa9 upstream
+    
+    Josh reported that the late SMT evaluation in cpu_smt_state_init() sets
+    cpu_smt_control to CPU_SMT_NOT_SUPPORTED in case that 'nosmt' was supplied
+    on the kernel command line as it cannot differentiate between SMT disabled
+    by BIOS and SMT soft disable via 'nosmt'. That wreckages the state and
+    makes the sysfs interface unusable.
+    
+    Rework this so that during bringup of the non boot CPUs the availability of
+    SMT is determined in cpu_smt_allowed(). If a newly booted CPU is not a
+    'primary' thread then set the local cpu_smt_available marker and evaluate
+    this explicitely right after the initial SMP bringup has finished.
+    
+    SMT evaulation on x86 is a trainwreck as the firmware has all the
+    information _before_ booting the kernel, but there is no interface to query
+    it.
+    
+    Fixes: 73d5e2b47264 ("cpu/hotplug: detect SMT disabled by BIOS")
+    Reported-by: Josh Poimboeuf <jpoimboe@redhat.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+commit c504b9fce7ba7a2ff96f857d609c69e291553ef0
+Author: Thomas Gleixner <tglx@linutronix.de>
+Date:   Tue Aug 7 08:19:57 2018 +0200
+
+    cpu/hotplug: Fix SMT supported evaluation
+    
+    commit bc2d8d262cba5736332cbc866acb11b1c5748aa9 upstream
+    
+    Josh reported that the late SMT evaluation in cpu_smt_state_init() sets
+    cpu_smt_control to CPU_SMT_NOT_SUPPORTED in case that 'nosmt' was supplied
+    on the kernel command line as it cannot differentiate between SMT disabled
+    by BIOS and SMT soft disable via 'nosmt'. That wreckages the state and
+    makes the sysfs interface unusable.
+    
+    Rework this so that during bringup of the non boot CPUs the availability of
+    SMT is determined in cpu_smt_allowed(). If a newly booted CPU is not a
+    'primary' thread then set the local cpu_smt_available marker and evaluate
+    this explicitely right after the initial SMP bringup has finished.
+    
+    SMT evaulation on x86 is a trainwreck as the firmware has all the
+    information _before_ booting the kernel, but there is no interface to query
+    it.
+    
+    Fixes: 73d5e2b47264 ("cpu/hotplug: detect SMT disabled by BIOS")
+    Reported-by: Josh Poimboeuf <jpoimboe@redhat.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 03b3614d4d6febe96117b9e5edc4941a8265e844 ......
+	 orig commit -> 1949f9f49792d65dba2090edddbe36a5f02e3ba3 ......
+checking 587d499c8bd203f6158779b5782a07fe7a5bcea8 ......
+	 orig commit -> 288d152c23dcf3c09da46c5c481903ca10ebfef7 ......
+checking 93aed2469df1fdef8ed97d6cbb6dd042181fe46e ......
+	 orig commit -> 3ec8ce5d866ec6a08a9cfab82b62acf4a830b35f ......
+checking 2decbf5264ea6175c6fca28ba2b5c0c683facf27 ......
+	 orig commit -> d90a7a0ec83fb86622cd7dae23255d3c50a99ec8 ......
+checking 929d3b2e9b130f238a8eb206bdc3f063ca68438f ......
+	 orig commit -> fee0aede6f4739c87179eca76136f83210953b86 ......
+checking a69c5e0706dc6783e11830bccafe34c0b7f0a979 ......
+	 orig commit -> 8e1b706b6e819bed215c0db16345568864660393 ......
+checking 4797c2f3791e58d21e82bf0948483ae9b639286b ......
+	 orig commit -> 895ae47f9918833c3a880fbccd41e0692b37e7d9 ......
+checking 6ccf633238db85cbadd3fa0830eab88fe949dd67 ......
+	 orig commit -> dd4bfa739a72508b75760b393d129ed7b431daab ......
+checking dff0982c5719eaedff58c026be9871ea63af992c ......
+	 orig commit -> 4c6523ec59fe895ea352a650218a6be0653910b1 ......
+checking 641a211704f630a3cc0c9ad1a7d922baf9432f11 ......
+	 orig commit -> 7db92e165ac814487264632ab2624e832f20ae38 ......
+		 7db92e165ac814487264632ab2624e832f20ae38 has problem. Fixes commit -> 94d7a86c21a3d6046bf4616272313cb7d525075a
+commit 6a2346f3229495f1338b7a2a869efd16822d4ee6
+Author: Josh Poimboeuf <jpoimboe@redhat.com>
+Date:   Tue Aug 14 12:32:19 2018 -0500
+
+    x86/kvm/vmx: Remove duplicate l1d flush definitions
+    
+    commit 94d7a86c21a3d6046bf4616272313cb7d525075a upstream.
+    
+    These are already defined higher up in the file.
+    
+    Fixes: 7db92e165ac8 ("x86/kvm: Move l1tf setup function")
+    Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Cc: Paolo Bonzini <pbonzini@redhat.com>
+    Cc: stable@vger.kernel.org
+    Link: https://lkml.kernel.org/r/d7ca03ae210d07173452aeed85ffe344301219a5.1534253536.git.jpoimboe@redhat.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 4186ae815556590798de371e0d6ed85fc3682534 ......
+	 orig commit -> a7b9020b06ec6d7c3f3b0d4ef1a9eba12654f4f7 ......
+		 a7b9020b06ec6d7c3f3b0d4ef1a9eba12654f4f7 has problem. Fixes commit -> 0027ff2a75f9dcf0537ac0a65c5840b0e21a4950
+commit 8729412ca3527c82e6daae2ab3c3e7e929c1b5de
+Author: Paolo Bonzini <pbonzini@redhat.com>
+Date:   Wed Aug 22 16:43:39 2018 +0200
+
+    KVM: VMX: fixes for vmentry_l1d_flush module parameter
+    
+    commit 0027ff2a75f9dcf0537ac0a65c5840b0e21a4950 upstream.
+    
+    Two bug fixes:
+    
+    1) missing entries in the l1d_param array; this can cause a host crash
+    if an access attempts to reach the missing entry. Future-proof the get
+    function against any overflows as well.  However, the two entries
+    VMENTER_L1D_FLUSH_EPT_DISABLED and VMENTER_L1D_FLUSH_NOT_REQUIRED must
+    not be accepted by the parse function, so disable them there.
+    
+    2) invalid values must be rejected even if the CPU does not have the
+    bug, so test for them before checking boot_cpu_has(X86_BUG_L1TF)
+    
+    ... and a small refactoring, since the .cmd field is redundant with
+    the index in the array.
+    
+    Reported-by: Bandan Das <bsd@redhat.com>
+    Cc: stable@vger.kernel.org
+    Fixes: a7b9020b06ec6d7c3f3b0d4ef1a9eba12654f4f7
+    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 31282cf43b9d4fd950d8879af081771c0ff04f5f ......
+	 orig commit -> 2f055947ae5e2741fb2dc5bba1033c417ccf4faa ......
+checking 80e55b5ea4e9dbc049594bf357b1a9b0347bb584 ......
+	 orig commit -> 72c6d2db64fa18c996ece8f06e499509e6c9a37e ......
+checking e7cda2ffe1279bcf63f1dd8bbc3c7b818a9ba457 ......
+	 orig commit -> 215af5499d9e2b55f111d2431ea20218115f29b3 ......
+checking a8c14676a93da6b3ef6610b37ef84e7d89f9f3a2 ......
+	 orig commit -> 390d975e0c4e60ce70d4157e0dd91ede37824603 ......
+checking c45ff817e91bef4cbb36944b0c723a42c4c920d2 ......
+	 orig commit -> 989e3992d2eca32c3f1404f2bc91acda3aa122d8 ......
+checking 5d3eaa2d3935e9a5be2dd7186962e72e475d5966 ......
+	 orig commit -> 3190709335dd31fe1aeeebfe4ffb6c7624ef971f ......
+checking 1555f9e8ed973df3e4a5aecc37cdb6d48469d366 ......
+	 orig commit -> ca83b4a7f2d068da79a029d323024aa45decb250 ......
+		 ca83b4a7f2d068da79a029d323024aa45decb250 has problem. Fixes commit -> 98ae70cc476e833332a2c6bb72f941a25f0de226
+commit acd744b4d6cbb2bec09eae3350c1b7cf53a643bd
+Author: Xiaoyao Li <xiaoyao.li@linux.intel.com>
+Date:   Thu Feb 14 12:08:58 2019 +0800
+
+    kvm: vmx: Fix entry number check for add_atomic_switch_msr()
+    
+    commit 98ae70cc476e833332a2c6bb72f941a25f0de226 upstream.
+    
+    Commit ca83b4a7f2d068da79a0 ("x86/KVM/VMX: Add find_msr() helper function")
+    introduces the helper function find_msr(), which returns -ENOENT when
+    not find the msr in vmx->msr_autoload.guest/host. Correct checking contion
+    of no more available entry in vmx->msr_autoload.
+    
+    Fixes: ca83b4a7f2d0 ("x86/KVM/VMX: Add find_msr() helper function")
+    Cc: stable@vger.kernel.org
+    Signed-off-by: Xiaoyao Li <xiaoyao.li@linux.intel.com>
+    Signed-off-by: Paolo Bonzini <pbonzini@redhat.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 57e3ada3e552dcd2de7e22acfb6eac2000f98868 ......
+	 orig commit -> 33966dd6b2d2c352fae55412db2ea8cfff5df13a ......
+checking 69c2525237979d595bf0db29b84cc79b222e25c7 ......
+checking b3dc63c4f43e57d73d769ad0d3f34eae74cb68a8 ......
+	 orig commit -> c595ceee45707f00f64f61c54fb64ef0cc0b4e85 ......
+checking acca8a70a5f6179007e1148a62b8bef12b212d9b ......
+	 orig commit -> 3fa045be4c720146b18a19cea7a767dc6ad5df94 ......
+checking b3d648aefab5265a566d6616de0e3a6b0aa2334b ......
+	 orig commit -> a47dd5f06714c844b33f3b5f517b6f3e81ce57b5 ......
+		 a47dd5f06714c844b33f3b5f517b6f3e81ce57b5 has problem. Fixes commit -> 288d152c23dcf3c09da46c5c481903ca10ebfef7
+commit 587d499c8bd203f6158779b5782a07fe7a5bcea8
+Author: Nicolai Stange <nstange@suse.de>
+Date:   Wed Jul 18 19:07:38 2018 +0200
+
+    x86/KVM/VMX: Initialize the vmx_l1d_flush_pages' content
+    
+    commit 288d152c23dcf3c09da46c5c481903ca10ebfef7 upstream
+    
+    The slow path in vmx_l1d_flush() reads from vmx_l1d_flush_pages in order
+    to evict the L1d cache.
+    
+    However, these pages are never cleared and, in theory, their data could be
+    leaked.
+    
+    More importantly, KSM could merge a nested hypervisor's vmx_l1d_flush_pages
+    to fewer than 1 << L1D_CACHE_ORDER host physical pages and this would break
+    the L1d flushing algorithm: L1D on x86_64 is tagged by physical addresses.
+    
+    Fix this by initializing the individual vmx_l1d_flush_pages with a
+    different pattern each.
+    
+    Rename the "empty_zp" asm constraint identifier in vmx_l1d_flush() to
+    "flush_pages" to reflect this change.
+    
+    Fixes: a47dd5f06714 ("x86/KVM/VMX: Add L1D flush algorithm")
+    Signed-off-by: Nicolai Stange <nstange@suse.de>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking af6ce92977a25540e5d6e0cf90ca187178b0ff9f ......
+	 orig commit -> a399477e52c17e148746d3ce9a483f681c2aa9a0 ......
+checking a0695af3406ae2a08184bd47a9e948fe6f9858b9 ......
+	 orig commit -> 26acfb666a473d960f0fd971fe68f3e3ad16c70b ......
+checking 8438e49bcac479213ada6a29595adfd2e3d99460 ......
+	 orig commit -> 0cc3cd21657be04cb0559fe8063f2130493f92cf ......
+		 0cc3cd21657be04cb0559fe8063f2130493f92cf has problem. Fixes commit -> 269777aa530f3438ec1781586cdac0b5fe47b061
+commit aee0861fbe95f2311c81b8162bbd1eb196cdf5f2
+Author: Abel Vesa <abelvesa@linux.com>
+Date:   Wed Aug 15 00:26:00 2018 +0300
+
+    cpu/hotplug: Non-SMP machines do not make use of booted_once
+    
+    commit 269777aa530f3438ec1781586cdac0b5fe47b061 upstream.
+    
+    Commit 0cc3cd21657b ("cpu/hotplug: Boot HT siblings at least once")
+    breaks non-SMP builds.
+    
+    [ I suspect the 'bool' fields should just be made to be bitfields and be
+      exposed regardless of configuration, but that's a separate cleanup
+      that I'll leave to the owners of this file for later.   - Linus ]
+    
+    Fixes: 0cc3cd21657b ("cpu/hotplug: Boot HT siblings at least once")
+    Cc: Dave Hansen <dave.hansen@intel.com>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Cc: Tony Luck <tony.luck@intel.com>
+    Signed-off-by: Abel Vesa <abelvesa@linux.com>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking fe2a955476f9d9a00d09840b5642d963893abebb ......
+	 orig commit -> 506a66f374891ff08e064a058c446b336c5ac760 ......
+checking 3f0eb66f652ceb5985b9b619e33fc61519121045 ......
+	 orig commit -> e14d7dfb41f5807a0c1c26a13f2b8ef16af24935 ......
+checking 53527af79dc940a225efa266f6320ae9e8dae5e3 ......
+	 orig commit -> 0d0f6249058834ffe1ceaad0bb31464af66f6e7a ......
+checking 250f0aebe2763df9e7ca8c9445d75fe5bbb3f970 ......
+	 orig commit -> 7ce2f0393ea2396142b7faf6ee9b1f3676d08a5f ......
+checking a8358624a3ca9139b461c669231e5f474df8ccf1 ......
+	 orig commit -> 11e34e64e4103955fc4568750914c75d65ea87ee ......
+checking c4b998c88f86971400b556520ba55c8ca96fd8dc ......
+	 orig commit -> 1a7ed1ba4bba6c075d5ad61bb75e3fbc870840d6 ......
+checking 4a818f2c354249439dcd9409dafbd95212c5cdb0 ......
+	 orig commit -> 2207def700f902f169fc237b717252c326f9e464 ......
+checking ae76eb1198fb9f90217d6f36072b780a250dda98 ......
+	 orig commit -> 1e1d7e25fd759eddf96d8ab39d0a90a1979b2d8c ......
+checking 112d243045c2b18f56b37334ee0f7faa01edc205 ......
+	 orig commit -> 119bff8a9c9bb00116a844ec68be7bc4b1c768f5 ......
+checking 0ee6f3b23c04b41ea5cf415aa8a31ef56ab21da7 ......
+	 orig commit -> 1910ad5624968f93be48e8e265513c54d66b897c ......
+checking 3b4f20ad388755d8b049b6b7387cbb847d142af6 ......
+	 orig commit -> 95f3d39ccf7aaea79d1ffdac1c887c2e100ec1b6 ......
+checking 691997bff5ff7e69b63c30ef36a29afc4a861c4e ......
+	 orig commit -> 545401f4448a807b963ff17b575e0a393e68b523 ......
+checking a6d2fa5dd70ad5caf47afce59ec468e176d026d0 ......
+	 orig commit -> 44ca36de56d1bf196dca2eb67cd753a46961ffe6 ......
+checking e0439285c628dea71517a1e77cab805d9134f898 ......
+	 orig commit -> 55e6d279abd92cfd7576bba031e7589be8475edb ......
+checking f37486c0a1d05f41e1d159a0798a19d5461c764a ......
+	 orig commit -> 05736e4ac13c08a4a9b1ef2de26dd31a32cbee57 ......
+checking 373b8def455ec80db7d951b20562a75ed2df2703 ......
+	 orig commit -> cc1fe215e1efa406b03aa4389e6269b61342dec5 ......
+checking 9333575fc4a35dbeda5f75fb9cf72e899e569f00 ......
+	 orig commit -> c4de65696d865c225fda3b9913b31284ea65ea96 ......
+checking 16fd33cd353be2cb71f2431788e5b2ae02891a77 ......
+	 orig commit -> f048c399e0f7490ab7296bc2c255d37eb14a9675 ......
+		 f048c399e0f7490ab7296bc2c255d37eb14a9675 has problem. Fixes commit -> 73d5e2b472640b1fcdb61ae8be389912ef211bda
+commit 8b1969db5567d49dd32c1f93fa9d7295a2c238a0
+Author: Josh Poimboeuf <jpoimboe@redhat.com>
+Date:   Wed Jul 25 12:00:27 2018 +0200
+
+    cpu/hotplug: detect SMT disabled by BIOS
+    
+    commit 73d5e2b472640b1fcdb61ae8be389912ef211bda upstream
+    
+    If SMT is disabled in BIOS, the CPU code doesn't properly detect it.
+    The /sys/devices/system/cpu/smt/control file shows 'on', and the 'l1tf'
+    vulnerabilities file shows SMT as vulnerable.
+    
+    Fix it by forcing 'cpu_smt_control' to CPU_SMT_NOT_SUPPORTED in such a
+    case.  Unfortunately the detection can only be done after bringing all
+    the CPUs online, so we have to overwrite any previous writes to the
+    variable.
+    
+    Reported-by: Joe Mario <jmario@redhat.com>
+    Tested-by: Jiri Kosina <jkosina@suse.cz>
+    Fixes: f048c399e0f7 ("x86/topology: Provide topology_smt_supported()")
+    Signed-off-by: Josh Poimboeuf <jpoimboe@redhat.com>
+    Signed-off-by: Peter Zijlstra <peterz@infradead.org>
+    Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 7b69a96e5a328f17fe33f3826d7e8349ab59015d ......
+	 orig commit -> 6a4d2657e048f096c7ffcad254010bd94891c8c0 ......
+		 6a4d2657e048f096c7ffcad254010bd94891c8c0 has problem. Fixes commit -> d0055f351e647f33f3b0329bff022213bf8aa085
+commit 59a6e1f27602b24f7919e188ff54561e0653620b
+Author: Vlastimil Babka <vbabka@suse.cz>
+Date:   Tue Aug 14 23:38:57 2018 +0200
+
+    x86/smp: fix non-SMP broken build due to redefinition of apic_id_is_primary_thread
+    
+    commit d0055f351e647f33f3b0329bff022213bf8aa085 upstream.
+    
+    The function has an inline "return false;" definition with CONFIG_SMP=n
+    but the "real" definition is also visible leading to "redefinition of
+    ‘apic_id_is_primary_thread’" compiler error.
+    
+    Guard it with #ifdef CONFIG_SMP
+    
+    Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+    Fixes: 6a4d2657e048 ("x86/smp: Provide topology_is_primary_thread()")
+    Cc: stable@vger.kernel.org
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 1ac1dc14671f531134f29755f98386f8e168b810 ......
+	 orig commit -> 56563f53d3066afa9e63d6c997bf67e76a8b05c0 ......
+checking e3923475ebb1b503668dfdb3ba90e2ebd46931e6 ......
+	 orig commit -> 377eeaa8e11fe815b1d07c81c4a0e2843a8c15eb ......
+		 377eeaa8e11fe815b1d07c81c4a0e2843a8c15eb has problem. Fixes commit -> 5b5e4d623ec8a34689df98e42d038a3b594d2ff9
+9df9516940a61d29aedf4d91b483ca6597e7d480
+792adb90fa724ce07c0171cbc96b9215af4b1045
+1a7ed1ba4bba6c075d5ad61bb75e3fbc870840d6
+commit fe0f40491bba65d904edd0147184bd9882cb7b7f
+Author: Vlastimil Babka <vbabka@suse.cz>
+Date:   Mon Aug 20 11:58:35 2018 +0200
+
+    x86/speculation/l1tf: Fix overflow in l1tf_pfn_limit() on 32bit
+    
+    commit 9df9516940a61d29aedf4d91b483ca6597e7d480 upstream.
+    
+    On 32bit PAE kernels on 64bit hardware with enough physical bits,
+    l1tf_pfn_limit() will overflow unsigned long. This in turn affects
+    max_swapfile_size() and can lead to swapon returning -EINVAL. This has been
+    observed in a 32bit guest with 42 bits physical address size, where
+    max_swapfile_size() overflows exactly to 1 << 32, thus zero, and produces
+    the following warning to dmesg:
+    
+    [    6.396845] Truncating oversized swap area, only using 0k out of 2047996k
+    
+    Fix this by using unsigned long long instead.
+    
+    Fixes: 17dbca119312 ("x86/speculation/l1tf: Add sysfs reporting for l1tf")
+    Fixes: 377eeaa8e11f ("x86/speculation/l1tf: Limit swap file size to MAX_PA/2")
+    Reported-by: Dominique Leuenberger <dimstar@suse.de>
+    Reported-by: Adrian Schroeter <adrian@suse.de>
+    Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Acked-by: Andi Kleen <ak@linux.intel.com>
+    Acked-by: Michal Hocko <mhocko@suse.com>
+    Cc: "H . Peter Anvin" <hpa@zytor.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Dave Hansen <dave.hansen@intel.com>
+    Cc: Michal Hocko <mhocko@kernel.org>
+    Cc: stable@vger.kernel.org
+    Link: https://lkml.kernel.org/r/20180820095835.5298-1-vbabka@suse.cz
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 16848eb10e9e0989e5898dec204f0967c483f044
+Author: Vlastimil Babka <vbabka@suse.cz>
+Date:   Tue Aug 14 20:50:47 2018 +0200
+
+    x86/init: fix build with CONFIG_SWAP=n
+    
+    commit 792adb90fa724ce07c0171cbc96b9215af4b1045 upstream.
+    
+    The introduction of generic_max_swapfile_size and arch-specific versions has
+    broken linking on x86 with CONFIG_SWAP=n due to undefined reference to
+    'generic_max_swapfile_size'. Fix it by compiling the x86-specific
+    max_swapfile_size() only with CONFIG_SWAP=y.
+    
+    Reported-by: Tomas Pruzina <pruzinat@gmail.com>
+    Fixes: 377eeaa8e11f ("x86/speculation/l1tf: Limit swap file size to MAX_PA/2")
+    Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+    Cc: stable@vger.kernel.org
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit c4b998c88f86971400b556520ba55c8ca96fd8dc
+Author: Vlastimil Babka <vbabka@suse.cz>
+Date:   Thu Jun 21 12:36:29 2018 +0200
+
+    x86/speculation/l1tf: Extend 64bit swap file size limit
+    
+    commit 1a7ed1ba4bba6c075d5ad61bb75e3fbc870840d6 upstream
+    
+    The previous patch has limited swap file size so that large offsets cannot
+    clear bits above MAX_PA/2 in the pte and interfere with L1TF mitigation.
+    
+    It assumed that offsets are encoded starting with bit 12, same as pfn. But
+    on x86_64, offsets are encoded starting with bit 9.
+    
+    Thus the limit can be raised by 3 bits. That means 16TB with 42bit MAX_PA
+    and 256TB with 46bit MAX_PA.
+    
+    Fixes: 377eeaa8e11f ("x86/speculation/l1tf: Limit swap file size to MAX_PA/2")
+    Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+commit fe0f40491bba65d904edd0147184bd9882cb7b7f
+Author: Vlastimil Babka <vbabka@suse.cz>
+Date:   Mon Aug 20 11:58:35 2018 +0200
+
+    x86/speculation/l1tf: Fix overflow in l1tf_pfn_limit() on 32bit
+    
+    commit 9df9516940a61d29aedf4d91b483ca6597e7d480 upstream.
+    
+    On 32bit PAE kernels on 64bit hardware with enough physical bits,
+    l1tf_pfn_limit() will overflow unsigned long. This in turn affects
+    max_swapfile_size() and can lead to swapon returning -EINVAL. This has been
+    observed in a 32bit guest with 42 bits physical address size, where
+    max_swapfile_size() overflows exactly to 1 << 32, thus zero, and produces
+    the following warning to dmesg:
+    
+    [    6.396845] Truncating oversized swap area, only using 0k out of 2047996k
+    
+    Fix this by using unsigned long long instead.
+    
+    Fixes: 17dbca119312 ("x86/speculation/l1tf: Add sysfs reporting for l1tf")
+    Fixes: 377eeaa8e11f ("x86/speculation/l1tf: Limit swap file size to MAX_PA/2")
+    Reported-by: Dominique Leuenberger <dimstar@suse.de>
+    Reported-by: Adrian Schroeter <adrian@suse.de>
+    Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Acked-by: Andi Kleen <ak@linux.intel.com>
+    Acked-by: Michal Hocko <mhocko@suse.com>
+    Cc: "H . Peter Anvin" <hpa@zytor.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Dave Hansen <dave.hansen@intel.com>
+    Cc: Michal Hocko <mhocko@kernel.org>
+    Cc: stable@vger.kernel.org
+    Link: https://lkml.kernel.org/r/20180820095835.5298-1-vbabka@suse.cz
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 16848eb10e9e0989e5898dec204f0967c483f044
+Author: Vlastimil Babka <vbabka@suse.cz>
+Date:   Tue Aug 14 20:50:47 2018 +0200
+
+    x86/init: fix build with CONFIG_SWAP=n
+    
+    commit 792adb90fa724ce07c0171cbc96b9215af4b1045 upstream.
+    
+    The introduction of generic_max_swapfile_size and arch-specific versions has
+    broken linking on x86 with CONFIG_SWAP=n due to undefined reference to
+    'generic_max_swapfile_size'. Fix it by compiling the x86-specific
+    max_swapfile_size() only with CONFIG_SWAP=y.
+    
+    Reported-by: Tomas Pruzina <pruzinat@gmail.com>
+    Fixes: 377eeaa8e11f ("x86/speculation/l1tf: Limit swap file size to MAX_PA/2")
+    Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+    Cc: stable@vger.kernel.org
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit c4b998c88f86971400b556520ba55c8ca96fd8dc
+Author: Vlastimil Babka <vbabka@suse.cz>
+Date:   Thu Jun 21 12:36:29 2018 +0200
+
+    x86/speculation/l1tf: Extend 64bit swap file size limit
+    
+    commit 1a7ed1ba4bba6c075d5ad61bb75e3fbc870840d6 upstream
+    
+    The previous patch has limited swap file size so that large offsets cannot
+    clear bits above MAX_PA/2 in the pte and interfere with L1TF mitigation.
+    
+    It assumed that offsets are encoded starting with bit 12, same as pfn. But
+    on x86_64, offsets are encoded starting with bit 9.
+    
+    Thus the limit can be raised by 3 bits. That means 16TB with 42bit MAX_PA
+    and 256TB with 46bit MAX_PA.
+    
+    Fixes: 377eeaa8e11f ("x86/speculation/l1tf: Limit swap file size to MAX_PA/2")
+    Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 7c5b42f82c13365b8284b5945f5ffa9f88380dd7 ......
+	 orig commit -> 42e4089c7890725fcd329999252dc489b72f2921 ......
+		 42e4089c7890725fcd329999252dc489b72f2921 has problem. Fixes commit -> 6c26fcd2abfe0a56bbd95271fce02df2896cfd24
+commit b4f17de89e7aaecfc67a173ca8607899ee8707c3
+Author: Jiri Kosina <jkosina@suse.cz>
+Date:   Sat Jul 14 21:56:13 2018 +0200
+
+    x86/speculation/l1tf: Unbreak !__HAVE_ARCH_PFN_MODIFY_ALLOWED architectures
+    
+    commit 6c26fcd2abfe0a56bbd95271fce02df2896cfd24 upstream.
+    
+    pfn_modify_allowed() and arch_has_pfn_modify_check() are outside of the
+    !__ASSEMBLY__ section in include/asm-generic/pgtable.h, which confuses
+    assembler on archs that don't have __HAVE_ARCH_PFN_MODIFY_ALLOWED (e.g.
+    ia64) and breaks build:
+    
+        include/asm-generic/pgtable.h: Assembler messages:
+        include/asm-generic/pgtable.h:538: Error: Unknown opcode `static inline bool pfn_modify_allowed(unsigned long pfn,pgprot_t prot)'
+        include/asm-generic/pgtable.h:540: Error: Unknown opcode `return true'
+        include/asm-generic/pgtable.h:543: Error: Unknown opcode `static inline bool arch_has_pfn_modify_check(void)'
+        include/asm-generic/pgtable.h:545: Error: Unknown opcode `return false'
+        arch/ia64/kernel/entry.S:69: Error: `mov' does not fit into bundle
+    
+    Move those two static inlines into the !__ASSEMBLY__ section so that they
+    don't confuse the asm build pass.
+    
+    Fixes: 42e4089c7890 ("x86/speculation/l1tf: Disallow non privileged high MMIO PROT_NONE mappings")
+    Signed-off-by: Jiri Kosina <jkosina@suse.cz>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    [groeck: Context changes]
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 432e99b34066099db62f87b2704654b1b23fd6be ......
+	 orig commit -> 17dbca119312b4e8173d4e25ff64262119fcef38 ......
+		 17dbca119312b4e8173d4e25ff64262119fcef38 has problem. Fixes commit -> cc51e5428ea54f575d49cfcede1d4cb3a72b4ec4
+b0a182f875689647b014bc01d36b340217792852
+9df9516940a61d29aedf4d91b483ca6597e7d480
+56563f53d3066afa9e63d6c997bf67e76a8b05c0
+commit f8d42d5c02084c936f0a7830e011b4395f30f06e
+Author: Vlastimil Babka <vbabka@suse.cz>
+Date:   Thu Aug 23 15:44:18 2018 +0200
+
+    x86/speculation/l1tf: Fix off-by-one error when warning that system has too much RAM
+    
+    commit b0a182f875689647b014bc01d36b340217792852 upstream.
+    
+    Two users have reported [1] that they have an "extremely unlikely" system
+    with more than MAX_PA/2 memory and L1TF mitigation is not effective. In
+    fact it's a CPU with 36bits phys limit (64GB) and 32GB memory, but due to
+    holes in the e820 map, the main region is almost 500MB over the 32GB limit:
+    
+    [    0.000000] BIOS-e820: [mem 0x0000000100000000-0x000000081effffff] usable
+    
+    Suggestions to use 'mem=32G' to enable the L1TF mitigation while losing the
+    500MB revealed, that there's an off-by-one error in the check in
+    l1tf_select_mitigation().
+    
+    l1tf_pfn_limit() returns the last usable pfn (inclusive) and the range
+    check in the mitigation path does not take this into account.
+    
+    Instead of amending the range check, make l1tf_pfn_limit() return the first
+    PFN which is over the limit which is less error prone. Adjust the other
+    users accordingly.
+    
+    [1] https://bugzilla.suse.com/show_bug.cgi?id=1105536
+    
+    Fixes: 17dbca119312 ("x86/speculation/l1tf: Add sysfs reporting for l1tf")
+    Reported-by: George Anchev <studio@anchev.net>
+    Reported-by: Christopher Snowhill <kode54@gmail.com>
+    Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Cc: "H . Peter Anvin" <hpa@zytor.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Andi Kleen <ak@linux.intel.com>
+    Cc: Dave Hansen <dave.hansen@intel.com>
+    Cc: Michal Hocko <mhocko@kernel.org>
+    Cc: stable@vger.kernel.org
+    Link: https://lkml.kernel.org/r/20180823134418.17008-1-vbabka@suse.cz
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit fe0f40491bba65d904edd0147184bd9882cb7b7f
+Author: Vlastimil Babka <vbabka@suse.cz>
+Date:   Mon Aug 20 11:58:35 2018 +0200
+
+    x86/speculation/l1tf: Fix overflow in l1tf_pfn_limit() on 32bit
+    
+    commit 9df9516940a61d29aedf4d91b483ca6597e7d480 upstream.
+    
+    On 32bit PAE kernels on 64bit hardware with enough physical bits,
+    l1tf_pfn_limit() will overflow unsigned long. This in turn affects
+    max_swapfile_size() and can lead to swapon returning -EINVAL. This has been
+    observed in a 32bit guest with 42 bits physical address size, where
+    max_swapfile_size() overflows exactly to 1 << 32, thus zero, and produces
+    the following warning to dmesg:
+    
+    [    6.396845] Truncating oversized swap area, only using 0k out of 2047996k
+    
+    Fix this by using unsigned long long instead.
+    
+    Fixes: 17dbca119312 ("x86/speculation/l1tf: Add sysfs reporting for l1tf")
+    Fixes: 377eeaa8e11f ("x86/speculation/l1tf: Limit swap file size to MAX_PA/2")
+    Reported-by: Dominique Leuenberger <dimstar@suse.de>
+    Reported-by: Adrian Schroeter <adrian@suse.de>
+    Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Acked-by: Andi Kleen <ak@linux.intel.com>
+    Acked-by: Michal Hocko <mhocko@suse.com>
+    Cc: "H . Peter Anvin" <hpa@zytor.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Dave Hansen <dave.hansen@intel.com>
+    Cc: Michal Hocko <mhocko@kernel.org>
+    Cc: stable@vger.kernel.org
+    Link: https://lkml.kernel.org/r/20180820095835.5298-1-vbabka@suse.cz
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 1ac1dc14671f531134f29755f98386f8e168b810
+Author: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Date:   Wed Jun 20 16:42:57 2018 -0400
+
+    x86/bugs: Move the l1tf function and define pr_fmt properly
+    
+    commit 56563f53d3066afa9e63d6c997bf67e76a8b05c0 upstream
+    
+    The pr_warn in l1tf_select_mitigation would have used the prior pr_fmt
+    which was defined as "Spectre V2 : ".
+    
+    Move the function to be past SSBD and also define the pr_fmt.
+    
+    Fixes: 17dbca119312 ("x86/speculation/l1tf: Add sysfs reporting for l1tf")
+    Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+commit ef3d45c9576415e657da3eca10216df1bb8d7ffa
+Author: Andi Kleen <ak@linux.intel.com>
+Date:   Fri Aug 24 10:03:50 2018 -0700
+
+    x86/speculation/l1tf: Increase l1tf memory limit for Nehalem+
+    
+    commit cc51e5428ea54f575d49cfcede1d4cb3a72b4ec4 upstream.
+    
+    On Nehalem and newer core CPUs the CPU cache internally uses 44 bits
+    physical address space. The L1TF workaround is limited by this internal
+    cache address width, and needs to have one bit free there for the
+    mitigation to work.
+    
+    Older client systems report only 36bit physical address space so the range
+    check decides that L1TF is not mitigated for a 36bit phys/32GB system with
+    some memory holes.
+    
+    But since these actually have the larger internal cache width this warning
+    is bogus because it would only really be needed if the system had more than
+    43bits of memory.
+    
+    Add a new internal x86_cache_bits field. Normally it is the same as the
+    physical bits field reported by CPUID, but for Nehalem and newerforce it to
+    be at least 44bits.
+    
+    Change the L1TF memory size warning to use the new cache_bits field to
+    avoid bogus warnings and remove the bogus comment about memory size.
+    
+    Fixes: 17dbca119312 ("x86/speculation/l1tf: Add sysfs reporting for l1tf")
+    Reported-by: George Anchev <studio@anchev.net>
+    Reported-by: Christopher Snowhill <kode54@gmail.com>
+    Signed-off-by: Andi Kleen <ak@linux.intel.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Cc: x86@kernel.org
+    Cc: linux-kernel@vger.kernel.org
+    Cc: Michael Hocko <mhocko@suse.com>
+    Cc: vbabka@suse.cz
+    Cc: stable@vger.kernel.org
+    Link: https://lkml.kernel.org/r/20180824170351.34874-1-andi@firstfloor.org
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit f8d42d5c02084c936f0a7830e011b4395f30f06e
+Author: Vlastimil Babka <vbabka@suse.cz>
+Date:   Thu Aug 23 15:44:18 2018 +0200
+
+    x86/speculation/l1tf: Fix off-by-one error when warning that system has too much RAM
+    
+    commit b0a182f875689647b014bc01d36b340217792852 upstream.
+    
+    Two users have reported [1] that they have an "extremely unlikely" system
+    with more than MAX_PA/2 memory and L1TF mitigation is not effective. In
+    fact it's a CPU with 36bits phys limit (64GB) and 32GB memory, but due to
+    holes in the e820 map, the main region is almost 500MB over the 32GB limit:
+    
+    [    0.000000] BIOS-e820: [mem 0x0000000100000000-0x000000081effffff] usable
+    
+    Suggestions to use 'mem=32G' to enable the L1TF mitigation while losing the
+    500MB revealed, that there's an off-by-one error in the check in
+    l1tf_select_mitigation().
+    
+    l1tf_pfn_limit() returns the last usable pfn (inclusive) and the range
+    check in the mitigation path does not take this into account.
+    
+    Instead of amending the range check, make l1tf_pfn_limit() return the first
+    PFN which is over the limit which is less error prone. Adjust the other
+    users accordingly.
+    
+    [1] https://bugzilla.suse.com/show_bug.cgi?id=1105536
+    
+    Fixes: 17dbca119312 ("x86/speculation/l1tf: Add sysfs reporting for l1tf")
+    Reported-by: George Anchev <studio@anchev.net>
+    Reported-by: Christopher Snowhill <kode54@gmail.com>
+    Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Cc: "H . Peter Anvin" <hpa@zytor.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Andi Kleen <ak@linux.intel.com>
+    Cc: Dave Hansen <dave.hansen@intel.com>
+    Cc: Michal Hocko <mhocko@kernel.org>
+    Cc: stable@vger.kernel.org
+    Link: https://lkml.kernel.org/r/20180823134418.17008-1-vbabka@suse.cz
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit fe0f40491bba65d904edd0147184bd9882cb7b7f
+Author: Vlastimil Babka <vbabka@suse.cz>
+Date:   Mon Aug 20 11:58:35 2018 +0200
+
+    x86/speculation/l1tf: Fix overflow in l1tf_pfn_limit() on 32bit
+    
+    commit 9df9516940a61d29aedf4d91b483ca6597e7d480 upstream.
+    
+    On 32bit PAE kernels on 64bit hardware with enough physical bits,
+    l1tf_pfn_limit() will overflow unsigned long. This in turn affects
+    max_swapfile_size() and can lead to swapon returning -EINVAL. This has been
+    observed in a 32bit guest with 42 bits physical address size, where
+    max_swapfile_size() overflows exactly to 1 << 32, thus zero, and produces
+    the following warning to dmesg:
+    
+    [    6.396845] Truncating oversized swap area, only using 0k out of 2047996k
+    
+    Fix this by using unsigned long long instead.
+    
+    Fixes: 17dbca119312 ("x86/speculation/l1tf: Add sysfs reporting for l1tf")
+    Fixes: 377eeaa8e11f ("x86/speculation/l1tf: Limit swap file size to MAX_PA/2")
+    Reported-by: Dominique Leuenberger <dimstar@suse.de>
+    Reported-by: Adrian Schroeter <adrian@suse.de>
+    Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Acked-by: Andi Kleen <ak@linux.intel.com>
+    Acked-by: Michal Hocko <mhocko@suse.com>
+    Cc: "H . Peter Anvin" <hpa@zytor.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Dave Hansen <dave.hansen@intel.com>
+    Cc: Michal Hocko <mhocko@kernel.org>
+    Cc: stable@vger.kernel.org
+    Link: https://lkml.kernel.org/r/20180820095835.5298-1-vbabka@suse.cz
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 1ac1dc14671f531134f29755f98386f8e168b810
+Author: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Date:   Wed Jun 20 16:42:57 2018 -0400
+
+    x86/bugs: Move the l1tf function and define pr_fmt properly
+    
+    commit 56563f53d3066afa9e63d6c997bf67e76a8b05c0 upstream
+    
+    The pr_warn in l1tf_select_mitigation would have used the prior pr_fmt
+    which was defined as "Spectre V2 : ".
+    
+    Move the function to be past SSBD and also define the pr_fmt.
+    
+    Fixes: 17dbca119312 ("x86/speculation/l1tf: Add sysfs reporting for l1tf")
+    Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 5b2ec92f70f6d4084d23bf42391fd27fa03e8c4c ......
+	 orig commit -> 10a70416e1f067f6c4efda6ffd8ea96002ac4223 ......
+checking 33182fe97add6e83c195e9d0f7297a6499563b52 ......
+	 orig commit -> 6b28baca9b1f0d4a42b865da7a05b1c81424bd5c ......
+		 6b28baca9b1f0d4a42b865da7a05b1c81424bd5c has problem. Fixes commit -> e14d7dfb41f5807a0c1c26a13f2b8ef16af24935
+commit bc71f393d31c68d3173381aab8f8b3bfdc43bbb9
+Author: Michal Hocko <mhocko@suse.cz>
+Date:   Wed Jun 27 17:46:50 2018 +0200
+
+    x86/speculation/l1tf: Fix up pte->pfn conversion for PAE
+    
+    commit e14d7dfb41f5807a0c1c26a13f2b8ef16af24935 upstream.
+    
+    Jan has noticed that pte_pfn and co. resp. pfn_pte are incorrect for
+    CONFIG_PAE because phys_addr_t is wider than unsigned long and so the
+    pte_val reps. shift left would get truncated. Fix this up by using proper
+    types.
+    
+    [Just one chunk, again, needed here.  Thanks to Ben and Guenter for
+    finding and fixing this. - gregkh]
+    
+    Fixes: 6b28baca9b1f ("x86/speculation/l1tf: Protect PROT_NONE PTEs against speculation")
+    Reported-by: Jan Beulich <JBeulich@suse.com>
+    Signed-off-by: Michal Hocko <mhocko@suse.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Acked-by: Vlastimil Babka <vbabka@suse.cz>
+    Cc: Guenter Roeck <linux@roeck-us.net>
+    Cc: Ben Hutchings <ben.hutchings@codethink.co.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 3f0eb66f652ceb5985b9b619e33fc61519121045
+Author: Michal Hocko <mhocko@suse.cz>
+Date:   Wed Jun 27 17:46:50 2018 +0200
+
+    x86/speculation/l1tf: Fix up pte->pfn conversion for PAE
+    
+    commit e14d7dfb41f5807a0c1c26a13f2b8ef16af24935 upstream
+    
+    Jan has noticed that pte_pfn and co. resp. pfn_pte are incorrect for
+    CONFIG_PAE because phys_addr_t is wider than unsigned long and so the
+    pte_val reps. shift left would get truncated. Fix this up by using proper
+    types.
+    
+    [dwmw2: Backport to 4.9]
+    
+    Fixes: 6b28baca9b1f ("x86/speculation/l1tf: Protect PROT_NONE PTEs against speculation")
+    Reported-by: Jan Beulich <JBeulich@suse.com>
+    Signed-off-by: Michal Hocko <mhocko@suse.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Acked-by: Vlastimil Babka <vbabka@suse.cz>
+    Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 60712274887fcd4ad5eb8e01796022b6b202143c ......
+	 orig commit -> 2f22b4cd45b67b3496f4aa4c7180a1271c6452f6 ......
+checking 2c9b57e4474d93222bcb6e7f901fd1e71ded699c ......
+	 orig commit -> bcd11afa7adad8d720e7ba5ef58bdcd9775cf45f ......
+checking 1a4922e0f01d08a4789b1e17b195bc30bf234a3b ......
+	 orig commit -> eee4818baac0f2b37848fdf90e4b16430dc536ac ......
+checking bbd07cbb1076de03d896c9c3787081b1080e8c99 ......
+	 orig commit -> 50896e180c6aa3a9c61a26ced99e15d602666a4c ......
+checking 329d815667373e858497b5947ad0484194d8c3e2 ......
+	 orig commit -> 208cbb32558907f68b3b2a081ca2337ac3744794 ......
+		 208cbb32558907f68b3b2a081ca2337ac3744794 has problem. Fixes commit -> 1f59a4581b5ecfe9b4f049a7a2cf904d8352842d
+commit c148246b87cef922d1773c21b33970fdde84809c
+Author: Nick Desaulniers <ndesaulniers@google.com>
+Date:   Mon Aug 27 14:40:09 2018 -0700
+
+    x86/irqflags: Mark native_restore_fl extern inline
+    
+    commit 1f59a4581b5ecfe9b4f049a7a2cf904d8352842d upstream.
+    
+    This should have been marked extern inline in order to pick up the out
+    of line definition in arch/x86/kernel/irqflags.S.
+    
+    Fixes: 208cbb325589 ("x86/irqflags: Provide a declaration for native_save_fl")
+    Reported-by: Ben Hutchings <ben.hutchings@codethink.co.uk>
+    Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Reviewed-by: Juergen Gross <jgross@suse.com>
+    Cc: "H. Peter Anvin" <hpa@zytor.com>
+    Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+    Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+    Cc: stable@vger.kernel.org
+    Link: https://lkml.kernel.org/r/20180827214011.55428-1-ndesaulniers@google.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking a92daabdfc87c320a626b2ad0318c2a0dee17a30 ......
+	 orig commit -> 0ea063306eecf300fcf06d2f5917474b580f666f ......
+checking 6455f41db5206cf46b623be071a0aa308c183642 ......
+	 orig commit -> fdf82a7856b32d905c39afc85e34364491e46346 ......
+checking 640fe070d801b91081b7c9e3575b1ed2f0018eeb ......
+	 orig commit -> 5800dc5c19f34e6e03b5adab1282535cb102fafd ......
+		 5800dc5c19f34e6e03b5adab1282535cb102fafd has problem. Fixes commit -> 571d0563c8881595f4ab027aef9ed1c55e3e7b7c
+commit 72b33231a7146da003205e080769d4d4db44fd71
+Author: Dan Carpenter <dan.carpenter@oracle.com>
+Date:   Wed Sep 19 13:35:53 2018 +0300
+
+    x86/paravirt: Fix some warning messages
+    
+    [ Upstream commit 571d0563c8881595f4ab027aef9ed1c55e3e7b7c ]
+    
+    The first argument to WARN_ONCE() is a condition.
+    
+    Fixes: 5800dc5c19f3 ("x86/paravirt: Fix spectre-v2 mitigations for paravirt guests")
+    Signed-off-by: Dan Carpenter <dan.carpenter@oracle.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Reviewed-by: Juergen Gross <jgross@suse.com>
+    Cc: Peter Zijlstra <peterz@infradead.org>
+    Cc: Alok Kataria <akataria@vmware.com>
+    Cc: "H. Peter Anvin" <hpa@zytor.com>
+    Cc: virtualization@lists.linux-foundation.org
+    Cc: kernel-janitors@vger.kernel.org
+    Link: https://lkml.kernel.org/r/20180919103553.GD9238@mwanda
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+checking 16aeb3f175a1b4d68dd68418230a1644de95fb6b ......
+	 orig commit -> 1bcfe0564044be578841744faea1c2f46adc8178 ......
+checking 27250cf83def3eeff4e438571a0aa9c18deb898f ......
+	 orig commit -> 062d0f22a30c39840ea49b72cfcfc1aa4cc538fa ......
+checking 5ee45fc998a3e45af45f8886fb13cc417c6f18d0 ......
+	 orig commit -> 069f05346d01e7298939f16533953cdf52370be3 ......
+checking e2ba7bf19727b67f0f3850c84829a19898401928 ......
+	 orig commit -> d8f9cc328c8888369880e2527e9186d745f2bbf6 ......
+		 d8f9cc328c8888369880e2527e9186d745f2bbf6 has problem. Fixes commit -> 3dc7c7badb7502ec3e3aa817a8bdd9e53aa54c52
+commit 43832bec7647dd6f16ea2af92d44d12a474494c6
+Author: Christophe Jaillet <christophe.jaillet@wanadoo.fr>
+Date:   Mon Jun 11 20:15:11 2018 +0200
+
+    IB/mlx4: Fix an error handling path in 'mlx4_ib_rereg_user_mr()'
+    
+    [ Upstream commit 3dc7c7badb7502ec3e3aa817a8bdd9e53aa54c52 ]
+    
+    Before returning -EPERM we should release some resources, as already done
+    in the other error handling path of the function.
+    
+    Fixes: d8f9cc328c88 ("IB/mlx4: Mark user MR as writable if actual virtual memory is writable")
+    Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+    Signed-off-by: Jason Gunthorpe <jgg@mellanox.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+checking 11410f99982cbc7ee71c58437d1f0cccd7bb5e96 ......
+	 orig commit -> 08bb558ac11ab944e0539e78619d7b4c356278bd ......
+checking a3a7b992b240ba621a47ff2d3465fa4f0534e297 ......
+	 orig commit -> 2fd1d2c4ceb2248a727696962cf3370dc9f5a0a4 ......
+checking 631f93a6fe847d2d317010d5bbd7cb3bcc284336 ......
+	 orig commit -> ace0c791e6c3cf5ef37cad2df69f0d90ccc40ffb ......
+		 ace0c791e6c3cf5ef37cad2df69f0d90ccc40ffb has problem. Fixes commit -> ea5751ccd665a2fd1b24f9af81f6167f0718c5f6
+2fd1d2c4ceb2248a727696962cf3370dc9f5a0a4
+commit a3a7b992b240ba621a47ff2d3465fa4f0534e297
+Author: Eric W. Biederman <ebiederm@xmission.com>
+Date:   Thu Jul 6 08:41:06 2017 -0500
+
+    proc: Fix proc_sys_prune_dcache to hold a sb reference
+    
+    commit 2fd1d2c4ceb2248a727696962cf3370dc9f5a0a4 upstream.
+    
+    Andrei Vagin writes:
+    FYI: This bug has been reproduced on 4.11.7
+    > BUG: Dentry ffff895a3dd01240{i=4e7c09a,n=lo}  still in use (1) [unmount of proc proc]
+    > ------------[ cut here ]------------
+    > WARNING: CPU: 1 PID: 13588 at fs/dcache.c:1445 umount_check+0x6e/0x80
+    > CPU: 1 PID: 13588 Comm: kworker/1:1 Not tainted 4.11.7-200.fc25.x86_64 #1
+    > Hardware name: CompuLab sbc-flt1/fitlet, BIOS SBCFLT_0.08.04 06/27/2015
+    > Workqueue: events proc_cleanup_work
+    > Call Trace:
+    >  dump_stack+0x63/0x86
+    >  __warn+0xcb/0xf0
+    >  warn_slowpath_null+0x1d/0x20
+    >  umount_check+0x6e/0x80
+    >  d_walk+0xc6/0x270
+    >  ? dentry_free+0x80/0x80
+    >  do_one_tree+0x26/0x40
+    >  shrink_dcache_for_umount+0x2d/0x90
+    >  generic_shutdown_super+0x1f/0xf0
+    >  kill_anon_super+0x12/0x20
+    >  proc_kill_sb+0x40/0x50
+    >  deactivate_locked_super+0x43/0x70
+    >  deactivate_super+0x5a/0x60
+    >  cleanup_mnt+0x3f/0x90
+    >  mntput_no_expire+0x13b/0x190
+    >  kern_unmount+0x3e/0x50
+    >  pid_ns_release_proc+0x15/0x20
+    >  proc_cleanup_work+0x15/0x20
+    >  process_one_work+0x197/0x450
+    >  worker_thread+0x4e/0x4a0
+    >  kthread+0x109/0x140
+    >  ? process_one_work+0x450/0x450
+    >  ? kthread_park+0x90/0x90
+    >  ret_from_fork+0x2c/0x40
+    > ---[ end trace e1c109611e5d0b41 ]---
+    > VFS: Busy inodes after unmount of proc. Self-destruct in 5 seconds.  Have a nice day...
+    > BUG: unable to handle kernel NULL pointer dereference at           (null)
+    > IP: _raw_spin_lock+0xc/0x30
+    > PGD 0
+    
+    Fix this by taking a reference to the super block in proc_sys_prune_dcache.
+    
+    The superblock reference is the core of the fix however the sysctl_inodes
+    list is converted to a hlist so that hlist_del_init_rcu may be used.  This
+    allows proc_sys_prune_dache to remove inodes the sysctl_inodes list, while
+    not causing problems for proc_sys_evict_inode when if it later choses to
+    remove the inode from the sysctl_inodes list.  Removing inodes from the
+    sysctl_inodes list allows proc_sys_prune_dcache to have a progress
+    guarantee, while still being able to drop all locks.  The fact that
+    head->unregistering is set in start_unregistering ensures that no more
+    inodes will be added to the the sysctl_inodes list.
+    
+    Previously the code did a dance where it delayed calling iput until the
+    next entry in the list was being considered to ensure the inode remained on
+    the sysctl_inodes list until the next entry was walked to.  The structure
+    of the loop in this patch does not need that so is much easier to
+    understand and maintain.
+    
+    Cc: stable@vger.kernel.org
+    Reported-by: Andrei Vagin <avagin@gmail.com>
+    Tested-by: Andrei Vagin <avagin@openvz.org>
+    Fixes: ace0c791e6c3 ("proc/sysctl: Don't grab i_lock under sysctl_lock.")
+    Fixes: d6cffbbe9a7e ("proc/sysctl: prune stale dentries during unregistering")
+    Signed-off-by: "Eric W. Biederman" <ebiederm@xmission.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+commit 4d5741aa2aaa1fb41abeeb46b0699299eea82d49
+Author: Ivan Delalande <colona@arista.com>
+Date:   Thu Dec 13 15:20:52 2018 -0800
+
+    proc/sysctl: don't return ENOMEM on lookup when a table is unregistering
+    
+    commit ea5751ccd665a2fd1b24f9af81f6167f0718c5f6 upstream.
+    
+    proc_sys_lookup can fail with ENOMEM instead of ENOENT when the
+    corresponding sysctl table is being unregistered. In our case we see
+    this upon opening /proc/sys/net/*/conf files while network interfaces
+    are being deleted, which confuses our configuration daemon.
+    
+    The problem was successfully reproduced and this fix tested on v4.9.122
+    and v4.20-rc6.
+    
+    v2: return ERR_PTRs in all cases when proc_sys_make_inode fails instead
+    of mixing them with NULL. Thanks Al Viro for the feedback.
+    
+    Fixes: ace0c791e6c3 ("proc/sysctl: Don't grab i_lock under sysctl_lock.")
+    Cc: stable@vger.kernel.org
+    Signed-off-by: Ivan Delalande <colona@arista.com>
+    Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit a3a7b992b240ba621a47ff2d3465fa4f0534e297
+Author: Eric W. Biederman <ebiederm@xmission.com>
+Date:   Thu Jul 6 08:41:06 2017 -0500
+
+    proc: Fix proc_sys_prune_dcache to hold a sb reference
+    
+    commit 2fd1d2c4ceb2248a727696962cf3370dc9f5a0a4 upstream.
+    
+    Andrei Vagin writes:
+    FYI: This bug has been reproduced on 4.11.7
+    > BUG: Dentry ffff895a3dd01240{i=4e7c09a,n=lo}  still in use (1) [unmount of proc proc]
+    > ------------[ cut here ]------------
+    > WARNING: CPU: 1 PID: 13588 at fs/dcache.c:1445 umount_check+0x6e/0x80
+    > CPU: 1 PID: 13588 Comm: kworker/1:1 Not tainted 4.11.7-200.fc25.x86_64 #1
+    > Hardware name: CompuLab sbc-flt1/fitlet, BIOS SBCFLT_0.08.04 06/27/2015
+    > Workqueue: events proc_cleanup_work
+    > Call Trace:
+    >  dump_stack+0x63/0x86
+    >  __warn+0xcb/0xf0
+    >  warn_slowpath_null+0x1d/0x20
+    >  umount_check+0x6e/0x80
+    >  d_walk+0xc6/0x270
+    >  ? dentry_free+0x80/0x80
+    >  do_one_tree+0x26/0x40
+    >  shrink_dcache_for_umount+0x2d/0x90
+    >  generic_shutdown_super+0x1f/0xf0
+    >  kill_anon_super+0x12/0x20
+    >  proc_kill_sb+0x40/0x50
+    >  deactivate_locked_super+0x43/0x70
+    >  deactivate_super+0x5a/0x60
+    >  cleanup_mnt+0x3f/0x90
+    >  mntput_no_expire+0x13b/0x190
+    >  kern_unmount+0x3e/0x50
+    >  pid_ns_release_proc+0x15/0x20
+    >  proc_cleanup_work+0x15/0x20
+    >  process_one_work+0x197/0x450
+    >  worker_thread+0x4e/0x4a0
+    >  kthread+0x109/0x140
+    >  ? process_one_work+0x450/0x450
+    >  ? kthread_park+0x90/0x90
+    >  ret_from_fork+0x2c/0x40
+    > ---[ end trace e1c109611e5d0b41 ]---
+    > VFS: Busy inodes after unmount of proc. Self-destruct in 5 seconds.  Have a nice day...
+    > BUG: unable to handle kernel NULL pointer dereference at           (null)
+    > IP: _raw_spin_lock+0xc/0x30
+    > PGD 0
+    
+    Fix this by taking a reference to the super block in proc_sys_prune_dcache.
+    
+    The superblock reference is the core of the fix however the sysctl_inodes
+    list is converted to a hlist so that hlist_del_init_rcu may be used.  This
+    allows proc_sys_prune_dache to remove inodes the sysctl_inodes list, while
+    not causing problems for proc_sys_evict_inode when if it later choses to
+    remove the inode from the sysctl_inodes list.  Removing inodes from the
+    sysctl_inodes list allows proc_sys_prune_dcache to have a progress
+    guarantee, while still being able to drop all locks.  The fact that
+    head->unregistering is set in start_unregistering ensures that no more
+    inodes will be added to the the sysctl_inodes list.
+    
+    Previously the code did a dance where it delayed calling iput until the
+    next entry in the list was being considered to ensure the inode remained on
+    the sysctl_inodes list until the next entry was walked to.  The structure
+    of the loop in this patch does not need that so is much easier to
+    understand and maintain.
+    
+    Cc: stable@vger.kernel.org
+    Reported-by: Andrei Vagin <avagin@gmail.com>
+    Tested-by: Andrei Vagin <avagin@openvz.org>
+    Fixes: ace0c791e6c3 ("proc/sysctl: Don't grab i_lock under sysctl_lock.")
+    Fixes: d6cffbbe9a7e ("proc/sysctl: prune stale dentries during unregistering")
+    Signed-off-by: "Eric W. Biederman" <ebiederm@xmission.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking b96e215e539509cae8bfe468689b70661cf511b4 ......
+	 orig commit -> d6cffbbe9a7e51eb705182965a189457c17ba8a3 ......
+		 d6cffbbe9a7e51eb705182965a189457c17ba8a3 has problem. Fixes commit -> 2fd1d2c4ceb2248a727696962cf3370dc9f5a0a4
+ace0c791e6c3cf5ef37cad2df69f0d90ccc40ffb
+commit 631f93a6fe847d2d317010d5bbd7cb3bcc284336
+Author: Eric W. Biederman <ebiederm@xmission.com>
+Date:   Mon Feb 20 18:17:03 2017 +1300
+
+    proc/sysctl: Don't grab i_lock under sysctl_lock.
+    
+    commit ace0c791e6c3cf5ef37cad2df69f0d90ccc40ffb upstream.
+    
+    Konstantin Khlebnikov <khlebnikov@yandex-team.ru> writes:
+    > This patch has locking problem. I've got lockdep splat under LTP.
+    >
+    > [ 6633.115456] ======================================================
+    > [ 6633.115502] [ INFO: possible circular locking dependency detected ]
+    > [ 6633.115553] 4.9.10-debug+ #9 Tainted: G             L
+    > [ 6633.115584] -------------------------------------------------------
+    > [ 6633.115627] ksm02/284980 is trying to acquire lock:
+    > [ 6633.115659]  (&sb->s_type->i_lock_key#4){+.+...}, at: [<ffffffff816bc1ce>] igrab+0x1e/0x80
+    > [ 6633.115834] but task is already holding lock:
+    > [ 6633.115882]  (sysctl_lock){+.+...}, at: [<ffffffff817e379b>] unregister_sysctl_table+0x6b/0x110
+    > [ 6633.116026] which lock already depends on the new lock.
+    > [ 6633.116026]
+    > [ 6633.116080]
+    > [ 6633.116080] the existing dependency chain (in reverse order) is:
+    > [ 6633.116117]
+    > -> #2 (sysctl_lock){+.+...}:
+    > -> #1 (&(&dentry->d_lockref.lock)->rlock){+.+...}:
+    > -> #0 (&sb->s_type->i_lock_key#4){+.+...}:
+    >
+    > d_lock nests inside i_lock
+    > sysctl_lock nests inside d_lock in d_compare
+    >
+    > This patch adds i_lock nesting inside sysctl_lock.
+    
+    Al Viro <viro@ZenIV.linux.org.uk> replied:
+    > Once ->unregistering is set, you can drop sysctl_lock just fine.  So I'd
+    > try something like this - use rcu_read_lock() in proc_sys_prune_dcache(),
+    > drop sysctl_lock() before it and regain after.  Make sure that no inodes
+    > are added to the list ones ->unregistering has been set and use RCU list
+    > primitives for modifying the inode list, with sysctl_lock still used to
+    > serialize its modifications.
+    >
+    > Freeing struct inode is RCU-delayed (see proc_destroy_inode()), so doing
+    > igrab() is safe there.  Since we don't drop inode reference until after we'd
+    > passed beyond it in the list, list_for_each_entry_rcu() should be fine.
+    
+    I agree with Al Viro's analsysis of the situtation.
+    
+    Fixes: d6cffbbe9a7e ("proc/sysctl: prune stale dentries during unregistering")
+    Reported-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+    Tested-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+    Suggested-by: Al Viro <viro@ZenIV.linux.org.uk>
+    Signed-off-by: "Eric W. Biederman" <ebiederm@xmission.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+commit a3a7b992b240ba621a47ff2d3465fa4f0534e297
+Author: Eric W. Biederman <ebiederm@xmission.com>
+Date:   Thu Jul 6 08:41:06 2017 -0500
+
+    proc: Fix proc_sys_prune_dcache to hold a sb reference
+    
+    commit 2fd1d2c4ceb2248a727696962cf3370dc9f5a0a4 upstream.
+    
+    Andrei Vagin writes:
+    FYI: This bug has been reproduced on 4.11.7
+    > BUG: Dentry ffff895a3dd01240{i=4e7c09a,n=lo}  still in use (1) [unmount of proc proc]
+    > ------------[ cut here ]------------
+    > WARNING: CPU: 1 PID: 13588 at fs/dcache.c:1445 umount_check+0x6e/0x80
+    > CPU: 1 PID: 13588 Comm: kworker/1:1 Not tainted 4.11.7-200.fc25.x86_64 #1
+    > Hardware name: CompuLab sbc-flt1/fitlet, BIOS SBCFLT_0.08.04 06/27/2015
+    > Workqueue: events proc_cleanup_work
+    > Call Trace:
+    >  dump_stack+0x63/0x86
+    >  __warn+0xcb/0xf0
+    >  warn_slowpath_null+0x1d/0x20
+    >  umount_check+0x6e/0x80
+    >  d_walk+0xc6/0x270
+    >  ? dentry_free+0x80/0x80
+    >  do_one_tree+0x26/0x40
+    >  shrink_dcache_for_umount+0x2d/0x90
+    >  generic_shutdown_super+0x1f/0xf0
+    >  kill_anon_super+0x12/0x20
+    >  proc_kill_sb+0x40/0x50
+    >  deactivate_locked_super+0x43/0x70
+    >  deactivate_super+0x5a/0x60
+    >  cleanup_mnt+0x3f/0x90
+    >  mntput_no_expire+0x13b/0x190
+    >  kern_unmount+0x3e/0x50
+    >  pid_ns_release_proc+0x15/0x20
+    >  proc_cleanup_work+0x15/0x20
+    >  process_one_work+0x197/0x450
+    >  worker_thread+0x4e/0x4a0
+    >  kthread+0x109/0x140
+    >  ? process_one_work+0x450/0x450
+    >  ? kthread_park+0x90/0x90
+    >  ret_from_fork+0x2c/0x40
+    > ---[ end trace e1c109611e5d0b41 ]---
+    > VFS: Busy inodes after unmount of proc. Self-destruct in 5 seconds.  Have a nice day...
+    > BUG: unable to handle kernel NULL pointer dereference at           (null)
+    > IP: _raw_spin_lock+0xc/0x30
+    > PGD 0
+    
+    Fix this by taking a reference to the super block in proc_sys_prune_dcache.
+    
+    The superblock reference is the core of the fix however the sysctl_inodes
+    list is converted to a hlist so that hlist_del_init_rcu may be used.  This
+    allows proc_sys_prune_dache to remove inodes the sysctl_inodes list, while
+    not causing problems for proc_sys_evict_inode when if it later choses to
+    remove the inode from the sysctl_inodes list.  Removing inodes from the
+    sysctl_inodes list allows proc_sys_prune_dcache to have a progress
+    guarantee, while still being able to drop all locks.  The fact that
+    head->unregistering is set in start_unregistering ensures that no more
+    inodes will be added to the the sysctl_inodes list.
+    
+    Previously the code did a dance where it delayed calling iput until the
+    next entry in the list was being considered to ensure the inode remained on
+    the sysctl_inodes list until the next entry was walked to.  The structure
+    of the loop in this patch does not need that so is much easier to
+    understand and maintain.
+    
+    Cc: stable@vger.kernel.org
+    Reported-by: Andrei Vagin <avagin@gmail.com>
+    Tested-by: Andrei Vagin <avagin@openvz.org>
+    Fixes: ace0c791e6c3 ("proc/sysctl: Don't grab i_lock under sysctl_lock.")
+    Fixes: d6cffbbe9a7e ("proc/sysctl: prune stale dentries during unregistering")
+    Signed-off-by: "Eric W. Biederman" <ebiederm@xmission.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 631f93a6fe847d2d317010d5bbd7cb3bcc284336
+Author: Eric W. Biederman <ebiederm@xmission.com>
+Date:   Mon Feb 20 18:17:03 2017 +1300
+
+    proc/sysctl: Don't grab i_lock under sysctl_lock.
+    
+    commit ace0c791e6c3cf5ef37cad2df69f0d90ccc40ffb upstream.
+    
+    Konstantin Khlebnikov <khlebnikov@yandex-team.ru> writes:
+    > This patch has locking problem. I've got lockdep splat under LTP.
+    >
+    > [ 6633.115456] ======================================================
+    > [ 6633.115502] [ INFO: possible circular locking dependency detected ]
+    > [ 6633.115553] 4.9.10-debug+ #9 Tainted: G             L
+    > [ 6633.115584] -------------------------------------------------------
+    > [ 6633.115627] ksm02/284980 is trying to acquire lock:
+    > [ 6633.115659]  (&sb->s_type->i_lock_key#4){+.+...}, at: [<ffffffff816bc1ce>] igrab+0x1e/0x80
+    > [ 6633.115834] but task is already holding lock:
+    > [ 6633.115882]  (sysctl_lock){+.+...}, at: [<ffffffff817e379b>] unregister_sysctl_table+0x6b/0x110
+    > [ 6633.116026] which lock already depends on the new lock.
+    > [ 6633.116026]
+    > [ 6633.116080]
+    > [ 6633.116080] the existing dependency chain (in reverse order) is:
+    > [ 6633.116117]
+    > -> #2 (sysctl_lock){+.+...}:
+    > -> #1 (&(&dentry->d_lockref.lock)->rlock){+.+...}:
+    > -> #0 (&sb->s_type->i_lock_key#4){+.+...}:
+    >
+    > d_lock nests inside i_lock
+    > sysctl_lock nests inside d_lock in d_compare
+    >
+    > This patch adds i_lock nesting inside sysctl_lock.
+    
+    Al Viro <viro@ZenIV.linux.org.uk> replied:
+    > Once ->unregistering is set, you can drop sysctl_lock just fine.  So I'd
+    > try something like this - use rcu_read_lock() in proc_sys_prune_dcache(),
+    > drop sysctl_lock() before it and regain after.  Make sure that no inodes
+    > are added to the list ones ->unregistering has been set and use RCU list
+    > primitives for modifying the inode list, with sysctl_lock still used to
+    > serialize its modifications.
+    >
+    > Freeing struct inode is RCU-delayed (see proc_destroy_inode()), so doing
+    > igrab() is safe there.  Since we don't drop inode reference until after we'd
+    > passed beyond it in the list, list_for_each_entry_rcu() should be fine.
+    
+    I agree with Al Viro's analsysis of the situtation.
+    
+    Fixes: d6cffbbe9a7e ("proc/sysctl: prune stale dentries during unregistering")
+    Reported-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+    Tested-by: Konstantin Khlebnikov <khlebnikov@yandex-team.ru>
+    Suggested-by: Al Viro <viro@ZenIV.linux.org.uk>
+    Signed-off-by: "Eric W. Biederman" <ebiederm@xmission.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking e31578c6fb0b89ceb8ef943528279571dfc0f8dc ......
+	 orig commit -> 119e1ef80ecfe0d1deb6378d4ab41f5b71519de1 ......
+checking 87a2d84d2ff4aea2f9bc8c5801f5044024fac1c4 ......
+	 orig commit -> 9ea0a46ca2c318fcc449c1e6b62a7230a17888f1 ......
+checking 59199c04b746b87db92843f28364547cb7ca1764 ......
+	 orig commit -> 4c0d7cd5c8416b1ef41534d19163cb07ffaa03ab ......
+checking cfac7df7dc10a1187176c19c4ba950b365d388b7 ......
+	 orig commit -> 90bad5e05bcdb0308cfa3d3a60f5c0b9c8e2efb3 ......
+checking 6bb53ee170c45f44ac80ad8318f72feff9cdee1b ......
+	 orig commit -> b5b1404d0815894de0690de8a1ab58269e56eae6 ......
+checking bcf447f808b5e054d529eea01dcbabe6a576666a ......
+	 orig commit -> 1214fd7b497400d200e3f4e64e2338b303a20949 ......
+checking 51b3938e399bdf0cef090cea7b146c1ba9604ca2 ......
+	 orig commit -> fdcb613d49321b5bf5d5a1bd0fba8e7c241dcc70 ......
+checking af3bd8d6a9efcb782d44e537dc391970e0d70fc7 ......
+	 orig commit -> d472b3a6cf63cd31cae1ed61930f07e6cd6671b5 ......
+checking fbf12e19c9f13374ded72893f34777c2fa41f75c ......
+	 orig commit -> 3c53776e29f81719efcf8f7a6e30cdf753bee94d ......
+checking 50bed434ad9c0d1d41a4b617935ac28c3fc778b8 ......
+	 orig commit -> 12c8f25a016dff69ee284aa3338bebfd2cfcba33 ......
+checking 2106b21a8a59acd74cf5e473f71e75fdf03e3b99 ......
+	 orig commit -> fedb8da96355f5f64353625bf96dc69423ad1826 ......
+checking 5f394c9ef67234750fe277bb9bfdcf99ebee41d8 ......
+	 orig commit -> 66509a276c8c1d19ee3f661a41b418d101c57d29 ......
+checking 1d4167a818e6f4a749b5f6ce54f98176276ed85b ......
+	 orig commit -> 3ab2011ea368ec3433ad49e1b9e1c7b70d2e65df ......
+checking 954e572ae2f26ec98a4d8c1c04ab91798ccace75 ......
+	 orig commit -> 5012284700775a4e6e3fbe7eac4c543c4874b559 ......

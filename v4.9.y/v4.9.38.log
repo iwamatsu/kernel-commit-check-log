@@ -1,0 +1,1220 @@
+Check from v4.9.38 to v4.9.39
+Commit count: 73
+checking c03917de04aa68017a737e90ea01338d991eaff5 ......
+checking cce8d2ee45715c1cc82609c885110656b038f51a ......
+	 orig commit -> 691bd4340bef49cf7e5855d06cf24444b5bf2d85 ......
+checking 07592d6225365e26777788c750dc2770d8e501b7 ......
+	 orig commit -> 4531662d1abf6c1f0e5c2b86ddb60e61509786c8 ......
+checking fab777e70ca46898422f6b62de08f20d86952ed2 ......
+	 orig commit -> 4439af9f911ae0243ffe4e2dfc12bace49605d8b ......
+checking bf7c2153561772f58b64b702babc733216be5193 ......
+	 orig commit -> a8b6fda38f80e75afa3b125c9e7f2550b579454b ......
+checking 04e002a5f681590d4b3d9aceb4aeb5526ce162e6 ......
+	 orig commit -> c59f29cb144a6a0dfac16ede9dc8eafc02dc56ca ......
+checking cc7d3b7dd1ac43bf4643d6d3e924f4b9f0e8da05 ......
+	 orig commit -> 2ca30331c156ca9e97643ad05dd8930b8fe78b01 ......
+checking 5480437f7963999c7634ccc1f9057c87ea8e198f ......
+	 orig commit -> ea0212f40c6bc0594c8eff79266759e3ecd4bacc ......
+		 ea0212f40c6bc0594c8eff79266759e3ecd4bacc has problem. Fixes commit -> 3df6f61fff49632492490fb6e42646b803a9958a
+commit 18c5d285a9d4a878313116c1e7095ea1c0869ebe
+Author: zhangyi (F) <yi.zhang@huawei.com>
+Date:   Tue Aug 14 10:34:42 2018 +0800
+
+    PM / sleep: wakeup: Fix build error caused by missing SRCU support
+    
+    commit 3df6f61fff49632492490fb6e42646b803a9958a upstream.
+    
+    Commit ea0212f40c6 (power: auto select CONFIG_SRCU) made the code in
+    drivers/base/power/wakeup.c use SRCU instead of RCU, but it forgot to
+    select CONFIG_SRCU in Kconfig, which leads to the following build
+    error if CONFIG_SRCU is not selected somewhere else:
+    
+    drivers/built-in.o: In function `wakeup_source_remove':
+    (.text+0x3c6fc): undefined reference to `synchronize_srcu'
+    drivers/built-in.o: In function `pm_print_active_wakeup_sources':
+    (.text+0x3c7a8): undefined reference to `__srcu_read_lock'
+    drivers/built-in.o: In function `pm_print_active_wakeup_sources':
+    (.text+0x3c84c): undefined reference to `__srcu_read_unlock'
+    drivers/built-in.o: In function `device_wakeup_arm_wake_irqs':
+    (.text+0x3d1d8): undefined reference to `__srcu_read_lock'
+    drivers/built-in.o: In function `device_wakeup_arm_wake_irqs':
+    (.text+0x3d228): undefined reference to `__srcu_read_unlock'
+    drivers/built-in.o: In function `device_wakeup_disarm_wake_irqs':
+    (.text+0x3d24c): undefined reference to `__srcu_read_lock'
+    drivers/built-in.o: In function `device_wakeup_disarm_wake_irqs':
+    (.text+0x3d29c): undefined reference to `__srcu_read_unlock'
+    drivers/built-in.o:(.data+0x4158): undefined reference to `process_srcu'
+    
+    Fix this error by selecting CONFIG_SRCU when PM_SLEEP is enabled.
+    
+    Fixes: ea0212f40c6 (power: auto select CONFIG_SRCU)
+    Cc: 4.2+ <stable@vger.kernel.org> # 4.2+
+    Signed-off-by: zhangyi (F) <yi.zhang@huawei.com>
+    [ rjw: Minor subject/changelog fixups ]
+    Signed-off-by: Rafael J. Wysocki <rafael.j.wysocki@intel.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 758dc6a8dabc0c533e3aff8a2095b9de8d597768 ......
+	 orig commit -> 73bb059f9b8a00c5e1bf2f7ca83138c05d05e600 ......
+checking 3e165b2322c6a7e50031cb91ef95ee6cb4e1d163 ......
+	 orig commit -> f32d782e31bf079f600dcec126ed117b0577e85c ......
+checking 7c3f08eadcfdfca74b2563e941e645b52cc34622 ......
+	 orig commit -> 0372dd2736e02672ac6e189c31f7d8c02ad543cd ......
+checking 542ebc96c2004c665a4a6e3d2f2813685f0de7a3 ......
+	 orig commit -> c6508a39640b9a27fc2bc10cb708152672c82045 ......
+	 orig commit -> c743f0a5c50f2fcbc628526279cfa24f3dabe182 ......
+		 c743f0a5c50f2fcbc628526279cfa24f3dabe182 has problem. Fixes commit -> d207af2eab3f8668b95ad02b21930481c42806fd
+commit 31710e63fa66518d1b9c1101060c2d0369e09b11
+Author: Michael Kelley <mhkelley@outlook.com>
+Date:   Wed Feb 14 02:54:03 2018 +0000
+
+    cpumask: Make for_each_cpu_wrap() available on UP as well
+    
+    [ Upstream commit d207af2eab3f8668b95ad02b21930481c42806fd ]
+    
+    for_each_cpu_wrap() was originally added in the #else half of a
+    large "#if NR_CPUS == 1" statement, but was omitted in the #if
+    half.  This patch adds the missing #if half to prevent compile
+    errors when NR_CPUS is 1.
+    
+    Reported-by: kbuild test robot <fengguang.wu@intel.com>
+    Signed-off-by: Michael Kelley <mhkelley@outlook.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Peter Zijlstra <peterz@infradead.org>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Cc: kys@microsoft.com
+    Cc: martin.petersen@oracle.com
+    Cc: mikelley@microsoft.com
+    Fixes: c743f0a5c50f ("sched/fair, cpumask: Export for_each_cpu_wrap()")
+    Link: http://lkml.kernel.org/r/SN6PR1901MB2045F087F59450507D4FCC17CBF50@SN6PR1901MB2045.namprd19.prod.outlook.com
+    Signed-off-by: Ingo Molnar <mingo@kernel.org>
+    Signed-off-by: Sasha Levin <alexander.levin@microsoft.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking a0a93e3e6e1e8c35d1d6cf624f2f74a976ab43d5 ......
+checking 80495c708490eccbd5a1e8e934a674c93df1b9d8 ......
+	 orig commit -> 7459e1d25ffefa2b1be799477fcc1f6c62f6cec7 ......
+checking 48a9dff213986c62fe5405f78ad5433c764dcd3e ......
+	 orig commit -> 854b06f768794cd664886ec3ba3a5b1c58d42167 ......
+		 854b06f768794cd664886ec3ba3a5b1c58d42167 has problem. Fixes commit -> 115957bb3e59fcb226ce76b97af14533f239e0ac
+checking db923288f37f42fae8afe58d448ed77e43cf56b1 ......
+	 orig commit -> b82ce24426a4071da9529d726057e4e642948667 ......
+		 b82ce24426a4071da9529d726057e4e642948667 has problem. Fixes commit -> 8861249c740fc4af9ddc5aee321eafefb960d7c6
+commit c3e8a12e701c587759e3f1d1e9fb8fc262eb5a26
+Author: megha.dey@linux.intel.com <megha.dey@linux.intel.com>
+Date:   Wed Aug 2 13:49:09 2017 -0700
+
+    crypto: x86/sha1 - Fix reads beyond the number of blocks passed
+    
+    commit 8861249c740fc4af9ddc5aee321eafefb960d7c6 upstream.
+    
+    It was reported that the sha1 AVX2 function(sha1_transform_avx2) is
+    reading ahead beyond its intended data, and causing a crash if the next
+    block is beyond page boundary:
+    http://marc.info/?l=linux-crypto-vger&m=149373371023377
+    
+    This patch makes sure that there is no overflow for any buffer length.
+    
+    It passes the tests written by Jan Stancek that revealed this problem:
+    https://github.com/jstancek/sha1-avx2-crash
+    
+    I have re-enabled sha1-avx2 by reverting commit
+    b82ce24426a4071da9529d726057e4e642948667
+    
+    Fixes: b82ce24426a4 ("crypto: sha1-ssse3 - Disable avx2")
+    Originally-by: Ilya Albrekht <ilya.albrekht@intel.com>
+    Tested-by: Jan Stancek <jstancek@redhat.com>
+    Signed-off-by: Megha Dey <megha.dey@linux.intel.com>
+    Reported-by: Jan Stancek <jstancek@redhat.com>
+    Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 81cc2ef2677b32252d23b50e6cef7c994bf6ec03 ......
+	 orig commit -> 1606043f214f912a52195293614935811a6e3e53 ......
+checking 2ff2cc768eb75b82b5df60d06e8316d4ea62c111 ......
+	 orig commit -> 03d2c5114c95797c0aa7d9f463348b171a274fd4 ......
+checking 38dfd2e3a67367c701db106a1b600212efc4f93a ......
+	 orig commit -> 37511fb5c91db93d8bd6e3f52f86e5a7ff7cfcdf ......
+checking 1e6f1af808c11a011b9c15e7e2e92f01885855b6 ......
+	 orig commit -> 796a3bae2fba6810427efdb314a1c126c9490fb3 ......
+checking 54fcb2303ef40bc9476fc698ad292c569e5da4fb ......
+	 orig commit -> 296990deb389c7da21c78030376ba244dc1badf5 ......
+checking bb4fbf094b440a9209ed88c8681960d4b26eec0f ......
+	 orig commit -> 99b19d16471e9c3faa85cad38abc9cbbe04c6d55 ......
+checking e260db7576765e0d82991dbe4bab2ec058ecb67a ......
+	 orig commit -> 570487d3faf2a1d8a220e6ee10f472163123d7da ......
+checking 7d976da043459fe2a476b95c4da5f713c5d076fc ......
+	 orig commit -> 3360acdf839170b612f5b212539694c20e3f16d0 ......
+checking ac5e9e801f47311bdbd1dc490a1b90df676b815c ......
+	 orig commit -> 6b5fc3a1331810db407c9e0e673dc1837afdc9d0 ......
+checking 63c634cf95475ef86cdf15eaef5abeb5888689ab ......
+	 orig commit -> 6987dc8a70976561d22450b5858fc9767788cc1c ......
+checking 445a945ad67bfbf4d1aed7f290b1465734c9a720 ......
+	 orig commit -> 88cda00733f0731711c76e535d4972c296ac512e ......
+checking f31c4f65dd09319ba21cf825fa36daf0c1ddf958 ......
+	 orig commit -> da029c11e6b12f321f36dac8771e833b65cec962 ......
+checking fbc877cd08e55f794bdd0d0363bce5147629ef16 ......
+	 orig commit -> a73dc5370e153ac63718d850bddf0c9aa9d871e6 ......
+checking 90fb0f7aefc944d9e69208ab85766b20472cb173 ......
+	 orig commit -> 47ebb09d54856500c5a5e14824781902b3bb738e ......
+checking 70779e0ebb37dadfdb31e53e534704600fa21f69 ......
+	 orig commit -> 02445990a96e60a67526510d8b00f7e3d14101c3 ......
+		 02445990a96e60a67526510d8b00f7e3d14101c3 has problem. Fixes commit -> c715b72c1ba406f133217b509044c38d8e714a37
+commit 1f2347a095ced10b2054fece0319801097cd852f
+Author: Kees Cook <keescook@chromium.org>
+Date:   Fri Aug 18 15:16:31 2017 -0700
+
+    mm: revert x86_64 and arm64 ELF_ET_DYN_BASE base changes
+    
+    commit c715b72c1ba406f133217b509044c38d8e714a37 upstream.
+    
+    Moving the x86_64 and arm64 PIE base from 0x555555554000 to 0x000100000000
+    broke AddressSanitizer.  This is a partial revert of:
+    
+      eab09532d400 ("binfmt_elf: use ELF_ET_DYN_BASE only for PIE")
+      02445990a96e ("arm64: move ELF_ET_DYN_BASE to 4GB / 4MB")
+    
+    The AddressSanitizer tool has hard-coded expectations about where
+    executable mappings are loaded.
+    
+    The motivation for changing the PIE base in the above commits was to
+    avoid the Stack-Clash CVEs that allowed executable mappings to get too
+    close to heap and stack.  This was mainly a problem on 32-bit, but the
+    64-bit bases were moved too, in an effort to proactively protect those
+    systems (proofs of concept do exist that show 64-bit collisions, but
+    other recent changes to fix stack accounting and setuid behaviors will
+    minimize the impact).
+    
+    The new 32-bit PIE base is fine for ASan (since it matches the ET_EXEC
+    base), so only the 64-bit PIE base needs to be reverted to let x86 and
+    arm64 ASan binaries run again.  Future changes to the 64-bit PIE base on
+    these architectures can be made optional once a more dynamic method for
+    dealing with AddressSanitizer is found.  (e.g.  always loading PIE into
+    the mmap region for marked binaries.)
+    
+    Link: http://lkml.kernel.org/r/20170807201542.GA21271@beast
+    Fixes: eab09532d400 ("binfmt_elf: use ELF_ET_DYN_BASE only for PIE")
+    Fixes: 02445990a96e ("arm64: move ELF_ET_DYN_BASE to 4GB / 4MB")
+    Signed-off-by: Kees Cook <keescook@chromium.org>
+    Reported-by: Kostya Serebryany <kcc@google.com>
+    Acked-by: Will Deacon <will.deacon@arm.com>
+    Cc: Ingo Molnar <mingo@elte.hu>
+    Cc: "H. Peter Anvin" <hpa@zytor.com>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking abb79a56898e044715d8efd07bc1902d27a94870 ......
+	 orig commit -> 6a9af90a3bcde217a1c053e135f5f43e5d5fafbd ......
+checking 63c2f8f8c41bf80af068f0b2aef4c0e2bdc32c4a ......
+	 orig commit -> eab09532d40090698b05a07c1c87f39fdbc5fab5 ......
+		 eab09532d40090698b05a07c1c87f39fdbc5fab5 has problem. Fixes commit -> c715b72c1ba406f133217b509044c38d8e714a37
+commit 1f2347a095ced10b2054fece0319801097cd852f
+Author: Kees Cook <keescook@chromium.org>
+Date:   Fri Aug 18 15:16:31 2017 -0700
+
+    mm: revert x86_64 and arm64 ELF_ET_DYN_BASE base changes
+    
+    commit c715b72c1ba406f133217b509044c38d8e714a37 upstream.
+    
+    Moving the x86_64 and arm64 PIE base from 0x555555554000 to 0x000100000000
+    broke AddressSanitizer.  This is a partial revert of:
+    
+      eab09532d400 ("binfmt_elf: use ELF_ET_DYN_BASE only for PIE")
+      02445990a96e ("arm64: move ELF_ET_DYN_BASE to 4GB / 4MB")
+    
+    The AddressSanitizer tool has hard-coded expectations about where
+    executable mappings are loaded.
+    
+    The motivation for changing the PIE base in the above commits was to
+    avoid the Stack-Clash CVEs that allowed executable mappings to get too
+    close to heap and stack.  This was mainly a problem on 32-bit, but the
+    64-bit bases were moved too, in an effort to proactively protect those
+    systems (proofs of concept do exist that show 64-bit collisions, but
+    other recent changes to fix stack accounting and setuid behaviors will
+    minimize the impact).
+    
+    The new 32-bit PIE base is fine for ASan (since it matches the ET_EXEC
+    base), so only the 64-bit PIE base needs to be reverted to let x86 and
+    arm64 ASan binaries run again.  Future changes to the 64-bit PIE base on
+    these architectures can be made optional once a more dynamic method for
+    dealing with AddressSanitizer is found.  (e.g.  always loading PIE into
+    the mmap region for marked binaries.)
+    
+    Link: http://lkml.kernel.org/r/20170807201542.GA21271@beast
+    Fixes: eab09532d400 ("binfmt_elf: use ELF_ET_DYN_BASE only for PIE")
+    Fixes: 02445990a96e ("arm64: move ELF_ET_DYN_BASE to 4GB / 4MB")
+    Signed-off-by: Kees Cook <keescook@chromium.org>
+    Reported-by: Kostya Serebryany <kcc@google.com>
+    Acked-by: Will Deacon <will.deacon@arm.com>
+    Cc: Ingo Molnar <mingo@elte.hu>
+    Cc: "H. Peter Anvin" <hpa@zytor.com>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 93eae954050d3b8490481aa8f7d20822f09719ca ......
+	 orig commit -> 8d81ae05d0176da1c54aeaed697fa34be5c5575e ......
+checking a9aa6522a1a58e025ba139d9b55c3350ef868cb8 ......
+	 orig commit -> b17c070fb624cf10162cf92ea5e1ec25cd8ac176 ......
+checking a48542e8b4ec9a7b3bf80edadb5aa229221826c4 ......
+	 orig commit -> 2c80cd57c74339889a8752b20862a16c28929c3a ......
+checking 8c6f19c250865c42669c005c51dc758644de1c6d ......
+	 orig commit -> c0d80ddab89916273cb97114889d3f337bc370ae ......
+checking d2b64687b37f06c1302fb156d0b3aa9b347191ad ......
+	 orig commit -> bbf29ffc7f963bb894f84f0580c70cfea01c3892 ......
+checking 68ea25f00ffec28c17e0576b027b2f9d6ef4ecca ......
+	 orig commit -> 98dcea0cfd04e083ac74137ceb9a632604740e2d ......
+checking e3d2adaaf92760282888899d853535e08606cc98 ......
+	 orig commit -> 649aa24254e85bf6bd7807dd372d083707852b1f ......
+checking 8ed89cfc8692d7d2fa61a462619334107697aa99 ......
+	 orig commit -> 33f9e02495d15a061f0c94ef46f5103a2d0c20f3 ......
+checking bf1e4dc3b4fb0afcbd628b63b3756ae27023ef03 ......
+	 orig commit -> b0f94efd5aa8daa8a07d7601714c2573266cd4c9 ......
+checking 008a1f2707488cf900bb20e29a8676cabeb6d405 ......
+	 orig commit -> 247462316f85a9e0479445c1a4223950b68ffac1 ......
+checking 59613f80ec670685b83932350980194ea082c96a ......
+	 orig commit -> 866d7c1b0a3c70387646c4e455e727a58c5d465a ......
+checking 6a90f81ab6398499e54927f5232b0a90d447b6de ......
+	 orig commit -> 0a27844ce86d039d74221dd56cd8c0349b146b63 ......
+checking 7e9e9638afdfa122ba0dc314c9219dd90ed116b8 ......
+	 orig commit -> 9361df14d1cbf966409d5d6f48bb334384fbe138 ......
+checking e471290603ee82cac555cd729d1eed1e2950665a ......
+	 orig commit -> d7f13f7450369281a5d0ea463cc69890a15923ae ......
+checking b68aa7dff96efc59fee40e25b8044017de21161a ......
+	 orig commit -> 8feb69c7bd89513be80eb19198d48f154b254021 ......
+checking 6ae9dd281965423d95f63a5475c120f8af952a4f ......
+	 orig commit -> c70d68150f71b84cea6997a53493e17bf18a54db ......
+checking 5f69bb1d18c503a24a576509826f82aabca0a4bd ......
+	 orig commit -> 5ea59db8a375216e6c915c5586f556766673b5a7 ......
+checking fd325ddd58843dd518e2cd09994ef4691a1f4b5c ......
+	 orig commit -> 57c00f2fac512837f8de73474ec1f54020015bae ......
+checking 414848bba6ab91fe12ca8105b4652c4aa6f4b574 ......
+	 orig commit -> 8f44c9a41386729fea410e688959ddaa9d51be7c ......
+checking 181dda46a314a34515c444e9fe7e71298cd24839 ......
+	 orig commit -> 0933a578cd55b02dc80f219dc8f2efb17ec61c9a ......
+		 0933a578cd55b02dc80f219dc8f2efb17ec61c9a has problem. Fixes commit -> 84eef2b2187ed73c0e4520cbfeb874e964a0b56a
+checking e6577f1ef3f80141333d83ba51b20295d794b8f8 ......
+	 orig commit -> f630c38ef0d785101363a8992bbd4f302180f86f ......
+checking 0bc26d1ca38d63cfbfaf5f4a7f8dacea27cf5109 ......
+	 orig commit -> f06b7549b79e29a672336d4e134524373fb7a232 ......
+checking 05e165e9bc45f5f5acdb2a072bd04c5840be8536 ......
+	 orig commit -> 9af9959e142c274f4a30fefb71d97d2b028b337f ......
+checking beabc6032772d186976742438d6b1f290894ce44 ......
+	 orig commit -> 69e766612c4bcb79e19cebed9eed61d4222c1d47 ......
+checking d2c9512085784a6387d688f57b2671c6c15fc984 ......
+	 orig commit -> ec8add2a4c9df723c94a863b8fcd6d93c472deed ......
+checking 743564306ee61a16fd9855528c6972653183a037 ......
+	 orig commit -> 8ff93de7668bd81bc8efa819d1184ebd48fae72d ......
+checking a80a70a4822ca842c16b29c8d9e4336a95375c61 ......
+	 orig commit -> 05a6b4cae8c0cc1680c9dd33a97a49a13c0f01bc ......
+checking e20204dc2c74b896b3ef4f4328acb15f4abcd5cb ......
+	 orig commit -> 2a0165a034ac024b60cca49c61e46f4afa2e4d98 ......
+		 2a0165a034ac024b60cca49c61e46f4afa2e4d98 has problem. Fixes commit -> 6377ed0bbae6fa28853e1679d068a9106c8a8908
+commit 3dde6c974c50107e6166a9dd3964ab48898e05e7
+Author: Moshe Shemesh <moshe@mellanox.com>
+Date:   Thu Oct 19 14:14:29 2017 +0300
+
+    net/mlx5: Fix health work queue spin lock to IRQ safe
+    
+    [ Upstream commit 6377ed0bbae6fa28853e1679d068a9106c8a8908 ]
+    
+    spin_lock/unlock of health->wq_lock should be IRQ safe.
+    It was changed to spin_lock_irqsave since adding commit 0179720d6be2
+    ("net/mlx5: Introduce trigger_health_work function") which uses
+    spin_lock from asynchronous event (IRQ) context.
+    Thus, all spin_lock/unlock of health->wq_lock should have been moved
+    to IRQ safe mode.
+    However, one occurrence on new code using this lock missed that
+    change, resulting in possible deadlock:
+      kernel: Possible unsafe locking scenario:
+      kernel:       CPU0
+      kernel:       ----
+      kernel:  lock(&(&health->wq_lock)->rlock);
+      kernel:  <Interrupt>
+      kernel:    lock(&(&health->wq_lock)->rlock);
+      kernel: #012 *** DEADLOCK ***
+    
+    Fixes: 2a0165a034ac ("net/mlx5: Cancel delayed recovery work when unloading the driver")
+    Signed-off-by: Moshe Shemesh <moshe@mellanox.com>
+    Signed-off-by: Saeed Mahameed <saeedm@mellanox.com>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+checking 067328078d14910fdc04ce5ce20ce18c5126ab32 ......
+	 orig commit -> e44699d2c28067f69698ccb68dd3ddeacfebc434 ......
+checking cd5de9cb858d3bffa15bc11bfc8584d4838e14bd ......
+	 orig commit -> 6bdf6abc56b53103324dfd270a86580306e1a232 ......
+checking bee8070548921f8de7b9aee7cfddd64bf8fa43e1 ......
+	 orig commit -> acb4b7df48b539cb391287921de57e4e5fae3460 ......
+checking e5e5c0ec39dd380804c7c4be838da42392e3a44f ......
+	 orig commit -> 1bfb159673957644951ab0a8d2aec44b93ddb1ae ......
+checking 3f04c32bf47a87b61a4df27faea7e2ab1c71388d ......
+	 orig commit -> 6f64ec74515925cced6df4571638b5a099a49aae ......
+checking ef13840028c8389966dad9ed505c48b8b78bd3f0 ......
+	 orig commit -> d747a7a51b00984127a88113cdbbc26f91e9d815 ......
+checking cf81b4abe7ac73eaa4c9d5600eaa1bedd61ff6a3 ......
+	 orig commit -> db9d8b29d19d2801793e4419f4c6272bf8951c62 ......
+checking 0526ff300304882d57712e29bb47634dc1110b20 ......
+	 orig commit -> 60abc0be96e00ca71bac083215ac91ad2e575096 ......
+checking 3f7e07c37ade390391a336e1f2e4c4d5a073c4a8 ......
+	 orig commit -> b866203d872d5deeafcecd25ea429d6748b5bd56 ......
+checking dc491cdd2c81588ca6110f07325e32535192bcf0 ......
+	 orig commit -> c1a4872ebfb83b1af7144f7b29ac8c4b344a12a8 ......
+checking 13550ffc9515d234c43d79ef4a87328e88182baa ......
+	 orig commit -> 87b60cfacf9f17cf71933c6e33b66e68160af71d ......
+		 87b60cfacf9f17cf71933c6e33b66e68160af71d has problem. Fixes commit -> c2d6511e6a4f1f3673d711569c00c3849549e9b0
+634576a1844dba15bc5e6fc61d72f37e13a21615
+30c31d746d0eb458ae327f522bc8e4c44cbea0f0
+3bdac362a2f89ed3e148fa6f38c5f5d858f50b1a
+32db864d33c21fd70a217ba53cb7224889354ffb
+e89d469e3be3ed3d7124a803211a463ff83d0964
+88c2ace69dbef696edba77712882af03879abc9c
+c1a4872ebfb83b1af7144f7b29ac8c4b344a12a8
+commit 977f75d5c361cce54b42c5e60c5ec4dc8bf034f3
+Author: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+Date:   Wed Aug 30 12:49:03 2017 +0300
+
+    sch_netem: avoid null pointer deref on init failure
+    
+    commit 634576a1844dba15bc5e6fc61d72f37e13a21615 upstream.
+    
+    netem can fail in ->init due to missing options (either not supplied by
+    user-space or used as a default qdisc) causing a timer->base null
+    pointer deref in its ->destroy() and ->reset() callbacks.
+    
+    Reproduce:
+    $ sysctl net.core.default_qdisc=netem
+    $ ip l set ethX up
+    
+    Crash log:
+    [ 1814.846943] BUG: unable to handle kernel NULL pointer dereference at (null)
+    [ 1814.847181] IP: hrtimer_active+0x17/0x8a
+    [ 1814.847270] PGD 59c34067
+    [ 1814.847271] P4D 59c34067
+    [ 1814.847337] PUD 37374067
+    [ 1814.847403] PMD 0
+    [ 1814.847468]
+    [ 1814.847582] Oops: 0000 [#1] SMP
+    [ 1814.847655] Modules linked in: sch_netem(O) sch_fq_codel(O)
+    [ 1814.847761] CPU: 3 PID: 1573 Comm: ip Tainted: G           O 4.13.0-rc6+ #62
+    [ 1814.847884] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.7.5-20140531_083030-gandalf 04/01/2014
+    [ 1814.848043] task: ffff88003723a700 task.stack: ffff88005adc8000
+    [ 1814.848235] RIP: 0010:hrtimer_active+0x17/0x8a
+    [ 1814.848407] RSP: 0018:ffff88005adcb590 EFLAGS: 00010246
+    [ 1814.848590] RAX: 0000000000000000 RBX: ffff880058e359d8 RCX: 0000000000000000
+    [ 1814.848793] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff880058e359d8
+    [ 1814.848998] RBP: ffff88005adcb5b0 R08: 00000000014080c0 R09: 00000000ffffffff
+    [ 1814.849204] R10: ffff88005adcb660 R11: 0000000000000020 R12: 0000000000000000
+    [ 1814.849410] R13: ffff880058e359d8 R14: 00000000ffffffff R15: 0000000000000001
+    [ 1814.849616] FS:  00007f733bbca740(0000) GS:ffff88005d980000(0000) knlGS:0000000000000000
+    [ 1814.849919] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+    [ 1814.850107] CR2: 0000000000000000 CR3: 0000000059f0d000 CR4: 00000000000406e0
+    [ 1814.850313] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+    [ 1814.850518] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+    [ 1814.850723] Call Trace:
+    [ 1814.850875]  hrtimer_try_to_cancel+0x1a/0x93
+    [ 1814.851047]  hrtimer_cancel+0x15/0x20
+    [ 1814.851211]  qdisc_watchdog_cancel+0x12/0x14
+    [ 1814.851383]  netem_reset+0xe6/0xed [sch_netem]
+    [ 1814.851561]  qdisc_destroy+0x8b/0xe5
+    [ 1814.851723]  qdisc_create_dflt+0x86/0x94
+    [ 1814.851890]  ? dev_activate+0x129/0x129
+    [ 1814.852057]  attach_one_default_qdisc+0x36/0x63
+    [ 1814.852232]  netdev_for_each_tx_queue+0x3d/0x48
+    [ 1814.852406]  dev_activate+0x4b/0x129
+    [ 1814.852569]  __dev_open+0xe7/0x104
+    [ 1814.852730]  __dev_change_flags+0xc6/0x15c
+    [ 1814.852899]  dev_change_flags+0x25/0x59
+    [ 1814.853064]  do_setlink+0x30c/0xb3f
+    [ 1814.853228]  ? check_chain_key+0xb0/0xfd
+    [ 1814.853396]  ? check_chain_key+0xb0/0xfd
+    [ 1814.853565]  rtnl_newlink+0x3a4/0x729
+    [ 1814.853728]  ? rtnl_newlink+0x117/0x729
+    [ 1814.853905]  ? ns_capable_common+0xd/0xb1
+    [ 1814.854072]  ? ns_capable+0x13/0x15
+    [ 1814.854234]  rtnetlink_rcv_msg+0x188/0x197
+    [ 1814.854404]  ? rcu_read_unlock+0x3e/0x5f
+    [ 1814.854572]  ? rtnl_newlink+0x729/0x729
+    [ 1814.854737]  netlink_rcv_skb+0x6c/0xce
+    [ 1814.854902]  rtnetlink_rcv+0x23/0x2a
+    [ 1814.855064]  netlink_unicast+0x103/0x181
+    [ 1814.855230]  netlink_sendmsg+0x326/0x337
+    [ 1814.855398]  sock_sendmsg_nosec+0x14/0x3f
+    [ 1814.855584]  sock_sendmsg+0x29/0x2e
+    [ 1814.855747]  ___sys_sendmsg+0x209/0x28b
+    [ 1814.855912]  ? do_raw_spin_unlock+0xcd/0xf8
+    [ 1814.856082]  ? _raw_spin_unlock+0x27/0x31
+    [ 1814.856251]  ? __handle_mm_fault+0x651/0xdb1
+    [ 1814.856421]  ? check_chain_key+0xb0/0xfd
+    [ 1814.856592]  __sys_sendmsg+0x45/0x63
+    [ 1814.856755]  ? __sys_sendmsg+0x45/0x63
+    [ 1814.856923]  SyS_sendmsg+0x19/0x1b
+    [ 1814.857083]  entry_SYSCALL_64_fastpath+0x23/0xc2
+    [ 1814.857256] RIP: 0033:0x7f733b2dd690
+    [ 1814.857419] RSP: 002b:00007ffe1d3387d8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+    [ 1814.858238] RAX: ffffffffffffffda RBX: ffffffff810d278c RCX: 00007f733b2dd690
+    [ 1814.858445] RDX: 0000000000000000 RSI: 00007ffe1d338820 RDI: 0000000000000003
+    [ 1814.858651] RBP: ffff88005adcbf98 R08: 0000000000000001 R09: 0000000000000003
+    [ 1814.858856] R10: 00007ffe1d3385a0 R11: 0000000000000246 R12: 0000000000000002
+    [ 1814.859060] R13: 000000000066f1a0 R14: 00007ffe1d3408d0 R15: 0000000000000000
+    [ 1814.859267]  ? trace_hardirqs_off_caller+0xa7/0xcf
+    [ 1814.859446] Code: 10 55 48 89 c7 48 89 e5 e8 45 a1 fb ff 31 c0 5d c3
+    31 c0 c3 66 66 66 66 90 55 48 89 e5 41 56 41 55 41 54 53 49 89 fd 49 8b
+    45 30 <4c> 8b 20 41 8b 5c 24 38 31 c9 31 d2 48 c7 c7 50 8e 1d 82 41 89
+    [ 1814.860022] RIP: hrtimer_active+0x17/0x8a RSP: ffff88005adcb590
+    [ 1814.860214] CR2: 0000000000000000
+    
+    Fixes: 87b60cfacf9f ("net_sched: fix error recovery at qdisc creation")
+    Fixes: 0fbbeb1ba43b ("[PKT_SCHED]: Fix missing qdisc_destroy() in qdisc_create_dflt()")
+    Signed-off-by: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Amit Pundir <amit.pundir@linaro.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit bafe019d5ff66db88a7547b5a41592146966bb1d
+Author: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+Date:   Wed Aug 30 12:48:59 2017 +0300
+
+    sch_hhf: fix null pointer dereference on init failure
+    
+    commit 32db864d33c21fd70a217ba53cb7224889354ffb upstream.
+    
+    If sch_hhf fails in its ->init() function (either due to wrong
+    user-space arguments as below or memory alloc failure of hh_flows) it
+    will do a null pointer deref of q->hh_flows in its ->destroy() function.
+    
+    To reproduce the crash:
+    $ tc qdisc add dev eth0 root hhf quantum 2000000 non_hh_weight 10000000
+    
+    Crash log:
+    [  690.654882] BUG: unable to handle kernel NULL pointer dereference at (null)
+    [  690.655565] IP: hhf_destroy+0x48/0xbc
+    [  690.655944] PGD 37345067
+    [  690.655948] P4D 37345067
+    [  690.656252] PUD 58402067
+    [  690.656554] PMD 0
+    [  690.656857]
+    [  690.657362] Oops: 0000 [#1] SMP
+    [  690.657696] Modules linked in:
+    [  690.658032] CPU: 3 PID: 920 Comm: tc Not tainted 4.13.0-rc6+ #57
+    [  690.658525] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.7.5-20140531_083030-gandalf 04/01/2014
+    [  690.659255] task: ffff880058578000 task.stack: ffff88005acbc000
+    [  690.659747] RIP: 0010:hhf_destroy+0x48/0xbc
+    [  690.660146] RSP: 0018:ffff88005acbf9e0 EFLAGS: 00010246
+    [  690.660601] RAX: 0000000000000000 RBX: 0000000000000020 RCX: 0000000000000000
+    [  690.661155] RDX: 0000000000000000 RSI: 0000000000000001 RDI: ffffffff821f63f0
+    [  690.661710] RBP: ffff88005acbfa08 R08: ffffffff81b10a90 R09: 0000000000000000
+    [  690.662267] R10: 00000000f42b7019 R11: ffff880058578000 R12: 00000000ffffffea
+    [  690.662820] R13: ffff8800372f6400 R14: 0000000000000000 R15: 0000000000000000
+    [  690.663769] FS:  00007f8ae5e8b740(0000) GS:ffff88005d980000(0000) knlGS:0000000000000000
+    [  690.667069] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+    [  690.667965] CR2: 0000000000000000 CR3: 0000000058523000 CR4: 00000000000406e0
+    [  690.668918] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+    [  690.669945] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+    [  690.671003] Call Trace:
+    [  690.671743]  qdisc_create+0x377/0x3fd
+    [  690.672534]  tc_modify_qdisc+0x4d2/0x4fd
+    [  690.673324]  rtnetlink_rcv_msg+0x188/0x197
+    [  690.674204]  ? rcu_read_unlock+0x3e/0x5f
+    [  690.675091]  ? rtnl_newlink+0x729/0x729
+    [  690.675877]  netlink_rcv_skb+0x6c/0xce
+    [  690.676648]  rtnetlink_rcv+0x23/0x2a
+    [  690.677405]  netlink_unicast+0x103/0x181
+    [  690.678179]  netlink_sendmsg+0x326/0x337
+    [  690.678958]  sock_sendmsg_nosec+0x14/0x3f
+    [  690.679743]  sock_sendmsg+0x29/0x2e
+    [  690.680506]  ___sys_sendmsg+0x209/0x28b
+    [  690.681283]  ? __handle_mm_fault+0xc7d/0xdb1
+    [  690.681915]  ? check_chain_key+0xb0/0xfd
+    [  690.682449]  __sys_sendmsg+0x45/0x63
+    [  690.682954]  ? __sys_sendmsg+0x45/0x63
+    [  690.683471]  SyS_sendmsg+0x19/0x1b
+    [  690.683974]  entry_SYSCALL_64_fastpath+0x23/0xc2
+    [  690.684516] RIP: 0033:0x7f8ae529d690
+    [  690.685016] RSP: 002b:00007fff26d2d6b8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+    [  690.685931] RAX: ffffffffffffffda RBX: ffffffff810d278c RCX: 00007f8ae529d690
+    [  690.686573] RDX: 0000000000000000 RSI: 00007fff26d2d700 RDI: 0000000000000003
+    [  690.687047] RBP: ffff88005acbff98 R08: 0000000000000001 R09: 0000000000000000
+    [  690.687519] R10: 00007fff26d2d480 R11: 0000000000000246 R12: 0000000000000002
+    [  690.687996] R13: 0000000001258070 R14: 0000000000000001 R15: 0000000000000000
+    [  690.688475]  ? trace_hardirqs_off_caller+0xa7/0xcf
+    [  690.688887] Code: 00 00 e8 2a 02 ae ff 49 8b bc 1d 60 02 00 00 48 83
+    c3 08 e8 19 02 ae ff 48 83 fb 20 75 dc 45 31 f6 4d 89 f7 4d 03 bd 20 02
+    00 00 <49> 8b 07 49 39 c7 75 24 49 83 c6 10 49 81 fe 00 40 00 00 75 e1
+    [  690.690200] RIP: hhf_destroy+0x48/0xbc RSP: ffff88005acbf9e0
+    [  690.690636] CR2: 0000000000000000
+    
+    Fixes: 87b60cfacf9f ("net_sched: fix error recovery at qdisc creation")
+    Fixes: 10239edf86f1 ("net-qdisc-hhf: Heavy-Hitter Filter (HHF) qdisc")
+    Signed-off-by: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Amit Pundir <amit.pundir@linaro.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 9db519dc793994d702876c815f1d903c29280ab5
+Author: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+Date:   Wed Aug 30 12:48:58 2017 +0300
+
+    sch_multiq: fix double free on init failure
+    
+    commit e89d469e3be3ed3d7124a803211a463ff83d0964 upstream.
+    
+    The below commit added a call to ->destroy() on init failure, but multiq
+    still frees ->queues on error in init, but ->queues is also freed by
+    ->destroy() thus we get double free and corrupted memory.
+    
+    Very easy to reproduce (eth0 not multiqueue):
+    $ tc qdisc add dev eth0 root multiq
+    RTNETLINK answers: Operation not supported
+    $ ip l add dumdum type dummy
+    (crash)
+    
+    Trace log:
+    [ 3929.467747] general protection fault: 0000 [#1] SMP
+    [ 3929.468083] Modules linked in:
+    [ 3929.468302] CPU: 3 PID: 967 Comm: ip Not tainted 4.13.0-rc6+ #56
+    [ 3929.468625] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.7.5-20140531_083030-gandalf 04/01/2014
+    [ 3929.469124] task: ffff88003716a700 task.stack: ffff88005872c000
+    [ 3929.469449] RIP: 0010:__kmalloc_track_caller+0x117/0x1be
+    [ 3929.469746] RSP: 0018:ffff88005872f6a0 EFLAGS: 00010246
+    [ 3929.470042] RAX: 00000000000002de RBX: 0000000058a59000 RCX: 00000000000002df
+    [ 3929.470406] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffffff821f7020
+    [ 3929.470770] RBP: ffff88005872f6e8 R08: 000000000001f010 R09: 0000000000000000
+    [ 3929.471133] R10: ffff88005872f730 R11: 0000000000008cdd R12: ff006d75646d7564
+    [ 3929.471496] R13: 00000000014000c0 R14: ffff88005b403c00 R15: ffff88005b403c00
+    [ 3929.471869] FS:  00007f0b70480740(0000) GS:ffff88005d980000(0000) knlGS:0000000000000000
+    [ 3929.472286] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+    [ 3929.472677] CR2: 00007ffcee4f3000 CR3: 0000000059d45000 CR4: 00000000000406e0
+    [ 3929.473209] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+    [ 3929.474109] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+    [ 3929.474873] Call Trace:
+    [ 3929.475337]  ? kstrdup_const+0x23/0x25
+    [ 3929.475863]  kstrdup+0x2e/0x4b
+    [ 3929.476338]  kstrdup_const+0x23/0x25
+    [ 3929.478084]  __kernfs_new_node+0x28/0xbc
+    [ 3929.478478]  kernfs_new_node+0x35/0x55
+    [ 3929.478929]  kernfs_create_link+0x23/0x76
+    [ 3929.479478]  sysfs_do_create_link_sd.isra.2+0x85/0xd7
+    [ 3929.480096]  sysfs_create_link+0x33/0x35
+    [ 3929.480649]  device_add+0x200/0x589
+    [ 3929.481184]  netdev_register_kobject+0x7c/0x12f
+    [ 3929.481711]  register_netdevice+0x373/0x471
+    [ 3929.482174]  rtnl_newlink+0x614/0x729
+    [ 3929.482610]  ? rtnl_newlink+0x17f/0x729
+    [ 3929.483080]  rtnetlink_rcv_msg+0x188/0x197
+    [ 3929.483533]  ? rcu_read_unlock+0x3e/0x5f
+    [ 3929.483984]  ? rtnl_newlink+0x729/0x729
+    [ 3929.484420]  netlink_rcv_skb+0x6c/0xce
+    [ 3929.484858]  rtnetlink_rcv+0x23/0x2a
+    [ 3929.485291]  netlink_unicast+0x103/0x181
+    [ 3929.485735]  netlink_sendmsg+0x326/0x337
+    [ 3929.486181]  sock_sendmsg_nosec+0x14/0x3f
+    [ 3929.486614]  sock_sendmsg+0x29/0x2e
+    [ 3929.486973]  ___sys_sendmsg+0x209/0x28b
+    [ 3929.487340]  ? do_raw_spin_unlock+0xcd/0xf8
+    [ 3929.487719]  ? _raw_spin_unlock+0x27/0x31
+    [ 3929.488092]  ? __handle_mm_fault+0x651/0xdb1
+    [ 3929.488471]  ? check_chain_key+0xb0/0xfd
+    [ 3929.488847]  __sys_sendmsg+0x45/0x63
+    [ 3929.489206]  ? __sys_sendmsg+0x45/0x63
+    [ 3929.489576]  SyS_sendmsg+0x19/0x1b
+    [ 3929.489901]  entry_SYSCALL_64_fastpath+0x23/0xc2
+    [ 3929.490172] RIP: 0033:0x7f0b6fb93690
+    [ 3929.490423] RSP: 002b:00007ffcee4ed588 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+    [ 3929.490881] RAX: ffffffffffffffda RBX: ffffffff810d278c RCX: 00007f0b6fb93690
+    [ 3929.491198] RDX: 0000000000000000 RSI: 00007ffcee4ed5d0 RDI: 0000000000000003
+    [ 3929.491521] RBP: ffff88005872ff98 R08: 0000000000000001 R09: 0000000000000000
+    [ 3929.491801] R10: 00007ffcee4ed350 R11: 0000000000000246 R12: 0000000000000002
+    [ 3929.492075] R13: 000000000066f1a0 R14: 00007ffcee4f5680 R15: 0000000000000000
+    [ 3929.492352]  ? trace_hardirqs_off_caller+0xa7/0xcf
+    [ 3929.492590] Code: 8b 45 c0 48 8b 45 b8 74 17 48 8b 4d c8 83 ca ff 44
+    89 ee 4c 89 f7 e8 83 ca ff ff 49 89 c4 eb 49 49 63 56 20 48 8d 48 01 4d
+    8b 06 <49> 8b 1c 14 48 89 c2 4c 89 e0 65 49 0f c7 08 0f 94 c0 83 f0 01
+    [ 3929.493335] RIP: __kmalloc_track_caller+0x117/0x1be RSP: ffff88005872f6a0
+    
+    Fixes: 87b60cfacf9f ("net_sched: fix error recovery at qdisc creation")
+    Fixes: f07d1501292b ("multiq: Further multiqueue cleanup")
+    Signed-off-by: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    [AmitP: Removed unused variable 'err' in multiq_init()]
+    Signed-off-by: Amit Pundir <amit.pundir@linaro.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 951104e4805f9eeb236edf02f31096c43d68f6b8
+Author: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+Date:   Wed Aug 30 12:48:57 2017 +0300
+
+    sch_htb: fix crash on init failure
+    
+    commit 88c2ace69dbef696edba77712882af03879abc9c upstream.
+    
+    The commit below added a call to the ->destroy() callback for all qdiscs
+    which failed in their ->init(), but some were not prepared for such
+    change and can't handle partially initialized qdisc. HTB is one of them
+    and if any error occurs before the qdisc watchdog timer and qdisc work are
+    initialized then we can hit either a null ptr deref (timer->base) when
+    canceling in ->destroy or lockdep error info about trying to register
+    a non-static key and a stack dump. So to fix these two move the watchdog
+    timer and workqueue init before anything that can err out.
+    To reproduce userspace needs to send broken htb qdisc create request,
+    tested with a modified tc (q_htb.c).
+    
+    Trace log:
+    [ 2710.897602] BUG: unable to handle kernel NULL pointer dereference at (null)
+    [ 2710.897977] IP: hrtimer_active+0x17/0x8a
+    [ 2710.898174] PGD 58fab067
+    [ 2710.898175] P4D 58fab067
+    [ 2710.898353] PUD 586c0067
+    [ 2710.898531] PMD 0
+    [ 2710.898710]
+    [ 2710.899045] Oops: 0000 [#1] SMP
+    [ 2710.899232] Modules linked in:
+    [ 2710.899419] CPU: 1 PID: 950 Comm: tc Not tainted 4.13.0-rc6+ #54
+    [ 2710.899646] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.7.5-20140531_083030-gandalf 04/01/2014
+    [ 2710.900035] task: ffff880059ed2700 task.stack: ffff88005ad4c000
+    [ 2710.900262] RIP: 0010:hrtimer_active+0x17/0x8a
+    [ 2710.900467] RSP: 0018:ffff88005ad4f960 EFLAGS: 00010246
+    [ 2710.900684] RAX: 0000000000000000 RBX: ffff88003701e298 RCX: 0000000000000000
+    [ 2710.900933] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff88003701e298
+    [ 2710.901177] RBP: ffff88005ad4f980 R08: 0000000000000001 R09: 0000000000000001
+    [ 2710.901419] R10: ffff88005ad4f800 R11: 0000000000000400 R12: 0000000000000000
+    [ 2710.901663] R13: ffff88003701e298 R14: ffffffff822a4540 R15: ffff88005ad4fac0
+    [ 2710.901907] FS:  00007f2f5e90f740(0000) GS:ffff88005d880000(0000) knlGS:0000000000000000
+    [ 2710.902277] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+    [ 2710.902500] CR2: 0000000000000000 CR3: 0000000058ca3000 CR4: 00000000000406e0
+    [ 2710.902744] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+    [ 2710.902977] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+    [ 2710.903180] Call Trace:
+    [ 2710.903332]  hrtimer_try_to_cancel+0x1a/0x93
+    [ 2710.903504]  hrtimer_cancel+0x15/0x20
+    [ 2710.903667]  qdisc_watchdog_cancel+0x12/0x14
+    [ 2710.903866]  htb_destroy+0x2e/0xf7
+    [ 2710.904097]  qdisc_create+0x377/0x3fd
+    [ 2710.904330]  tc_modify_qdisc+0x4d2/0x4fd
+    [ 2710.904511]  rtnetlink_rcv_msg+0x188/0x197
+    [ 2710.904682]  ? rcu_read_unlock+0x3e/0x5f
+    [ 2710.904849]  ? rtnl_newlink+0x729/0x729
+    [ 2710.905017]  netlink_rcv_skb+0x6c/0xce
+    [ 2710.905183]  rtnetlink_rcv+0x23/0x2a
+    [ 2710.905345]  netlink_unicast+0x103/0x181
+    [ 2710.905511]  netlink_sendmsg+0x326/0x337
+    [ 2710.905679]  sock_sendmsg_nosec+0x14/0x3f
+    [ 2710.905847]  sock_sendmsg+0x29/0x2e
+    [ 2710.906010]  ___sys_sendmsg+0x209/0x28b
+    [ 2710.906176]  ? do_raw_spin_unlock+0xcd/0xf8
+    [ 2710.906346]  ? _raw_spin_unlock+0x27/0x31
+    [ 2710.906514]  ? __handle_mm_fault+0x651/0xdb1
+    [ 2710.906685]  ? check_chain_key+0xb0/0xfd
+    [ 2710.906855]  __sys_sendmsg+0x45/0x63
+    [ 2710.907018]  ? __sys_sendmsg+0x45/0x63
+    [ 2710.907185]  SyS_sendmsg+0x19/0x1b
+    [ 2710.907344]  entry_SYSCALL_64_fastpath+0x23/0xc2
+    
+    Note that probably this bug goes further back because the default qdisc
+    handling always calls ->destroy on init failure too.
+    
+    Fixes: 87b60cfacf9f ("net_sched: fix error recovery at qdisc creation")
+    Fixes: 0fbbeb1ba43b ("[PKT_SCHED]: Fix missing qdisc_destroy() in qdisc_create_dflt()")
+    Signed-off-by: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Amit Pundir <amit.pundir@linaro.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit dc491cdd2c81588ca6110f07325e32535192bcf0
+Author: Gao Feng <gfree.wind@vip.163.com>
+Date:   Wed Jun 28 12:53:54 2017 +0800
+
+    net: sched: Fix one possible panic when no destroy callback
+    
+    commit c1a4872ebfb83b1af7144f7b29ac8c4b344a12a8 upstream.
+    
+    When qdisc fail to init, qdisc_create would invoke the destroy callback
+    to cleanup. But there is no check if the callback exists really. So it
+    would cause the panic if there is no real destroy callback like the qdisc
+    codel, fq, and so on.
+    
+    Take codel as an example following:
+    When a malicious user constructs one invalid netlink msg, it would cause
+    codel_init->codel_change->nla_parse_nested failed.
+    Then kernel would invoke the destroy callback directly but qdisc codel
+    doesn't define one. It causes one panic as a result.
+    
+    Now add one the check for destroy to avoid the possible panic.
+    
+    Fixes: 87b60cfacf9f ("net_sched: fix error recovery at qdisc creation")
+    Signed-off-by: Gao Feng <gfree.wind@vip.163.com>
+    Acked-by: Eric Dumazet <edumazet@google.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+commit 3d343258091119b53792beed2082bc87340ab5de
+Author: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+Date:   Wed Aug 30 12:49:05 2017 +0300
+
+    sch_tbf: fix two null pointer dereferences on init failure
+    
+    commit c2d6511e6a4f1f3673d711569c00c3849549e9b0 upstream.
+    
+    sch_tbf calls qdisc_watchdog_cancel() in both its ->reset and ->destroy
+    callbacks but it may fail before the timer is initialized due to missing
+    options (either not supplied by user-space or set as a default qdisc),
+    also q->qdisc is used by ->reset and ->destroy so we need it initialized.
+    
+    Reproduce:
+    $ sysctl net.core.default_qdisc=tbf
+    $ ip l set ethX up
+    
+    Crash log:
+    [  959.160172] BUG: unable to handle kernel NULL pointer dereference at 0000000000000018
+    [  959.160323] IP: qdisc_reset+0xa/0x5c
+    [  959.160400] PGD 59cdb067
+    [  959.160401] P4D 59cdb067
+    [  959.160466] PUD 59ccb067
+    [  959.160532] PMD 0
+    [  959.160597]
+    [  959.160706] Oops: 0000 [#1] SMP
+    [  959.160778] Modules linked in: sch_tbf sch_sfb sch_prio sch_netem
+    [  959.160891] CPU: 2 PID: 1562 Comm: ip Not tainted 4.13.0-rc6+ #62
+    [  959.160998] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.7.5-20140531_083030-gandalf 04/01/2014
+    [  959.161157] task: ffff880059c9a700 task.stack: ffff8800376d0000
+    [  959.161263] RIP: 0010:qdisc_reset+0xa/0x5c
+    [  959.161347] RSP: 0018:ffff8800376d3610 EFLAGS: 00010286
+    [  959.161531] RAX: ffffffffa001b1dd RBX: ffff8800373a2800 RCX: 0000000000000000
+    [  959.161733] RDX: ffffffff8215f160 RSI: ffffffff8215f160 RDI: 0000000000000000
+    [  959.161939] RBP: ffff8800376d3618 R08: 00000000014080c0 R09: 00000000ffffffff
+    [  959.162141] R10: ffff8800376d3578 R11: 0000000000000020 R12: ffffffffa001d2c0
+    [  959.162343] R13: ffff880037538000 R14: 00000000ffffffff R15: 0000000000000001
+    [  959.162546] FS:  00007fcc5126b740(0000) GS:ffff88005d900000(0000) knlGS:0000000000000000
+    [  959.162844] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+    [  959.163030] CR2: 0000000000000018 CR3: 000000005abc4000 CR4: 00000000000406e0
+    [  959.163233] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+    [  959.163436] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+    [  959.163638] Call Trace:
+    [  959.163788]  tbf_reset+0x19/0x64 [sch_tbf]
+    [  959.163957]  qdisc_destroy+0x8b/0xe5
+    [  959.164119]  qdisc_create_dflt+0x86/0x94
+    [  959.164284]  ? dev_activate+0x129/0x129
+    [  959.164449]  attach_one_default_qdisc+0x36/0x63
+    [  959.164623]  netdev_for_each_tx_queue+0x3d/0x48
+    [  959.164795]  dev_activate+0x4b/0x129
+    [  959.164957]  __dev_open+0xe7/0x104
+    [  959.165118]  __dev_change_flags+0xc6/0x15c
+    [  959.165287]  dev_change_flags+0x25/0x59
+    [  959.165451]  do_setlink+0x30c/0xb3f
+    [  959.165613]  ? check_chain_key+0xb0/0xfd
+    [  959.165782]  rtnl_newlink+0x3a4/0x729
+    [  959.165947]  ? rtnl_newlink+0x117/0x729
+    [  959.166121]  ? ns_capable_common+0xd/0xb1
+    [  959.166288]  ? ns_capable+0x13/0x15
+    [  959.166450]  rtnetlink_rcv_msg+0x188/0x197
+    [  959.166617]  ? rcu_read_unlock+0x3e/0x5f
+    [  959.166783]  ? rtnl_newlink+0x729/0x729
+    [  959.166948]  netlink_rcv_skb+0x6c/0xce
+    [  959.167113]  rtnetlink_rcv+0x23/0x2a
+    [  959.167273]  netlink_unicast+0x103/0x181
+    [  959.167439]  netlink_sendmsg+0x326/0x337
+    [  959.167607]  sock_sendmsg_nosec+0x14/0x3f
+    [  959.167772]  sock_sendmsg+0x29/0x2e
+    [  959.167932]  ___sys_sendmsg+0x209/0x28b
+    [  959.168098]  ? do_raw_spin_unlock+0xcd/0xf8
+    [  959.168267]  ? _raw_spin_unlock+0x27/0x31
+    [  959.168432]  ? __handle_mm_fault+0x651/0xdb1
+    [  959.168602]  ? check_chain_key+0xb0/0xfd
+    [  959.168773]  __sys_sendmsg+0x45/0x63
+    [  959.168934]  ? __sys_sendmsg+0x45/0x63
+    [  959.169100]  SyS_sendmsg+0x19/0x1b
+    [  959.169260]  entry_SYSCALL_64_fastpath+0x23/0xc2
+    [  959.169432] RIP: 0033:0x7fcc5097e690
+    [  959.169592] RSP: 002b:00007ffd0d5c7b48 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+    [  959.169887] RAX: ffffffffffffffda RBX: ffffffff810d278c RCX: 00007fcc5097e690
+    [  959.170089] RDX: 0000000000000000 RSI: 00007ffd0d5c7b90 RDI: 0000000000000003
+    [  959.170292] RBP: ffff8800376d3f98 R08: 0000000000000001 R09: 0000000000000003
+    [  959.170494] R10: 00007ffd0d5c7910 R11: 0000000000000246 R12: 0000000000000006
+    [  959.170697] R13: 000000000066f1a0 R14: 00007ffd0d5cfc40 R15: 0000000000000000
+    [  959.170900]  ? trace_hardirqs_off_caller+0xa7/0xcf
+    [  959.171076] Code: 00 41 c7 84 24 14 01 00 00 00 00 00 00 41 c7 84 24
+    98 00 00 00 00 00 00 00 41 5c 41 5d 41 5e 5d c3 66 66 66 66 90 55 48 89
+    e5 53 <48> 8b 47 18 48 89 fb 48 8b 40 48 48 85 c0 74 02 ff d0 48 8b bb
+    [  959.171637] RIP: qdisc_reset+0xa/0x5c RSP: ffff8800376d3610
+    [  959.171821] CR2: 0000000000000018
+    
+    Fixes: 87b60cfacf9f ("net_sched: fix error recovery at qdisc creation")
+    Fixes: 0fbbeb1ba43b ("[PKT_SCHED]: Fix missing qdisc_destroy() in qdisc_create_dflt()")
+    Signed-off-by: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Amit Pundir <amit.pundir@linaro.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 977f75d5c361cce54b42c5e60c5ec4dc8bf034f3
+Author: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+Date:   Wed Aug 30 12:49:03 2017 +0300
+
+    sch_netem: avoid null pointer deref on init failure
+    
+    commit 634576a1844dba15bc5e6fc61d72f37e13a21615 upstream.
+    
+    netem can fail in ->init due to missing options (either not supplied by
+    user-space or used as a default qdisc) causing a timer->base null
+    pointer deref in its ->destroy() and ->reset() callbacks.
+    
+    Reproduce:
+    $ sysctl net.core.default_qdisc=netem
+    $ ip l set ethX up
+    
+    Crash log:
+    [ 1814.846943] BUG: unable to handle kernel NULL pointer dereference at (null)
+    [ 1814.847181] IP: hrtimer_active+0x17/0x8a
+    [ 1814.847270] PGD 59c34067
+    [ 1814.847271] P4D 59c34067
+    [ 1814.847337] PUD 37374067
+    [ 1814.847403] PMD 0
+    [ 1814.847468]
+    [ 1814.847582] Oops: 0000 [#1] SMP
+    [ 1814.847655] Modules linked in: sch_netem(O) sch_fq_codel(O)
+    [ 1814.847761] CPU: 3 PID: 1573 Comm: ip Tainted: G           O 4.13.0-rc6+ #62
+    [ 1814.847884] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.7.5-20140531_083030-gandalf 04/01/2014
+    [ 1814.848043] task: ffff88003723a700 task.stack: ffff88005adc8000
+    [ 1814.848235] RIP: 0010:hrtimer_active+0x17/0x8a
+    [ 1814.848407] RSP: 0018:ffff88005adcb590 EFLAGS: 00010246
+    [ 1814.848590] RAX: 0000000000000000 RBX: ffff880058e359d8 RCX: 0000000000000000
+    [ 1814.848793] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff880058e359d8
+    [ 1814.848998] RBP: ffff88005adcb5b0 R08: 00000000014080c0 R09: 00000000ffffffff
+    [ 1814.849204] R10: ffff88005adcb660 R11: 0000000000000020 R12: 0000000000000000
+    [ 1814.849410] R13: ffff880058e359d8 R14: 00000000ffffffff R15: 0000000000000001
+    [ 1814.849616] FS:  00007f733bbca740(0000) GS:ffff88005d980000(0000) knlGS:0000000000000000
+    [ 1814.849919] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+    [ 1814.850107] CR2: 0000000000000000 CR3: 0000000059f0d000 CR4: 00000000000406e0
+    [ 1814.850313] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+    [ 1814.850518] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+    [ 1814.850723] Call Trace:
+    [ 1814.850875]  hrtimer_try_to_cancel+0x1a/0x93
+    [ 1814.851047]  hrtimer_cancel+0x15/0x20
+    [ 1814.851211]  qdisc_watchdog_cancel+0x12/0x14
+    [ 1814.851383]  netem_reset+0xe6/0xed [sch_netem]
+    [ 1814.851561]  qdisc_destroy+0x8b/0xe5
+    [ 1814.851723]  qdisc_create_dflt+0x86/0x94
+    [ 1814.851890]  ? dev_activate+0x129/0x129
+    [ 1814.852057]  attach_one_default_qdisc+0x36/0x63
+    [ 1814.852232]  netdev_for_each_tx_queue+0x3d/0x48
+    [ 1814.852406]  dev_activate+0x4b/0x129
+    [ 1814.852569]  __dev_open+0xe7/0x104
+    [ 1814.852730]  __dev_change_flags+0xc6/0x15c
+    [ 1814.852899]  dev_change_flags+0x25/0x59
+    [ 1814.853064]  do_setlink+0x30c/0xb3f
+    [ 1814.853228]  ? check_chain_key+0xb0/0xfd
+    [ 1814.853396]  ? check_chain_key+0xb0/0xfd
+    [ 1814.853565]  rtnl_newlink+0x3a4/0x729
+    [ 1814.853728]  ? rtnl_newlink+0x117/0x729
+    [ 1814.853905]  ? ns_capable_common+0xd/0xb1
+    [ 1814.854072]  ? ns_capable+0x13/0x15
+    [ 1814.854234]  rtnetlink_rcv_msg+0x188/0x197
+    [ 1814.854404]  ? rcu_read_unlock+0x3e/0x5f
+    [ 1814.854572]  ? rtnl_newlink+0x729/0x729
+    [ 1814.854737]  netlink_rcv_skb+0x6c/0xce
+    [ 1814.854902]  rtnetlink_rcv+0x23/0x2a
+    [ 1814.855064]  netlink_unicast+0x103/0x181
+    [ 1814.855230]  netlink_sendmsg+0x326/0x337
+    [ 1814.855398]  sock_sendmsg_nosec+0x14/0x3f
+    [ 1814.855584]  sock_sendmsg+0x29/0x2e
+    [ 1814.855747]  ___sys_sendmsg+0x209/0x28b
+    [ 1814.855912]  ? do_raw_spin_unlock+0xcd/0xf8
+    [ 1814.856082]  ? _raw_spin_unlock+0x27/0x31
+    [ 1814.856251]  ? __handle_mm_fault+0x651/0xdb1
+    [ 1814.856421]  ? check_chain_key+0xb0/0xfd
+    [ 1814.856592]  __sys_sendmsg+0x45/0x63
+    [ 1814.856755]  ? __sys_sendmsg+0x45/0x63
+    [ 1814.856923]  SyS_sendmsg+0x19/0x1b
+    [ 1814.857083]  entry_SYSCALL_64_fastpath+0x23/0xc2
+    [ 1814.857256] RIP: 0033:0x7f733b2dd690
+    [ 1814.857419] RSP: 002b:00007ffe1d3387d8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+    [ 1814.858238] RAX: ffffffffffffffda RBX: ffffffff810d278c RCX: 00007f733b2dd690
+    [ 1814.858445] RDX: 0000000000000000 RSI: 00007ffe1d338820 RDI: 0000000000000003
+    [ 1814.858651] RBP: ffff88005adcbf98 R08: 0000000000000001 R09: 0000000000000003
+    [ 1814.858856] R10: 00007ffe1d3385a0 R11: 0000000000000246 R12: 0000000000000002
+    [ 1814.859060] R13: 000000000066f1a0 R14: 00007ffe1d3408d0 R15: 0000000000000000
+    [ 1814.859267]  ? trace_hardirqs_off_caller+0xa7/0xcf
+    [ 1814.859446] Code: 10 55 48 89 c7 48 89 e5 e8 45 a1 fb ff 31 c0 5d c3
+    31 c0 c3 66 66 66 66 90 55 48 89 e5 41 56 41 55 41 54 53 49 89 fd 49 8b
+    45 30 <4c> 8b 20 41 8b 5c 24 38 31 c9 31 d2 48 c7 c7 50 8e 1d 82 41 89
+    [ 1814.860022] RIP: hrtimer_active+0x17/0x8a RSP: ffff88005adcb590
+    [ 1814.860214] CR2: 0000000000000000
+    
+    Fixes: 87b60cfacf9f ("net_sched: fix error recovery at qdisc creation")
+    Fixes: 0fbbeb1ba43b ("[PKT_SCHED]: Fix missing qdisc_destroy() in qdisc_create_dflt()")
+    Signed-off-by: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Amit Pundir <amit.pundir@linaro.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit bafe019d5ff66db88a7547b5a41592146966bb1d
+Author: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+Date:   Wed Aug 30 12:48:59 2017 +0300
+
+    sch_hhf: fix null pointer dereference on init failure
+    
+    commit 32db864d33c21fd70a217ba53cb7224889354ffb upstream.
+    
+    If sch_hhf fails in its ->init() function (either due to wrong
+    user-space arguments as below or memory alloc failure of hh_flows) it
+    will do a null pointer deref of q->hh_flows in its ->destroy() function.
+    
+    To reproduce the crash:
+    $ tc qdisc add dev eth0 root hhf quantum 2000000 non_hh_weight 10000000
+    
+    Crash log:
+    [  690.654882] BUG: unable to handle kernel NULL pointer dereference at (null)
+    [  690.655565] IP: hhf_destroy+0x48/0xbc
+    [  690.655944] PGD 37345067
+    [  690.655948] P4D 37345067
+    [  690.656252] PUD 58402067
+    [  690.656554] PMD 0
+    [  690.656857]
+    [  690.657362] Oops: 0000 [#1] SMP
+    [  690.657696] Modules linked in:
+    [  690.658032] CPU: 3 PID: 920 Comm: tc Not tainted 4.13.0-rc6+ #57
+    [  690.658525] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.7.5-20140531_083030-gandalf 04/01/2014
+    [  690.659255] task: ffff880058578000 task.stack: ffff88005acbc000
+    [  690.659747] RIP: 0010:hhf_destroy+0x48/0xbc
+    [  690.660146] RSP: 0018:ffff88005acbf9e0 EFLAGS: 00010246
+    [  690.660601] RAX: 0000000000000000 RBX: 0000000000000020 RCX: 0000000000000000
+    [  690.661155] RDX: 0000000000000000 RSI: 0000000000000001 RDI: ffffffff821f63f0
+    [  690.661710] RBP: ffff88005acbfa08 R08: ffffffff81b10a90 R09: 0000000000000000
+    [  690.662267] R10: 00000000f42b7019 R11: ffff880058578000 R12: 00000000ffffffea
+    [  690.662820] R13: ffff8800372f6400 R14: 0000000000000000 R15: 0000000000000000
+    [  690.663769] FS:  00007f8ae5e8b740(0000) GS:ffff88005d980000(0000) knlGS:0000000000000000
+    [  690.667069] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+    [  690.667965] CR2: 0000000000000000 CR3: 0000000058523000 CR4: 00000000000406e0
+    [  690.668918] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+    [  690.669945] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+    [  690.671003] Call Trace:
+    [  690.671743]  qdisc_create+0x377/0x3fd
+    [  690.672534]  tc_modify_qdisc+0x4d2/0x4fd
+    [  690.673324]  rtnetlink_rcv_msg+0x188/0x197
+    [  690.674204]  ? rcu_read_unlock+0x3e/0x5f
+    [  690.675091]  ? rtnl_newlink+0x729/0x729
+    [  690.675877]  netlink_rcv_skb+0x6c/0xce
+    [  690.676648]  rtnetlink_rcv+0x23/0x2a
+    [  690.677405]  netlink_unicast+0x103/0x181
+    [  690.678179]  netlink_sendmsg+0x326/0x337
+    [  690.678958]  sock_sendmsg_nosec+0x14/0x3f
+    [  690.679743]  sock_sendmsg+0x29/0x2e
+    [  690.680506]  ___sys_sendmsg+0x209/0x28b
+    [  690.681283]  ? __handle_mm_fault+0xc7d/0xdb1
+    [  690.681915]  ? check_chain_key+0xb0/0xfd
+    [  690.682449]  __sys_sendmsg+0x45/0x63
+    [  690.682954]  ? __sys_sendmsg+0x45/0x63
+    [  690.683471]  SyS_sendmsg+0x19/0x1b
+    [  690.683974]  entry_SYSCALL_64_fastpath+0x23/0xc2
+    [  690.684516] RIP: 0033:0x7f8ae529d690
+    [  690.685016] RSP: 002b:00007fff26d2d6b8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+    [  690.685931] RAX: ffffffffffffffda RBX: ffffffff810d278c RCX: 00007f8ae529d690
+    [  690.686573] RDX: 0000000000000000 RSI: 00007fff26d2d700 RDI: 0000000000000003
+    [  690.687047] RBP: ffff88005acbff98 R08: 0000000000000001 R09: 0000000000000000
+    [  690.687519] R10: 00007fff26d2d480 R11: 0000000000000246 R12: 0000000000000002
+    [  690.687996] R13: 0000000001258070 R14: 0000000000000001 R15: 0000000000000000
+    [  690.688475]  ? trace_hardirqs_off_caller+0xa7/0xcf
+    [  690.688887] Code: 00 00 e8 2a 02 ae ff 49 8b bc 1d 60 02 00 00 48 83
+    c3 08 e8 19 02 ae ff 48 83 fb 20 75 dc 45 31 f6 4d 89 f7 4d 03 bd 20 02
+    00 00 <49> 8b 07 49 39 c7 75 24 49 83 c6 10 49 81 fe 00 40 00 00 75 e1
+    [  690.690200] RIP: hhf_destroy+0x48/0xbc RSP: ffff88005acbf9e0
+    [  690.690636] CR2: 0000000000000000
+    
+    Fixes: 87b60cfacf9f ("net_sched: fix error recovery at qdisc creation")
+    Fixes: 10239edf86f1 ("net-qdisc-hhf: Heavy-Hitter Filter (HHF) qdisc")
+    Signed-off-by: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Amit Pundir <amit.pundir@linaro.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 9db519dc793994d702876c815f1d903c29280ab5
+Author: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+Date:   Wed Aug 30 12:48:58 2017 +0300
+
+    sch_multiq: fix double free on init failure
+    
+    commit e89d469e3be3ed3d7124a803211a463ff83d0964 upstream.
+    
+    The below commit added a call to ->destroy() on init failure, but multiq
+    still frees ->queues on error in init, but ->queues is also freed by
+    ->destroy() thus we get double free and corrupted memory.
+    
+    Very easy to reproduce (eth0 not multiqueue):
+    $ tc qdisc add dev eth0 root multiq
+    RTNETLINK answers: Operation not supported
+    $ ip l add dumdum type dummy
+    (crash)
+    
+    Trace log:
+    [ 3929.467747] general protection fault: 0000 [#1] SMP
+    [ 3929.468083] Modules linked in:
+    [ 3929.468302] CPU: 3 PID: 967 Comm: ip Not tainted 4.13.0-rc6+ #56
+    [ 3929.468625] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.7.5-20140531_083030-gandalf 04/01/2014
+    [ 3929.469124] task: ffff88003716a700 task.stack: ffff88005872c000
+    [ 3929.469449] RIP: 0010:__kmalloc_track_caller+0x117/0x1be
+    [ 3929.469746] RSP: 0018:ffff88005872f6a0 EFLAGS: 00010246
+    [ 3929.470042] RAX: 00000000000002de RBX: 0000000058a59000 RCX: 00000000000002df
+    [ 3929.470406] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffffff821f7020
+    [ 3929.470770] RBP: ffff88005872f6e8 R08: 000000000001f010 R09: 0000000000000000
+    [ 3929.471133] R10: ffff88005872f730 R11: 0000000000008cdd R12: ff006d75646d7564
+    [ 3929.471496] R13: 00000000014000c0 R14: ffff88005b403c00 R15: ffff88005b403c00
+    [ 3929.471869] FS:  00007f0b70480740(0000) GS:ffff88005d980000(0000) knlGS:0000000000000000
+    [ 3929.472286] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+    [ 3929.472677] CR2: 00007ffcee4f3000 CR3: 0000000059d45000 CR4: 00000000000406e0
+    [ 3929.473209] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+    [ 3929.474109] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+    [ 3929.474873] Call Trace:
+    [ 3929.475337]  ? kstrdup_const+0x23/0x25
+    [ 3929.475863]  kstrdup+0x2e/0x4b
+    [ 3929.476338]  kstrdup_const+0x23/0x25
+    [ 3929.478084]  __kernfs_new_node+0x28/0xbc
+    [ 3929.478478]  kernfs_new_node+0x35/0x55
+    [ 3929.478929]  kernfs_create_link+0x23/0x76
+    [ 3929.479478]  sysfs_do_create_link_sd.isra.2+0x85/0xd7
+    [ 3929.480096]  sysfs_create_link+0x33/0x35
+    [ 3929.480649]  device_add+0x200/0x589
+    [ 3929.481184]  netdev_register_kobject+0x7c/0x12f
+    [ 3929.481711]  register_netdevice+0x373/0x471
+    [ 3929.482174]  rtnl_newlink+0x614/0x729
+    [ 3929.482610]  ? rtnl_newlink+0x17f/0x729
+    [ 3929.483080]  rtnetlink_rcv_msg+0x188/0x197
+    [ 3929.483533]  ? rcu_read_unlock+0x3e/0x5f
+    [ 3929.483984]  ? rtnl_newlink+0x729/0x729
+    [ 3929.484420]  netlink_rcv_skb+0x6c/0xce
+    [ 3929.484858]  rtnetlink_rcv+0x23/0x2a
+    [ 3929.485291]  netlink_unicast+0x103/0x181
+    [ 3929.485735]  netlink_sendmsg+0x326/0x337
+    [ 3929.486181]  sock_sendmsg_nosec+0x14/0x3f
+    [ 3929.486614]  sock_sendmsg+0x29/0x2e
+    [ 3929.486973]  ___sys_sendmsg+0x209/0x28b
+    [ 3929.487340]  ? do_raw_spin_unlock+0xcd/0xf8
+    [ 3929.487719]  ? _raw_spin_unlock+0x27/0x31
+    [ 3929.488092]  ? __handle_mm_fault+0x651/0xdb1
+    [ 3929.488471]  ? check_chain_key+0xb0/0xfd
+    [ 3929.488847]  __sys_sendmsg+0x45/0x63
+    [ 3929.489206]  ? __sys_sendmsg+0x45/0x63
+    [ 3929.489576]  SyS_sendmsg+0x19/0x1b
+    [ 3929.489901]  entry_SYSCALL_64_fastpath+0x23/0xc2
+    [ 3929.490172] RIP: 0033:0x7f0b6fb93690
+    [ 3929.490423] RSP: 002b:00007ffcee4ed588 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+    [ 3929.490881] RAX: ffffffffffffffda RBX: ffffffff810d278c RCX: 00007f0b6fb93690
+    [ 3929.491198] RDX: 0000000000000000 RSI: 00007ffcee4ed5d0 RDI: 0000000000000003
+    [ 3929.491521] RBP: ffff88005872ff98 R08: 0000000000000001 R09: 0000000000000000
+    [ 3929.491801] R10: 00007ffcee4ed350 R11: 0000000000000246 R12: 0000000000000002
+    [ 3929.492075] R13: 000000000066f1a0 R14: 00007ffcee4f5680 R15: 0000000000000000
+    [ 3929.492352]  ? trace_hardirqs_off_caller+0xa7/0xcf
+    [ 3929.492590] Code: 8b 45 c0 48 8b 45 b8 74 17 48 8b 4d c8 83 ca ff 44
+    89 ee 4c 89 f7 e8 83 ca ff ff 49 89 c4 eb 49 49 63 56 20 48 8d 48 01 4d
+    8b 06 <49> 8b 1c 14 48 89 c2 4c 89 e0 65 49 0f c7 08 0f 94 c0 83 f0 01
+    [ 3929.493335] RIP: __kmalloc_track_caller+0x117/0x1be RSP: ffff88005872f6a0
+    
+    Fixes: 87b60cfacf9f ("net_sched: fix error recovery at qdisc creation")
+    Fixes: f07d1501292b ("multiq: Further multiqueue cleanup")
+    Signed-off-by: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    [AmitP: Removed unused variable 'err' in multiq_init()]
+    Signed-off-by: Amit Pundir <amit.pundir@linaro.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 951104e4805f9eeb236edf02f31096c43d68f6b8
+Author: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+Date:   Wed Aug 30 12:48:57 2017 +0300
+
+    sch_htb: fix crash on init failure
+    
+    commit 88c2ace69dbef696edba77712882af03879abc9c upstream.
+    
+    The commit below added a call to the ->destroy() callback for all qdiscs
+    which failed in their ->init(), but some were not prepared for such
+    change and can't handle partially initialized qdisc. HTB is one of them
+    and if any error occurs before the qdisc watchdog timer and qdisc work are
+    initialized then we can hit either a null ptr deref (timer->base) when
+    canceling in ->destroy or lockdep error info about trying to register
+    a non-static key and a stack dump. So to fix these two move the watchdog
+    timer and workqueue init before anything that can err out.
+    To reproduce userspace needs to send broken htb qdisc create request,
+    tested with a modified tc (q_htb.c).
+    
+    Trace log:
+    [ 2710.897602] BUG: unable to handle kernel NULL pointer dereference at (null)
+    [ 2710.897977] IP: hrtimer_active+0x17/0x8a
+    [ 2710.898174] PGD 58fab067
+    [ 2710.898175] P4D 58fab067
+    [ 2710.898353] PUD 586c0067
+    [ 2710.898531] PMD 0
+    [ 2710.898710]
+    [ 2710.899045] Oops: 0000 [#1] SMP
+    [ 2710.899232] Modules linked in:
+    [ 2710.899419] CPU: 1 PID: 950 Comm: tc Not tainted 4.13.0-rc6+ #54
+    [ 2710.899646] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.7.5-20140531_083030-gandalf 04/01/2014
+    [ 2710.900035] task: ffff880059ed2700 task.stack: ffff88005ad4c000
+    [ 2710.900262] RIP: 0010:hrtimer_active+0x17/0x8a
+    [ 2710.900467] RSP: 0018:ffff88005ad4f960 EFLAGS: 00010246
+    [ 2710.900684] RAX: 0000000000000000 RBX: ffff88003701e298 RCX: 0000000000000000
+    [ 2710.900933] RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffff88003701e298
+    [ 2710.901177] RBP: ffff88005ad4f980 R08: 0000000000000001 R09: 0000000000000001
+    [ 2710.901419] R10: ffff88005ad4f800 R11: 0000000000000400 R12: 0000000000000000
+    [ 2710.901663] R13: ffff88003701e298 R14: ffffffff822a4540 R15: ffff88005ad4fac0
+    [ 2710.901907] FS:  00007f2f5e90f740(0000) GS:ffff88005d880000(0000) knlGS:0000000000000000
+    [ 2710.902277] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+    [ 2710.902500] CR2: 0000000000000000 CR3: 0000000058ca3000 CR4: 00000000000406e0
+    [ 2710.902744] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+    [ 2710.902977] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+    [ 2710.903180] Call Trace:
+    [ 2710.903332]  hrtimer_try_to_cancel+0x1a/0x93
+    [ 2710.903504]  hrtimer_cancel+0x15/0x20
+    [ 2710.903667]  qdisc_watchdog_cancel+0x12/0x14
+    [ 2710.903866]  htb_destroy+0x2e/0xf7
+    [ 2710.904097]  qdisc_create+0x377/0x3fd
+    [ 2710.904330]  tc_modify_qdisc+0x4d2/0x4fd
+    [ 2710.904511]  rtnetlink_rcv_msg+0x188/0x197
+    [ 2710.904682]  ? rcu_read_unlock+0x3e/0x5f
+    [ 2710.904849]  ? rtnl_newlink+0x729/0x729
+    [ 2710.905017]  netlink_rcv_skb+0x6c/0xce
+    [ 2710.905183]  rtnetlink_rcv+0x23/0x2a
+    [ 2710.905345]  netlink_unicast+0x103/0x181
+    [ 2710.905511]  netlink_sendmsg+0x326/0x337
+    [ 2710.905679]  sock_sendmsg_nosec+0x14/0x3f
+    [ 2710.905847]  sock_sendmsg+0x29/0x2e
+    [ 2710.906010]  ___sys_sendmsg+0x209/0x28b
+    [ 2710.906176]  ? do_raw_spin_unlock+0xcd/0xf8
+    [ 2710.906346]  ? _raw_spin_unlock+0x27/0x31
+    [ 2710.906514]  ? __handle_mm_fault+0x651/0xdb1
+    [ 2710.906685]  ? check_chain_key+0xb0/0xfd
+    [ 2710.906855]  __sys_sendmsg+0x45/0x63
+    [ 2710.907018]  ? __sys_sendmsg+0x45/0x63
+    [ 2710.907185]  SyS_sendmsg+0x19/0x1b
+    [ 2710.907344]  entry_SYSCALL_64_fastpath+0x23/0xc2
+    
+    Note that probably this bug goes further back because the default qdisc
+    handling always calls ->destroy on init failure too.
+    
+    Fixes: 87b60cfacf9f ("net_sched: fix error recovery at qdisc creation")
+    Fixes: 0fbbeb1ba43b ("[PKT_SCHED]: Fix missing qdisc_destroy() in qdisc_create_dflt()")
+    Signed-off-by: Nikolay Aleksandrov <nikolay@cumulusnetworks.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Amit Pundir <amit.pundir@linaro.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit dc491cdd2c81588ca6110f07325e32535192bcf0
+Author: Gao Feng <gfree.wind@vip.163.com>
+Date:   Wed Jun 28 12:53:54 2017 +0800
+
+    net: sched: Fix one possible panic when no destroy callback
+    
+    commit c1a4872ebfb83b1af7144f7b29ac8c4b344a12a8 upstream.
+    
+    When qdisc fail to init, qdisc_create would invoke the destroy callback
+    to cleanup. But there is no check if the callback exists really. So it
+    would cause the panic if there is no real destroy callback like the qdisc
+    codel, fq, and so on.
+    
+    Take codel as an example following:
+    When a malicious user constructs one invalid netlink msg, it would cause
+    codel_init->codel_change->nla_parse_nested failed.
+    Then kernel would invoke the destroy callback directly but qdisc codel
+    doesn't define one. It causes one panic as a result.
+    
+    Now add one the check for destroy to avoid the possible panic.
+    
+    Fixes: 87b60cfacf9f ("net_sched: fix error recovery at qdisc creation")
+    Signed-off-by: Gao Feng <gfree.wind@vip.163.com>
+    Acked-by: Eric Dumazet <edumazet@google.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 21f79ae43fd2d498847ff82161027a62a1269926 ......
+	 orig commit -> 538d92912d3190a1dd809233a0d57277459f37b2 ......
