@@ -1,0 +1,230 @@
+Check from v4.14.60 to v4.14.61
+Commit count: 24
+checking 2ae6c0413b4768f9d8fc6f718a732f9dae014b67 ......
+checking b4653a3ea3d7e68d4118f0476c72f70288c6c7f4 ......
+	 orig commit -> c170e5a8d222537e98aa8d4fddb667ff7a2ee114 ......
+checking 1a08888316d2d69d772391597fadde90d1cf1483 ......
+	 orig commit -> a6a00918d4ad8718c3ccde38c02cec17f116b2fd ......
+checking 51ef850c78bb311e7bc5e6aada5756fbf71d6b08 ......
+	 orig commit -> 46d8c4b28652d35dc6cfb5adf7f54e102fc04384 ......
+checking 65be9cbe1224f1fe51591b44e3d35603b81b595c ......
+	 orig commit -> addb8a6559f0f8b5a37582b7ca698358445a55bf ......
+checking 4aa0acf290643c8161a0b6af4b5083a000124ff1 ......
+	 orig commit -> 0a5257bc6d89c2ae69b9bf955679cb4f89261874 ......
+checking 0eba9f5d3d4829fe5cc53abe90a73c33f47405af ......
+	 orig commit -> 31e810aa1033a7db50a2746cd34a2432237f6420 ......
+checking a1b5bcffe4a4e6740545fe8ab4a3381da148ce89 ......
+	 orig commit -> b305f7ed0f4f494ad6f3ef5667501535d5a8fa31 ......
+checking e5a16c6a6707f7ec905dc595cd3a7e37402735a2 ......
+	 orig commit -> 63aff65573d73eb8dda4732ad4ef222dd35e4862 ......
+checking c1a29c2d00c656fcc4abfeec5f4f92762e3c7437 ......
+	 orig commit -> b3681dd548d06deb2e1573890829dff4b15abf46 ......
+checking 7cf6b325f5545ba41953e2a49267632ea3a78af8 ......
+	 orig commit -> d9e6dbcf28f383bf08e6a3180972f5722e514a54 ......
+checking 34a938cd3ad45b5c6d67d83329ce1dcf239863a8 ......
+	 orig commit -> 89da619bc18d79bca5304724c11d4ba3b67ce2c6 ......
+checking 45c8178cf69ea21b6d0356b3e541c8e111ba6458 ......
+	 orig commit -> c8e8cd579bb4265651df8223730105341e61a2d1 ......
+checking c8159f9a1ae9c9ea76b389666a37bd9263a761cd ......
+	 orig commit -> 72c05f32f4a5055c9c8fe889bb6903ec959c0aad ......
+checking e7de67165efe052f1a05f4afae5b7cd4dc242b34 ......
+	 orig commit -> 71755ee5350b63fb1f283de8561cdb61b47f4d1d ......
+checking 953f918d548b569d37467fadb7266d0cd93a9ff6 ......
+	 orig commit -> d512584780d3e6a7cacb2f482834849453d444a1 ......
+checking a766ccbf1d29db4f3a793131c2e986287757107c ......
+	 orig commit -> 5f5991f36dce1e69dd8bd7495763eec2e28f08e7 ......
+		 5f5991f36dce1e69dd8bd7495763eec2e28f08e7 has problem. Fixes commit -> 4e046de0f50e04acd48eb373d6a9061ddf014e0c
+commit eb31b906dcac50ce1bcf40e82689414f7051925d
+Author: Bodong Wang <bodong@mellanox.com>
+Date:   Sun Jan 13 22:47:26 2019 -0600
+
+    Revert "net/mlx5e: E-Switch, Initialize eswitch only if eswitch manager"
+    
+    [ Upstream commit 4e046de0f50e04acd48eb373d6a9061ddf014e0c ]
+    
+    This reverts commit 5f5991f36dce1e69dd8bd7495763eec2e28f08e7.
+    
+    With the original commit, eswitch instance will not be initialized for
+    a function which is vport group manager but not eswitch manager such as
+    host PF on SmartNIC (BlueField) card. This will result in a kernel crash
+    when such a vport group manager is trying to access vports in its group.
+    E.g, PF vport manager (not eswitch manager) tries to configure the MAC
+    of its VF vport, a kernel trace will happen similar as bellow:
+    
+     BUG: unable to handle kernel NULL pointer dereference at 0000000000000000
+     ...
+     RIP: 0010:mlx5_eswitch_get_vport_config+0xc/0x180 [mlx5_core]
+     ...
+    
+    Fixes: 5f5991f36dce ("net/mlx5e: E-Switch, Initialize eswitch only if eswitch manager")
+    Signed-off-by: Bodong Wang <bodong@mellanox.com>
+    Reported-by: Yuval Avnery <yuvalav@mellanox.com>
+    Reviewed-by: Daniel Jurgens <danielj@mellanox.com>
+    Reviewed-by: Or Gerlitz <ogerlitz@mellanox.com>
+    Signed-off-by: Saeed Mahameed <saeedm@mellanox.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking e0638b6a054cef5ad820f7380ff59463c6519b57 ......
+	 orig commit -> c01f6c9b3207e52fc9973a066a856ddf7a0538d8 ......
+checking 83a46456c983258eb0ba6cfc1ad650df9f59c9c1 ......
+	 orig commit -> b7d0f08e9129c45ed41bc0cfa8e77067881e45fd ......
+		 b7d0f08e9129c45ed41bc0cfa8e77067881e45fd has problem. Fixes commit -> 6dea7e1881fd86b80da64e476ac398008daed857
+81a8b0799632627b587af31ecd06112397e4ec36
+commit 486942ea8d78a034942a2f6729b8b013bc34a012
+Author: Jose Abreu <jose.abreu@synopsys.com>
+Date:   Wed Jan 9 10:05:56 2019 +0100
+
+    net: stmmac: Fix PCI module removal leak
+    
+    [ Upstream commit 6dea7e1881fd86b80da64e476ac398008daed857 ]
+    
+    Since commit b7d0f08e9129, the enable / disable of PCI device is not
+    managed which will result in IO regions not being automatically unmapped.
+    As regions continue mapped it is currently not possible to remove and
+    then probe again the PCI module of stmmac.
+    
+    Fix this by manually unmapping regions on remove callback.
+    
+    Changes from v1:
+    - Fix build error
+    
+    Cc: Joao Pinto <jpinto@synopsys.com>
+    Cc: David S. Miller <davem@davemloft.net>
+    Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>
+    Cc: Alexandre Torgue <alexandre.torgue@st.com>
+    Fixes: b7d0f08e9129 ("net: stmmac: Fix WoL for PCI-based setups")
+    Signed-off-by: Jose Abreu <joabreu@synopsys.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+
+commit cbc38304947ea2e57440bb38b733613e3f003605
+Author: Arnd Bergmann <arnd@arndb.de>
+Date:   Mon Aug 13 23:50:41 2018 +0200
+
+    net: stmmac: mark PM functions as __maybe_unused
+    
+    [ Upstream commit 81a8b0799632627b587af31ecd06112397e4ec36 ]
+    
+    The newly added suspend/resume functions cause a build warning
+    when CONFIG_PM is disabled:
+    
+    drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c:324:12: error: 'stmmac_pci_resume' defined but not used [-Werror=unused-function]
+    drivers/net/ethernet/stmicro/stmmac/stmmac_pci.c:306:12: error: 'stmmac_pci_suspend' defined but not used [-Werror=unused-function]
+    
+    Mark them as __maybe_unused so gcc can drop them silently.
+    
+    Fixes: b7d0f08e9129 ("net: stmmac: Fix WoL for PCI-based setups")
+    Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+commit 486942ea8d78a034942a2f6729b8b013bc34a012
+Author: Jose Abreu <jose.abreu@synopsys.com>
+Date:   Wed Jan 9 10:05:56 2019 +0100
+
+    net: stmmac: Fix PCI module removal leak
+    
+    [ Upstream commit 6dea7e1881fd86b80da64e476ac398008daed857 ]
+    
+    Since commit b7d0f08e9129, the enable / disable of PCI device is not
+    managed which will result in IO regions not being automatically unmapped.
+    As regions continue mapped it is currently not possible to remove and
+    then probe again the PCI module of stmmac.
+    
+    Fix this by manually unmapping regions on remove callback.
+    
+    Changes from v1:
+    - Fix build error
+    
+    Cc: Joao Pinto <jpinto@synopsys.com>
+    Cc: David S. Miller <davem@davemloft.net>
+    Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>
+    Cc: Alexandre Torgue <alexandre.torgue@st.com>
+    Fixes: b7d0f08e9129 ("net: stmmac: Fix WoL for PCI-based setups")
+    Signed-off-by: Jose Abreu <joabreu@synopsys.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+checking 1828cb3d10d9fee017fdd13dc655f708a1f39d68 ......
+	 orig commit -> bc5b6c0b62b932626a135f516a41838c510c6eba ......
+checking bcbdea1371599dab43a16dcb3649f811cf602d03 ......
+	 orig commit -> a94c689e6c9e72e722f28339e12dff191ee5a265 ......
+checking 8721f360894576908a32f5c2979dbe640731a97b ......
+	 orig commit -> 4672694bd4f1aebdab0ad763ae4716e89cb15221 ......
+checking fc63057d5fdad14ccf94dffe746187388aad2e55 ......
+	 orig commit -> 56e2c94f055d328f5f6b0a5c1721cca2f2d4e0a1 ......
+checking dc8edd08cd894a87b0136c7f077b48290eef14f6 ......
+	 orig commit -> 7e2556e40026a1b0c16f37446ab398d5a5a892e4 ......
+		 7e2556e40026a1b0c16f37446ab398d5a5a892e4 has problem. Fixes commit -> 001e465f09a18857443489a57e74314a3368c805
+commit 0bab999063b9bb3f6c9addc52f54c7688f2a51b6
+Author: Willem de Bruijn <willemb@google.com>
+Date:   Tue Jan 8 12:32:42 2019 -0500
+
+    bonding: update nest level on unlink
+    
+    [ Upstream commit 001e465f09a18857443489a57e74314a3368c805 ]
+    
+    A network device stack with multiple layers of bonding devices can
+    trigger a false positive lockdep warning. Adding lockdep nest levels
+    fixes this. Update the level on both enslave and unlink, to avoid the
+    following series of events ..
+    
+        ip netns add test
+        ip netns exec test bash
+        ip link set dev lo addr 00:11:22:33:44:55
+        ip link set dev lo down
+    
+        ip link add dev bond1 type bond
+        ip link add dev bond2 type bond
+    
+        ip link set dev lo master bond1
+        ip link set dev bond1 master bond2
+    
+        ip link set dev bond1 nomaster
+        ip link set dev bond2 master bond1
+    
+    .. from still generating a splat:
+    
+        [  193.652127] ======================================================
+        [  193.658231] WARNING: possible circular locking dependency detected
+        [  193.664350] 4.20.0 #8 Not tainted
+        [  193.668310] ------------------------------------------------------
+        [  193.674417] ip/15577 is trying to acquire lock:
+        [  193.678897] 00000000a40e3b69 (&(&bond->stats_lock)->rlock#3/3){+.+.}, at: bond_get_stats+0x58/0x290
+        [  193.687851]
+                   but task is already holding lock:
+        [  193.693625] 00000000807b9d9f (&(&bond->stats_lock)->rlock#2/2){+.+.}, at: bond_get_stats+0x58/0x290
+    
+        [..]
+    
+        [  193.851092]        lock_acquire+0xa7/0x190
+        [  193.855138]        _raw_spin_lock_nested+0x2d/0x40
+        [  193.859878]        bond_get_stats+0x58/0x290
+        [  193.864093]        dev_get_stats+0x5a/0xc0
+        [  193.868140]        bond_get_stats+0x105/0x290
+        [  193.872444]        dev_get_stats+0x5a/0xc0
+        [  193.876493]        rtnl_fill_stats+0x40/0x130
+        [  193.880797]        rtnl_fill_ifinfo+0x6c5/0xdc0
+        [  193.885271]        rtmsg_ifinfo_build_skb+0x86/0xe0
+        [  193.890091]        rtnetlink_event+0x5b/0xa0
+        [  193.894320]        raw_notifier_call_chain+0x43/0x60
+        [  193.899225]        netdev_change_features+0x50/0xa0
+        [  193.904044]        bond_compute_features.isra.46+0x1ab/0x270
+        [  193.909640]        bond_enslave+0x141d/0x15b0
+        [  193.913946]        do_set_master+0x89/0xa0
+        [  193.918016]        do_setlink+0x37c/0xda0
+        [  193.921980]        __rtnl_newlink+0x499/0x890
+        [  193.926281]        rtnl_newlink+0x48/0x70
+        [  193.930238]        rtnetlink_rcv_msg+0x171/0x4b0
+        [  193.934801]        netlink_rcv_skb+0xd1/0x110
+        [  193.939103]        rtnetlink_rcv+0x15/0x20
+        [  193.943151]        netlink_unicast+0x3b5/0x520
+        [  193.947544]        netlink_sendmsg+0x2fd/0x3f0
+        [  193.951942]        sock_sendmsg+0x38/0x50
+        [  193.955899]        ___sys_sendmsg+0x2ba/0x2d0
+        [  193.960205]        __x64_sys_sendmsg+0xad/0x100
+        [  193.964687]        do_syscall_64+0x5a/0x460
+        [  193.968823]        entry_SYSCALL_64_after_hwframe+0x49/0xbe
+    
+    Fixes: 7e2556e40026 ("bonding: avoid lockdep confusion in bond_get_stats()")
+    Reported-by: syzbot <syzkaller@googlegroups.com>
+    Signed-off-by: Willem de Bruijn <willemb@google.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>

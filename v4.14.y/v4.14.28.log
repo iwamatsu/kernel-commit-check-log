@@ -1,0 +1,276 @@
+Check from v4.14.28 to v4.14.29
+Commit count: 42
+checking 8096079403628e532af7152ce7a6aebf46900f62 ......
+checking f2216e3e1d64e879a5391be3cca2e6e3aefcb4f2 ......
+	 orig commit -> b16ea8b9492e99e03b1269fe93ebdbf8e4eabf8a ......
+checking 3914aae2ae24ba1630e1b8885da21c6c13a22942 ......
+	 orig commit -> 8874ae5f15f3feef3b4a415b9aed51edcf449aa1 ......
+checking c209d68794e632241875c14a0731ab211b31cfcb ......
+	 orig commit -> 6a2cf8d3663e13e19af636c2a8d92e766261dc45 ......
+		 6a2cf8d3663e13e19af636c2a8d92e766261dc45 has problem. Fixes commit -> 6d6340672ba3a99c4cf7af79c2edf7aa25595c84
+commit b18daa09fefe5c7a1b35419734012469287b9504
+Author: Bill Kuzeja <William.Kuzeja@stratus.com>
+Date:   Fri Mar 23 10:37:25 2018 -0400
+
+    scsi: qla2xxx: Fix small memory leak in qla2x00_probe_one on probe failure
+    
+    commit 6d6340672ba3a99c4cf7af79c2edf7aa25595c84 upstream.
+    
+    The code that fixes the crashes in the following commit introduced a small
+    memory leak:
+    
+    commit 6a2cf8d3663e ("scsi: qla2xxx: Fix crashes in qla2x00_probe_one on probe failure")
+    
+    Fixing this requires a bit of reworking, which I've explained. Also provide
+    some code cleanup.
+    
+    There is a small window in qla2x00_probe_one where if qla2x00_alloc_queues
+    fails, we end up never freeing req and rsp and leak 0xc0 and 0xc8 bytes
+    respectively (the sizes of req and rsp).
+    
+    I originally put in checks to test for this condition which were based on
+    the incorrect assumption that if ha->rsp_q_map and ha->req_q_map were
+    allocated, then rsp and req were allocated as well. This is incorrect.
+    There is a window between these allocations:
+    
+           ret = qla2x00_mem_alloc(ha, req_length, rsp_length, &req, &rsp);
+                    goto probe_hw_failed;
+    
+    [if successful, both rsp and req allocated]
+    
+           base_vha = qla2x00_create_host(sht, ha);
+                    goto probe_hw_failed;
+    
+           ret = qla2x00_request_irqs(ha, rsp);
+                    goto probe_failed;
+    
+           if (qla2x00_alloc_queues(ha, req, rsp)) {
+                    goto probe_failed;
+    
+    [if successful, now ha->rsp_q_map and ha->req_q_map allocated]
+    
+    To simplify this, we should just set req and rsp to NULL after we free
+    them. Sounds simple enough? The problem is that req and rsp are pointers
+    defined in the qla2x00_probe_one and they are not always passed by reference
+    to the routines that free them.
+    
+    Here are paths which can free req and rsp:
+    
+    PATH 1:
+    qla2x00_probe_one
+       ret = qla2x00_mem_alloc(ha, req_length, rsp_length, &req, &rsp);
+       [req and rsp are passed by reference, but if this fails, we currently
+        do not NULL out req and rsp. Easily fixed]
+    
+    PATH 2:
+    qla2x00_probe_one
+       failing in qla2x00_request_irqs or qla2x00_alloc_queues
+          probe_failed:
+             qla2x00_free_device(base_vha);
+                qla2x00_free_req_que(ha, req)
+                qla2x00_free_rsp_que(ha, rsp)
+    
+    PATH 3:
+    qla2x00_probe_one:
+       failing in qla2x00_mem_alloc or qla2x00_create_host
+          probe_hw_failed:
+             qla2x00_free_req_que(ha, req)
+             qla2x00_free_rsp_que(ha, rsp)
+    
+    PATH 1: This should currently work, but it doesn't because rsp and rsp are
+    not set to NULL in qla2x00_mem_alloc. Easily remedied.
+    
+    PATH 2: req and rsp aren't passed in at all to qla2x00_free_device but are
+    derived from ha->req_q_map[0] and ha->rsp_q_map[0]. These are only set up if
+    qla2x00_alloc_queues succeeds.
+    
+    In qla2x00_free_queues, we are protected from crashing if these don't exist
+    because req_qid_map and rsp_qid_map are only set on their allocation. We are
+    guarded in this way:
+    
+            for (cnt = 0; cnt < ha->max_req_queues; cnt++) {
+                    if (!test_bit(cnt, ha->req_qid_map))
+                            continue;
+    
+    PATH 3: This works. We haven't freed req or rsp yet (or they were never
+    allocated if qla2x00_mem_alloc failed), so we'll attempt to free them here.
+    
+    To summarize, there are a few small changes to make this work correctly and
+    (and for some cleanup):
+    
+    1) (For PATH 1) Set *rsp and *req to NULL in case of failure in
+    qla2x00_mem_alloc so these are correctly set to NULL back in
+    qla2x00_probe_one
+    
+    2) After jumping to probe_failed: and calling qla2x00_free_device,
+    explicitly set rsp and req to NULL so further calls with these pointers do
+    not crash, i.e. the free queue calls in the probe_hw_failed section we fall
+    through to.
+    
+    3) Fix return code check in the call to qla2x00_alloc_queues. We currently
+    drop the return code on the floor. The probe fails but the caller of the
+    probe doesn't have an error code, so it attaches to pci. This can result in
+    a crash on module shutdown.
+    
+    4) Remove unnecessary NULL checks in qla2x00_free_req_que,
+    qla2x00_free_rsp_que, and the egregious NULL checks before kfrees and vfrees
+    in qla2x00_mem_free.
+    
+    I tested this out running a scenario where the card breaks at various times
+    during initialization. I made sure I forced every error exit path in
+    qla2x00_probe_one.
+    
+    Cc: <stable@vger.kernel.org> # v4.16
+    Fixes: 6a2cf8d3663e ("scsi: qla2xxx: Fix crashes in qla2x00_probe_one on probe failure")
+    Signed-off-by: Bill Kuzeja <william.kuzeja@stratus.com>
+    Acked-by: Himanshu Madhani <himanshu.madhani@cavium.com>
+    Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 91cb90636e038c8403ac581f3cc285efd1ba5ec5 ......
+	 orig commit -> a2390348c19d0819d525d375414a7cfdacb51a68 ......
+checking 31de69d5c9b83c066cf7cf0774912e01fc4ef530 ......
+	 orig commit -> 5c25d451163cab9be80744cbc5448d6b95ab8d1a ......
+		 5c25d451163cab9be80744cbc5448d6b95ab8d1a has problem. Fixes commit -> 7ac0c332f96bb9688560726f5e80c097ed8de59a
+commit f3a7d11834f30d04a67c68dd572493953c088834
+Author: himanshu.madhani@cavium.com <himanshu.madhani@cavium.com>
+Date:   Mon Jan 15 20:46:48 2018 -0800
+
+    scsi: qla2xxx: Fix warning in qla2x00_async_iocb_timeout()
+    
+    
+    [ Upstream commit 7ac0c332f96bb9688560726f5e80c097ed8de59a ]
+    
+    This patch fixes following Smatch warning:
+    
+    drivers/scsi/qla2xxx/qla_init.c:130 qla2x00_async_iocb_timeout() error: we previously assumed 'fcport' could be null (see line 107)
+    
+    Fixes: 5c25d451163c ("scsi: qla2xxx: Fix NULL pointer access for fcport structure")
+    Reported by: Dan Carpenter <dan.carpenter@oracle.com>
+    Signed-off-by: Quinn Tran <quinn.tran@cavium.com>
+    Signed-off-by: Himanshu Madhani <himanshu.madhani@cavium.com>
+    Signed-off-by: Martin K. Petersen <martin.petersen@oracle.com>
+    Signed-off-by: Sasha Levin <alexander.levin@microsoft.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 8cdd1908c17492cb6176d63d279de2534342b369 ......
+	 orig commit -> 62aa281470fdb7c0796d63a1cc918a8c1f02dde2 ......
+checking 1a8902505673e41b44f357014706f7fd907f18f3 ......
+	 orig commit -> 9deae9689231964972a94bb56a79b669f9d47ac1 ......
+checking d35115930d84a3c9ac10b92a371dbfa97f174f6f ......
+	 orig commit -> c8195a7b1ad5648857ce20ba24f384faed8512bc ......
+checking cb6945546b5220ff693a1aa3f4cf91782359e60e ......
+	 orig commit -> fd649f10c3d21ee9d7542c609f29978bdf73ab94 ......
+checking 0136bd7238b2cb8238426af4183ed0b02165c3f9 ......
+	 orig commit -> 92e222df7b8f05c565009c7383321b593eca488b ......
+checking 7e7fbff126d18ce2d7556f60e4b2c0b1d5d8bda3 ......
+	 orig commit -> 18bf591ba9753e3e5ba91f38f756a800693408f4 ......
+checking e625797168ce2d1ac07f8d02c71b022b70c391f6 ......
+	 orig commit -> 047fdea6341966a0898e3b16c51f54d4f5ba030a ......
+checking e01cf461f1d0fe48921da462896f8c3c6336dd7d ......
+	 orig commit -> 4f2c7583e33eb08dc09dd2e25574b80175ba7d93 ......
+checking 1f4b6d083dc6d2c3ad271bcd8af9e58048a392d1 ......
+	 orig commit -> 74b44bbe80b4c62113ac1501482ea1ee40eb9d67 ......
+checking cd21b3400bc117ebf919d47ca80a5a04ec92a0a9 ......
+	 orig commit -> d0264c01e7587001a8c4608a5d1818dba9a4c11a ......
+checking 076c7c06801a71035c077ea3f621fc9d33a51a9b ......
+	 orig commit -> a6d7cff472eea87d96899a20fa718d2bab7109f3 ......
+		 a6d7cff472eea87d96899a20fa718d2bab7109f3 has problem. Fixes commit -> baf10564fbb66ea222cae66fbff11c444590ffd9
+commit fbcede36bbfd69a9df511a22d14bccaaf36b412a
+Author: Al Viro <viro@zeniv.linux.org.uk>
+Date:   Sun May 20 16:46:23 2018 -0400
+
+    aio: fix io_destroy(2) vs. lookup_ioctx() race
+    
+    commit baf10564fbb66ea222cae66fbff11c444590ffd9 upstream.
+    
+    kill_ioctx() used to have an explicit RCU delay between removing the
+    reference from ->ioctx_table and percpu_ref_kill() dropping the refcount.
+    At some point that delay had been removed, on the theory that
+    percpu_ref_kill() itself contained an RCU delay.  Unfortunately, that was
+    the wrong kind of RCU delay and it didn't care about rcu_read_lock() used
+    by lookup_ioctx().  As the result, we could get ctx freed right under
+    lookup_ioctx().  Tejun has fixed that in a6d7cff472e ("fs/aio: Add explicit
+    RCU grace period when freeing kioctx"); however, that fix is not enough.
+    
+    Suppose io_destroy() from one thread races with e.g. io_setup() from another;
+    CPU1 removes the reference from current->mm->ioctx_table[...] just as CPU2
+    has picked it (under rcu_read_lock()).  Then CPU1 proceeds to drop the
+    refcount, getting it to 0 and triggering a call of free_ioctx_users(),
+    which proceeds to drop the secondary refcount and once that reaches zero
+    calls free_ioctx_reqs().  That does
+            INIT_RCU_WORK(&ctx->free_rwork, free_ioctx);
+            queue_rcu_work(system_wq, &ctx->free_rwork);
+    and schedules freeing the whole thing after RCU delay.
+    
+    In the meanwhile CPU2 has gotten around to percpu_ref_get(), bumping the
+    refcount from 0 to 1 and returned the reference to io_setup().
+    
+    Tejun's fix (that queue_rcu_work() in there) guarantees that ctx won't get
+    freed until after percpu_ref_get().  Sure, we'd increment the counter before
+    ctx can be freed.  Now we are out of rcu_read_lock() and there's nothing to
+    stop freeing of the whole thing.  Unfortunately, CPU2 assumes that since it
+    has grabbed the reference, ctx is *NOT* going away until it gets around to
+    dropping that reference.
+    
+    The fix is obvious - use percpu_ref_tryget_live() and treat failure as miss.
+    It's not costlier than what we currently do in normal case, it's safe to
+    call since freeing *is* delayed and it closes the race window - either
+    lookup_ioctx() comes before percpu_ref_kill() (in which case ctx->users
+    won't reach 0 until the caller of lookup_ioctx() drops it) or lookup_ioctx()
+    fails, ctx->users is unaffected and caller of lookup_ioctx() doesn't see
+    the object in question at all.
+    
+    Cc: stable@kernel.org
+    Fixes: a6d7cff472e "fs/aio: Add explicit RCU grace period when freeing kioctx"
+    Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking b071bce3ff7eda34c4e4aa9f5d39067b9db33dd8 ......
+	 orig commit -> 3b821409632ab778d46e807516b457dfa72736ed ......
+checking e693f1331c4c46347d2a3bdeae97f3d25baf0dcd ......
+	 orig commit -> 16ca6a607d84bef0129698d8d808f501afd08d43 ......
+		 16ca6a607d84bef0129698d8d808f501afd08d43 has problem. Fixes commit -> 53692908b0f594285aba18ab848318262332ed25
+checking b85437d007f45e347cf564b6acfb2761453e9f45 ......
+	 orig commit -> 27e91ad1e746e341ca2312f29bccb9736be7b476 ......
+checking 2ffe95e3aa1eb309026b9948ac74e2d509d27c26 ......
+	 orig commit -> 76600428c3677659e3c3633bb4f2ea302220a275 ......
+checking 0481f001d9c1c8a277908622cedd965575f2915b ......
+	 orig commit -> 95dd77580ccd66a0da96e6d4696945b8cea39431 ......
+checking 690291bccba932991038116ead8f28ca57978af8 ......
+	 orig commit -> 7d617264eb22b18d979eac6e85877a141253034e ......
+checking 1a50b5f07acf00112da8d6221f48b3c77c404d6a ......
+	 orig commit -> 0f4f715bc6bed3bf14c5cd7d5fe88d443e756b14 ......
+checking b4a9192c74ad78f9b7c0231434846d7981a5a211 ......
+	 orig commit -> 342038d92403b3efa1138a8599666b9f026279d6 ......
+checking bdbd0a2082d51565edc284ee8d552e856954fc3a ......
+	 orig commit -> 76f2e2bc627f7d08360ac731b6277d744d4eb599 ......
+checking 3d1ef6fbdc226248c098db5bf54eeadcf378308e ......
+	 orig commit -> a2ff19f7b70118ced291a28d5313469914de451b ......
+checking 0609022631b3f4f6af082d12351b0d926e979159 ......
+	 orig commit -> d0f833065221cbfcbadf19fd4102bcfa9330006a ......
+checking c0cafa62d78041bc612ea8aea65a98c15a0200d9 ......
+	 orig commit -> 40088dc4e1ead7df31728c73f5b51d71da18831d ......
+checking 5ee6abaa537059cc448b5d0344a0c400c2c23d7e ......
+	 orig commit -> 01c0b4265cc16bc1f43f475c5944c55c10d5768f ......
+checking a9cf8b6fe73bc86039b67057f1f175fa24dccdf6 ......
+	 orig commit -> 9ef0f88fe5466c2ca1d2975549ba6be502c464c1 ......
+checking 6fcb523eafa044c6833d0ce1317b64758c4b4453 ......
+	 orig commit -> 18a955219bf7d9008ce480d4451b6b8bf4483a22 ......
+checking 4b428e9998c175122d5c5b8f8fe74928a0847fd9 ......
+	 orig commit -> daaf216c06fba4ee4dc3f62715667da929d68774 ......
+checking 732f9a89fc1e72158a2d14fb890a81a7c21b4363 ......
+	 orig commit -> e3b3121fa8da94cb20f9e0c64ab7981ae47fd085 ......
+checking 76aaa3978252880e0405dfa66a725ca3a8c76115 ......
+	 orig commit -> a14bff131108faf50cc0cf864589fd71ee216c96 ......
+checking 68ce9930065957479f7bc43071e5fd883e70494b ......
+	 orig commit -> b5069782453459f6ec1fdeb495d9901a4545fcb5 ......
+checking 602e52e66fbe21c07c2b61642580c1c77a0f04da ......
+	 orig commit -> 78393fdde2a456cafa414b171c90f26a3df98b20 ......
+checking 102c51c6349467405d3fc0f7bcd5dc977411a182 ......
+	 orig commit -> a9e017d5619eb371460c8e516f4684def62bef3a ......
+checking 6d3789cafd00b22c5a636ec9b6a92541f51c3082 ......
+	 orig commit -> 9390afebe1d3f5a0be18b1afdd0ce09d67cebf9e ......
+checking 9ad561690f831904b455148c2fc1c2b976db2eb4 ......
+	 orig commit -> 327d53d005ca47b10eae940616ed11c569f75a9b ......
+checking 4cf4908d1d4e8d1617c4bb17bd660042e497617d ......
+	 orig commit -> 7958b2246fadf54b7ff820a2a5a2c5ca1554716f ......
+checking 828ba3c7fd5a02c7dc42d04b685c8cf6b06b9c54 ......
+	 orig commit -> 1da961d72ab0cfbe8b7c26cba731dc2bb6b9494b ......
