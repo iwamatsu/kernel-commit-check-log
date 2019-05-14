@@ -1,0 +1,389 @@
+Check from v4.4.124 to v4.4.125
+Commit count: 44
+checking aec8e72ebde913a205f5c466d718bd5fe14ab440 ......
+checking b3ca20cba49a9cc656f70b6ffbea4b5098f90aa2 ......
+	 orig commit -> 6007b080d2e2adb7af22bf29165f0594ea12b34c ......
+checking c9ea2f8af67399904fe9c72ab5192a0c0ae7f2bf ......
+	 orig commit -> 0fa4fe85f4724fff89b09741c437cbee9cf8b008 ......
+checking cbb5420a2fc021a8827bdf06ec38828bf1b43dc8 ......
+	 orig commit -> 87e0d4f0f37fb0c8c4aeeac46fff5e957738df79 ......
+checking 0de8df2e32c33e1b1d3a8ac2e5781f271c3f6206 ......
+	 orig commit -> c3eec59659cf25916647d2178c541302bb4822ad ......
+checking 95cdf6bdceddcbefeba6a15b488d816aab4ac203 ......
+	 orig commit -> e5ea9b54a055619160bbfe527ebb7d7191823d66 ......
+checking c6fe55e30bb6d431ee56cd4bbb582e30766c5e0e ......
+	 orig commit -> d8ba61ba58c88d5207c1ba2f7d9a2280e7d03be9 ......
+checking b18864167de00eb04820d1f7c6fa04bacbba43e7 ......
+	 orig commit -> c55b8550fa57ba4f5e507be406ff9fc2845713e8 ......
+checking 073bb7ddd35ca8f17a170258dacbe384935a43c8 ......
+	 orig commit -> e3d03598e8ae7d195af5d3d049596dec336f569f ......
+checking 5e4e65a940c91b61bfaf8d6e4448522577beb5ef ......
+	 orig commit -> 32d43cd391bacb5f0814c2624399a5dad3501d09 ......
+checking a0a00395f4f29c0bb52450d800d91d713294944c ......
+	 orig commit -> f1869a890cdedb92a3fab969db5d0fd982850273 ......
+checking 651ac6ccf0616b56eee5b3c8e05bb27e5e245f4d ......
+	 orig commit -> 9ffd7503944ec7c0ef41c3245d1306c221aef2be ......
+checking 2347221a6174ece34e161545c76f6f29991b5c83 ......
+	 orig commit -> 746201235b3f876792099079f4c6fea941d76183 ......
+		 746201235b3f876792099079f4c6fea941d76183 has problem. Fixes commit -> 9ffd7503944ec7c0ef41c3245d1306c221aef2be
+commit 651ac6ccf0616b56eee5b3c8e05bb27e5e245f4d
+Author: Andri Yngvason <andri.yngvason@marel.com>
+Date:   Thu Mar 15 18:23:17 2018 +0000
+
+    can: cc770: Fix use after free in cc770_tx_interrupt()
+    
+    commit 9ffd7503944ec7c0ef41c3245d1306c221aef2be upstream.
+    
+    This fixes use after free introduced by the last cc770 patch.
+    
+    Signed-off-by: Andri Yngvason <andri.yngvason@marel.com>
+    Fixes: 746201235b3f ("can: cc770: Fix queue stall & dropped RTR reply")
+    Cc: linux-stable <stable@vger.kernel.org>
+    Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking e41a696498abaf4001ca42ce1dbc585b8ecdd96a ......
+	 orig commit -> f4353daf4905c0099fd25fa742e2ffd4a4bab26a ......
+checking badf74b65fc27112f5fee871c7ade9199c74b2e1 ......
+	 orig commit -> 4c41aa24baa4ed338241d05494f2c595c885af8f ......
+checking 97acf77bc1743233920239ac9658fe6d525f9d00 ......
+	 orig commit -> fa8e6d58c5bc260f4369c6699683d69695daed0a ......
+checking 79eb32ec31ae572934361619be980c601ce0d1eb ......
+	 orig commit -> c5d343b6b7badd1f5fe0873eff2e8d63a193e732 ......
+checking 52226763072f1a2b9b4a1b00380401391ca0ab38 ......
+	 orig commit -> 78dc897b7ee67205423dbbc6b56be49fb18d15b5 ......
+checking 1e0b98b438715596ea68b1e1cc7832be4591242d ......
+	 orig commit -> 455f3e76cfc0d893585a5f358b9ddbe9c1e1e53b ......
+checking 8f4fb489b775398373e8caa44c4e97b91a4a1be2 ......
+	 orig commit -> dc9e0a9347e932e3fd3cd03e7ff241022ed6ea8a ......
+checking 224eaa8a8e644e0d3df35fe232b08fd8fead8864 ......
+	 orig commit -> 3b82a4db8eaccce735dffd50b4d4e1578099b8e8 ......
+checking 20b74f2b70b0909709d03c36f78afd9b9c7ce4e6 ......
+	 orig commit -> 2681bc79eeb640562c932007bfebbbdc55bf6a7d ......
+checking 9c6c892ed8e50f22341d654e1faa6ef570c9207d ......
+	 orig commit -> 73a88250b70954a8f27c2444e1c2411bba3c29d9 ......
+		 73a88250b70954a8f27c2444e1c2411bba3c29d9 has problem. Fixes commit -> 13f149d47392782baafd96d54d4e65f3b5ca342f
+commit 4eb1eb94f2e2e0bcdee61996588fe9932253a3a5
+Author: Thomas Hellstrom <thellstrom@vmware.com>
+Date:   Thu Apr 26 09:59:30 2018 +0200
+
+    drm/vmwgfx: Fix a buffer object leak
+    
+    commit 13f149d47392782baafd96d54d4e65f3b5ca342f upstream.
+    
+    A buffer object leak was introduced when fixing a premature buffer
+    object release. Fix this.
+    
+    Cc: <stable@vger.kernel.org>
+    Fixes: 73a88250b709 ("Fix a destoy-while-held mutex problem.")
+    Signed-off-by: Thomas Hellstrom <thellstrom@vmware.com>
+    Reviewed-by: Deepak Rawat <drawat@vmware.com>
+    Reviewed-by: Sinclair Yeh <syeh@vmware.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 0972e0f0ea83874181c803936dfed55afb525f89 ......
+	 orig commit -> 28ee90fe6048fa7b7ceaeb8831c0e4e454a4cf89 ......
+		 28ee90fe6048fa7b7ceaeb8831c0e4e454a4cf89 has problem. Fixes commit -> 5e0fb5df2ee871b841f96f9cb6a7f2784e96aa4e
+785a19f9d1dd8a4ab2d0633be4656653bd3de1fc
+f967db0b9ed44ec3057a28f3b28efc51df51b835
+commit 29f475cbff9b56c83821344b02d5152847839bc2
+Author: Chintan Pandya <cpandya@codeaurora.org>
+Date:   Wed Jun 27 08:13:47 2018 -0600
+
+    ioremap: Update pgtable free interfaces with addr
+    
+    commit 785a19f9d1dd8a4ab2d0633be4656653bd3de1fc upstream.
+    
+    The following kernel panic was observed on ARM64 platform due to a stale
+    TLB entry.
+    
+     1. ioremap with 4K size, a valid pte page table is set.
+     2. iounmap it, its pte entry is set to 0.
+     3. ioremap the same address with 2M size, update its pmd entry with
+        a new value.
+     4. CPU may hit an exception because the old pmd entry is still in TLB,
+        which leads to a kernel panic.
+    
+    Commit b6bdb7517c3d ("mm/vmalloc: add interfaces to free unmapped page
+    table") has addressed this panic by falling to pte mappings in the above
+    case on ARM64.
+    
+    To support pmd mappings in all cases, TLB purge needs to be performed
+    in this case on ARM64.
+    
+    Add a new arg, 'addr', to pud_free_pmd_page() and pmd_free_pte_page()
+    so that TLB purge can be added later in seprate patches.
+    
+    [toshi.kani@hpe.com: merge changes, rewrite patch description]
+    Fixes: 28ee90fe6048 ("x86/mm: implement free pmd/pte page interfaces")
+    Signed-off-by: Chintan Pandya <cpandya@codeaurora.org>
+    Signed-off-by: Toshi Kani <toshi.kani@hpe.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Cc: mhocko@suse.com
+    Cc: akpm@linux-foundation.org
+    Cc: hpa@zytor.com
+    Cc: linux-mm@kvack.org
+    Cc: linux-arm-kernel@lists.infradead.org
+    Cc: Will Deacon <will.deacon@arm.com>
+    Cc: Joerg Roedel <joro@8bytes.org>
+    Cc: stable@vger.kernel.org
+    Cc: Andrew Morton <akpm@linux-foundation.org>
+    Cc: Michal Hocko <mhocko@suse.com>
+    Cc: "H. Peter Anvin" <hpa@zytor.com>
+    Cc: <stable@vger.kernel.org>
+    Link: https://lkml.kernel.org/r/20180627141348.21777-3-toshi.kani@hpe.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 438604aa025a449e5c994ba4c824cc7267b8ccd2
+Author: Toshi Kani <toshi.kani@hpe.com>
+Date:   Wed Jun 27 08:13:46 2018 -0600
+
+    x86/mm: Disable ioremap free page handling on x86-PAE
+    
+    commit f967db0b9ed44ec3057a28f3b28efc51df51b835 upstream.
+    
+    ioremap() supports pmd mappings on x86-PAE.  However, kernel's pmd
+    tables are not shared among processes on x86-PAE.  Therefore, any
+    update to sync'd pmd entries need re-syncing.  Freeing a pte page
+    also leads to a vmalloc fault and hits the BUG_ON in vmalloc_sync_one().
+    
+    Disable free page handling on x86-PAE.  pud_free_pmd_page() and
+    pmd_free_pte_page() simply return 0 if a given pud/pmd entry is present.
+    This assures that ioremap() does not update sync'd pmd entries at the
+    cost of falling back to pte mappings.
+    
+    Fixes: 28ee90fe6048 ("x86/mm: implement free pmd/pte page interfaces")
+    Reported-by: Joerg Roedel <joro@8bytes.org>
+    Signed-off-by: Toshi Kani <toshi.kani@hpe.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Cc: mhocko@suse.com
+    Cc: akpm@linux-foundation.org
+    Cc: hpa@zytor.com
+    Cc: cpandya@codeaurora.org
+    Cc: linux-mm@kvack.org
+    Cc: linux-arm-kernel@lists.infradead.org
+    Cc: stable@vger.kernel.org
+    Cc: Andrew Morton <akpm@linux-foundation.org>
+    Cc: Michal Hocko <mhocko@suse.com>
+    Cc: "H. Peter Anvin" <hpa@zytor.com>
+    Cc: <stable@vger.kernel.org>
+    Link: https://lkml.kernel.org/r/20180627141348.21777-2-toshi.kani@hpe.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+commit 5b9b4a8cca9c9fd9a035edbbe6eea3d1cf687981
+Author: Toshi Kani <toshi.kani@hpe.com>
+Date:   Wed Jun 27 08:13:48 2018 -0600
+
+    x86/mm: Add TLB purge to free pmd/pte page interfaces
+    
+    commit 5e0fb5df2ee871b841f96f9cb6a7f2784e96aa4e upstream.
+    
+    ioremap() calls pud_free_pmd_page() / pmd_free_pte_page() when it creates
+    a pud / pmd map.  The following preconditions are met at their entry.
+     - All pte entries for a target pud/pmd address range have been cleared.
+     - System-wide TLB purges have been peformed for a target pud/pmd address
+       range.
+    
+    The preconditions assure that there is no stale TLB entry for the range.
+    Speculation may not cache TLB entries since it requires all levels of page
+    entries, including ptes, to have P & A-bits set for an associated address.
+    However, speculation may cache pud/pmd entries (paging-structure caches)
+    when they have P-bit set.
+    
+    Add a system-wide TLB purge (INVLPG) to a single page after clearing
+    pud/pmd entry's P-bit.
+    
+    SDM 4.10.4.1, Operation that Invalidate TLBs and Paging-Structure Caches,
+    states that:
+      INVLPG invalidates all paging-structure caches associated with the
+      current PCID regardless of the liner addresses to which they correspond.
+    
+    Fixes: 28ee90fe6048 ("x86/mm: implement free pmd/pte page interfaces")
+    Signed-off-by: Toshi Kani <toshi.kani@hpe.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Cc: mhocko@suse.com
+    Cc: akpm@linux-foundation.org
+    Cc: hpa@zytor.com
+    Cc: cpandya@codeaurora.org
+    Cc: linux-mm@kvack.org
+    Cc: linux-arm-kernel@lists.infradead.org
+    Cc: Joerg Roedel <joro@8bytes.org>
+    Cc: stable@vger.kernel.org
+    Cc: Andrew Morton <akpm@linux-foundation.org>
+    Cc: Michal Hocko <mhocko@suse.com>
+    Cc: "H. Peter Anvin" <hpa@zytor.com>
+    Cc: <stable@vger.kernel.org>
+    Link: https://lkml.kernel.org/r/20180627141348.21777-4-toshi.kani@hpe.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 29f475cbff9b56c83821344b02d5152847839bc2
+Author: Chintan Pandya <cpandya@codeaurora.org>
+Date:   Wed Jun 27 08:13:47 2018 -0600
+
+    ioremap: Update pgtable free interfaces with addr
+    
+    commit 785a19f9d1dd8a4ab2d0633be4656653bd3de1fc upstream.
+    
+    The following kernel panic was observed on ARM64 platform due to a stale
+    TLB entry.
+    
+     1. ioremap with 4K size, a valid pte page table is set.
+     2. iounmap it, its pte entry is set to 0.
+     3. ioremap the same address with 2M size, update its pmd entry with
+        a new value.
+     4. CPU may hit an exception because the old pmd entry is still in TLB,
+        which leads to a kernel panic.
+    
+    Commit b6bdb7517c3d ("mm/vmalloc: add interfaces to free unmapped page
+    table") has addressed this panic by falling to pte mappings in the above
+    case on ARM64.
+    
+    To support pmd mappings in all cases, TLB purge needs to be performed
+    in this case on ARM64.
+    
+    Add a new arg, 'addr', to pud_free_pmd_page() and pmd_free_pte_page()
+    so that TLB purge can be added later in seprate patches.
+    
+    [toshi.kani@hpe.com: merge changes, rewrite patch description]
+    Fixes: 28ee90fe6048 ("x86/mm: implement free pmd/pte page interfaces")
+    Signed-off-by: Chintan Pandya <cpandya@codeaurora.org>
+    Signed-off-by: Toshi Kani <toshi.kani@hpe.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Cc: mhocko@suse.com
+    Cc: akpm@linux-foundation.org
+    Cc: hpa@zytor.com
+    Cc: linux-mm@kvack.org
+    Cc: linux-arm-kernel@lists.infradead.org
+    Cc: Will Deacon <will.deacon@arm.com>
+    Cc: Joerg Roedel <joro@8bytes.org>
+    Cc: stable@vger.kernel.org
+    Cc: Andrew Morton <akpm@linux-foundation.org>
+    Cc: Michal Hocko <mhocko@suse.com>
+    Cc: "H. Peter Anvin" <hpa@zytor.com>
+    Cc: <stable@vger.kernel.org>
+    Link: https://lkml.kernel.org/r/20180627141348.21777-3-toshi.kani@hpe.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 438604aa025a449e5c994ba4c824cc7267b8ccd2
+Author: Toshi Kani <toshi.kani@hpe.com>
+Date:   Wed Jun 27 08:13:46 2018 -0600
+
+    x86/mm: Disable ioremap free page handling on x86-PAE
+    
+    commit f967db0b9ed44ec3057a28f3b28efc51df51b835 upstream.
+    
+    ioremap() supports pmd mappings on x86-PAE.  However, kernel's pmd
+    tables are not shared among processes on x86-PAE.  Therefore, any
+    update to sync'd pmd entries need re-syncing.  Freeing a pte page
+    also leads to a vmalloc fault and hits the BUG_ON in vmalloc_sync_one().
+    
+    Disable free page handling on x86-PAE.  pud_free_pmd_page() and
+    pmd_free_pte_page() simply return 0 if a given pud/pmd entry is present.
+    This assures that ioremap() does not update sync'd pmd entries at the
+    cost of falling back to pte mappings.
+    
+    Fixes: 28ee90fe6048 ("x86/mm: implement free pmd/pte page interfaces")
+    Reported-by: Joerg Roedel <joro@8bytes.org>
+    Signed-off-by: Toshi Kani <toshi.kani@hpe.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Cc: mhocko@suse.com
+    Cc: akpm@linux-foundation.org
+    Cc: hpa@zytor.com
+    Cc: cpandya@codeaurora.org
+    Cc: linux-mm@kvack.org
+    Cc: linux-arm-kernel@lists.infradead.org
+    Cc: stable@vger.kernel.org
+    Cc: Andrew Morton <akpm@linux-foundation.org>
+    Cc: Michal Hocko <mhocko@suse.com>
+    Cc: "H. Peter Anvin" <hpa@zytor.com>
+    Cc: <stable@vger.kernel.org>
+    Link: https://lkml.kernel.org/r/20180627141348.21777-2-toshi.kani@hpe.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 31895cfd79564111cdd5a9f48c5d491ae26a238e ......
+	 orig commit -> b6bdb7517c3d3f41f20e5c2948d6bc3f8897394e ......
+checking fc0d81cf45b3d8215c1d10079ee73365d79b5555 ......
+	 orig commit -> d418ff56b8f2d2b296daafa8da151fe27689b757 ......
+checking e32afd336f726144375d5763949004514ae1cb10 ......
+	 orig commit -> 3bf7b5d6d017c27e0d3b160aafb35a8e7cfeda1f ......
+checking 4c1c7a8283e6e8c2d1dc6f434dcdcf20e570209a ......
+	 orig commit -> 62ac3f7305470e3f52f159de448bc1a771717e88 ......
+checking f2e5f241e3396d3a638cbe980a5c781ed64f50dd ......
+	 orig commit -> ca6bfcb2f6d9deab3924bf901e73622a94900473 ......
+checking 6ebd126d886d2f584c989769551ae0f2b6f2e087 ......
+	 orig commit -> b17e5729a630d8326a48ec34ef02e6b4464a6aef ......
+		 b17e5729a630d8326a48ec34ef02e6b4464a6aef has problem. Fixes commit -> 3bf7b5d6d017c27e0d3b160aafb35a8e7cfeda1f
+commit e32afd336f726144375d5763949004514ae1cb10
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Mon Mar 19 16:33:59 2018 +0100
+
+    libata: Make Crucial BX100 500GB LPM quirk apply to all firmware versions
+    
+    commit 3bf7b5d6d017c27e0d3b160aafb35a8e7cfeda1f upstream.
+    
+    Commit b17e5729a630 ("libata: disable LPM for Crucial BX100 SSD 500GB
+    drive"), introduced a ATA_HORKAGE_NOLPM quirk for Crucial BX100 500GB SSDs
+    but limited this to the MU02 firmware version, according to:
+    http://www.crucial.com/usa/en/support-ssd-firmware
+    
+    MU02 is the last version, so there are no newer possibly fixed versions
+    and if the MU02 version has broken LPM then the MU01 almost certainly
+    also has broken LPM, so this commit changes the quirk to apply to all
+    firmware versions.
+    
+    Fixes: b17e5729a630 ("libata: disable LPM for Crucial BX100 SSD 500GB...")
+    Cc: stable@vger.kernel.org
+    Cc: Kai-Heng Feng <kai.heng.feng@canonical.com>
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Signed-off-by: Tejun Heo <tj@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 2b69573ceefabd7c20d72ade03fb89b49f994543 ......
+	 orig commit -> 9c7be59fc519af9081c46c48f06f2b8fadf55ad8 ......
+		 9c7be59fc519af9081c46c48f06f2b8fadf55ad8 has problem. Fixes commit -> d418ff56b8f2d2b296daafa8da151fe27689b757
+commit fc0d81cf45b3d8215c1d10079ee73365d79b5555
+Author: Hans de Goede <hdegoede@redhat.com>
+Date:   Mon Mar 19 16:34:00 2018 +0100
+
+    libata: Modify quirks for MX100 to limit NCQ_TRIM quirk to MU01 version
+    
+    commit d418ff56b8f2d2b296daafa8da151fe27689b757 upstream.
+    
+    When commit 9c7be59fc519af ("libata: Apply NOLPM quirk to Crucial MX100
+    512GB SSDs") was added it inherited the ATA_HORKAGE_NO_NCQ_TRIM quirk
+    from the existing "Crucial_CT*MX100*" entry, but that entry sets model_rev
+    to "MU01", where as the entry adding the NOLPM quirk sets it to NULL.
+    
+    This means that after this commit we no apply the NO_NCQ_TRIM quirk to
+    all "Crucial_CT512MX100*" SSDs even if they have the fixed "MU02"
+    firmware. This commit splits the "Crucial_CT512MX100*" quirk into 2
+    quirks, one for the "MU01" firmware and one for all other firmware
+    versions, so that we once again only apply the NO_NCQ_TRIM quirk to the
+    "MU01" firmware version.
+    
+    Fixes: 9c7be59fc519af ("libata: Apply NOLPM quirk to ... MX100 512GB SSDs")
+    Cc: stable@vger.kernel.org
+    Signed-off-by: Hans de Goede <hdegoede@redhat.com>
+    Signed-off-by: Tejun Heo <tj@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 5442db31a2b3efd6897d7ccb6be7dd772137dd8c ......
+	 orig commit -> 9173e5e80729c8434b8d27531527c5245f4a5594 ......
+checking e80ce18ad70635adf5d9ae02df6af16e7f5f0621 ......
+	 orig commit -> 058f58e235cbe03e923b30ea7c49995a46a8725f ......
+checking b5533179e758b63161159086dce94a5710ff76c8 ......
+	 orig commit -> f44cb4b19ed40b655c2d422c9021ab2c2625adb6 ......
+checking 0ff603268b01f27cb31d58738c5b33dfdcd1d923 ......
+	 orig commit -> 7997f3b2df751aab0b8e60149b226a32966c41ac ......
+checking e298da755cdf4d2e08b27c4c8cc06ad360aa0fff ......
+	 orig commit -> 28b2182dad43f6f8fcbd167539a26714fd12bd64 ......
+checking 494644c5c334b52a2931ddfa0afa4f5766ba5d49 ......
+	 orig commit -> 1903be8222b7c278ca897c129ce477c1dd6403a8 ......
+checking aaf6dfbd400003397509933c02228da1920e22ca ......
+	 orig commit -> 47b7de2f6c18f75d1f2716efe752cba43f32a626 ......
+checking ae5b14170ef12f5013f6dcee7710197baf9a7bc8 ......
+	 orig commit -> e40bdb03d3cd7da66bd0bc1e40cbcfb49351265c ......
+checking 5e6d308ff7789933d7b4003bc250de402ea311b4 ......
+	 orig commit -> 8e6b1a72a75bb5067ccb6b56d8ca4aa3a300a64e ......
+checking eba92f154208004eacaa4fb7f83009766571f142 ......
+	 orig commit -> 67a01afaf3d34893cf7d2ea19b34555d6abb7cb0 ......
+checking 87eccc3cd1e0c3da222e047f0ce0ede65638f1fd ......
+	 orig commit -> a6618f4aedb2b60932d766bd82ae7ce866e842aa ......
+checking 8e1f1062d9f9b564cef3b2c36a6e86568c27b86e ......
+	 orig commit -> 8b438686a001db64c21782d04ef68111e53c45d9 ......
+checking f56bf442fbc1aa43e24846c3bd322b6e3c79d57b ......
+	 orig commit -> 891731f6a5dbe508d12443175a7e166a2fba616a ......

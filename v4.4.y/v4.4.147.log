@@ -1,0 +1,747 @@
+Check from v4.4.147 to v4.4.148
+Commit count: 46
+checking 30a97c1e2dc39f45d9deeeccc2733278fc285d5e ......
+checking 8f2adf3d2118cc0822b83a7bb43475f9149a1d26 ......
+	 orig commit -> 6c26fcd2abfe0a56bbd95271fce02df2896cfd24 ......
+checking 4b90ff885c6cc88795b678414aaf5d7b0153a5dc ......
+	 orig commit -> 792adb90fa724ce07c0171cbc96b9215af4b1045 ......
+checking eb993211b9d7856a9ab8c487c701c84103842713 ......
+checking 6b06f36f07e2c91ad0126f17d0fc8f933c827da8 ......
+	 orig commit -> 1063711b57393c1999248cccb57bebfaf16739e7 ......
+checking 02ff2769edbce2261e981effbc3c4b98fae4faf0 ......
+	 orig commit -> 958f79b9ee55dfaf00c8106ed1c22a2919e0028b ......
+checking 9feecdb6cb73feaa55b0135aee8777eaac848c78 ......
+	 orig commit -> 0768f91530ff46683e0b372df14fd79fe8d156e5 ......
+checking 0aae5fe8413dfcd949d0df1c7d6b835efecd5b3b ......
+	 orig commit -> f22cc87f6c1f771b57c407555cfefd811cdd9507 ......
+		 f22cc87f6c1f771b57c407555cfefd811cdd9507 has problem. Fixes commit -> f19f5c49bbc3ffcc9126cc245fc1b24cc29f4a37
+commit 4cdedeefa38f45299b18ae692426d5baaff6b785
+Author: Sean Christopherson <sean.j.christopherson@intel.com>
+Date:   Fri Aug 17 10:27:36 2018 -0700
+
+    x86/speculation/l1tf: Exempt zeroed PTEs from inversion
+    
+    commit f19f5c49bbc3ffcc9126cc245fc1b24cc29f4a37 upstream.
+    
+    It turns out that we should *not* invert all not-present mappings,
+    because the all zeroes case is obviously special.
+    
+    clear_page() does not undergo the XOR logic to invert the address bits,
+    i.e. PTE, PMD and PUD entries that have not been individually written
+    will have val=0 and so will trigger __pte_needs_invert(). As a result,
+    {pte,pmd,pud}_pfn() will return the wrong PFN value, i.e. all ones
+    (adjusted by the max PFN mask) instead of zero. A zeroed entry is ok
+    because the page at physical address 0 is reserved early in boot
+    specifically to mitigate L1TF, so explicitly exempt them from the
+    inversion when reading the PFN.
+    
+    Manifested as an unexpected mprotect(..., PROT_NONE) failure when called
+    on a VMA that has VM_PFNMAP and was mmap'd to as something other than
+    PROT_NONE but never used. mprotect() sends the PROT_NONE request down
+    prot_none_walk(), which walks the PTEs to check the PFNs.
+    prot_none_pte_entry() gets the bogus PFN from pte_pfn() and returns
+    -EACCES because it thinks mprotect() is trying to adjust a high MMIO
+    address.
+    
+    [ This is a very modified version of Sean's original patch, but all
+      credit goes to Sean for doing this and also pointing out that
+      sometimes the __pte_needs_invert() function only gets the protection
+      bits, not the full eventual pte.  But zero remains special even in
+      just protection bits, so that's ok.   - Linus ]
+    
+    Fixes: f22cc87f6c1f ("x86/speculation/l1tf: Invert all not present mappings")
+    Signed-off-by: Sean Christopherson <sean.j.christopherson@intel.com>
+    Acked-by: Andi Kleen <ak@linux.intel.com>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Cc: Josh Poimboeuf <jpoimboe@redhat.com>
+    Cc: Michal Hocko <mhocko@suse.com>
+    Cc: Vlastimil Babka <vbabka@suse.cz>
+    Cc: Dave Hansen <dave.hansen@intel.com>
+    Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 09049f022a9b96b0d09d90023d4f0a097a61a767 ......
+	 orig commit -> e14d7dfb41f5807a0c1c26a13f2b8ef16af24935 ......
+checking b55b06bd3b3c977da2c938d1a73d38674cb88086 ......
+	 orig commit -> 0d0f6249058834ffe1ceaad0bb31464af66f6e7a ......
+checking dc48c1a2f45b628d3128ad4bb31d1bcd342c059d ......
+	 orig commit -> 11e34e64e4103955fc4568750914c75d65ea87ee ......
+checking df7fd6ccb358bd4aa3abc8a6ff995b1f3da1b0fb ......
+	 orig commit -> 1a7ed1ba4bba6c075d5ad61bb75e3fbc870840d6 ......
+checking fa86c208d22d8179ef3d295f6084fc87390c8366 ......
+	 orig commit -> 56563f53d3066afa9e63d6c997bf67e76a8b05c0 ......
+checking 685b44483f077c949bd5016fdfe734b662b74aba ......
+	 orig commit -> 377eeaa8e11fe815b1d07c81c4a0e2843a8c15eb ......
+		 377eeaa8e11fe815b1d07c81c4a0e2843a8c15eb has problem. Fixes commit -> 5b5e4d623ec8a34689df98e42d038a3b594d2ff9
+9df9516940a61d29aedf4d91b483ca6597e7d480
+792adb90fa724ce07c0171cbc96b9215af4b1045
+1a7ed1ba4bba6c075d5ad61bb75e3fbc870840d6
+commit 6a56bd7f2ea31d4c86849b8f67d4e2dc1cb5b788
+Author: Vlastimil Babka <vbabka@suse.cz>
+Date:   Mon Aug 20 11:58:35 2018 +0200
+
+    x86/speculation/l1tf: Fix overflow in l1tf_pfn_limit() on 32bit
+    
+    commit 9df9516940a61d29aedf4d91b483ca6597e7d480 upstream.
+    
+    On 32bit PAE kernels on 64bit hardware with enough physical bits,
+    l1tf_pfn_limit() will overflow unsigned long. This in turn affects
+    max_swapfile_size() and can lead to swapon returning -EINVAL. This has been
+    observed in a 32bit guest with 42 bits physical address size, where
+    max_swapfile_size() overflows exactly to 1 << 32, thus zero, and produces
+    the following warning to dmesg:
+    
+    [    6.396845] Truncating oversized swap area, only using 0k out of 2047996k
+    
+    Fix this by using unsigned long long instead.
+    
+    Fixes: 17dbca119312 ("x86/speculation/l1tf: Add sysfs reporting for l1tf")
+    Fixes: 377eeaa8e11f ("x86/speculation/l1tf: Limit swap file size to MAX_PA/2")
+    Reported-by: Dominique Leuenberger <dimstar@suse.de>
+    Reported-by: Adrian Schroeter <adrian@suse.de>
+    Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Acked-by: Andi Kleen <ak@linux.intel.com>
+    Acked-by: Michal Hocko <mhocko@suse.com>
+    Cc: "H . Peter Anvin" <hpa@zytor.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Dave Hansen <dave.hansen@intel.com>
+    Cc: Michal Hocko <mhocko@kernel.org>
+    Cc: stable@vger.kernel.org
+    Link: https://lkml.kernel.org/r/20180820095835.5298-1-vbabka@suse.cz
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 4b90ff885c6cc88795b678414aaf5d7b0153a5dc
+Author: Vlastimil Babka <vbabka@suse.cz>
+Date:   Tue Aug 14 20:50:47 2018 +0200
+
+    x86/init: fix build with CONFIG_SWAP=n
+    
+    commit 792adb90fa724ce07c0171cbc96b9215af4b1045 upstream.
+    
+    The introduction of generic_max_swapfile_size and arch-specific versions has
+    broken linking on x86 with CONFIG_SWAP=n due to undefined reference to
+    'generic_max_swapfile_size'. Fix it by compiling the x86-specific
+    max_swapfile_size() only with CONFIG_SWAP=y.
+    
+    Reported-by: Tomas Pruzina <pruzinat@gmail.com>
+    Fixes: 377eeaa8e11f ("x86/speculation/l1tf: Limit swap file size to MAX_PA/2")
+    Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+    Cc: stable@vger.kernel.org
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit df7fd6ccb358bd4aa3abc8a6ff995b1f3da1b0fb
+Author: Vlastimil Babka <vbabka@suse.cz>
+Date:   Thu Jun 21 12:36:29 2018 +0200
+
+    x86/speculation/l1tf: Extend 64bit swap file size limit
+    
+    commit 1a7ed1ba4bba6c075d5ad61bb75e3fbc870840d6 upstream
+    
+    The previous patch has limited swap file size so that large offsets cannot
+    clear bits above MAX_PA/2 in the pte and interfere with L1TF mitigation.
+    
+    It assumed that offsets are encoded starting with bit 12, same as pfn. But
+    on x86_64, offsets are encoded starting with bit 9.
+    
+    Thus the limit can be raised by 3 bits. That means 16TB with 42bit MAX_PA
+    and 256TB with 46bit MAX_PA.
+    
+    Fixes: 377eeaa8e11f ("x86/speculation/l1tf: Limit swap file size to MAX_PA/2")
+    Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+commit 6a56bd7f2ea31d4c86849b8f67d4e2dc1cb5b788
+Author: Vlastimil Babka <vbabka@suse.cz>
+Date:   Mon Aug 20 11:58:35 2018 +0200
+
+    x86/speculation/l1tf: Fix overflow in l1tf_pfn_limit() on 32bit
+    
+    commit 9df9516940a61d29aedf4d91b483ca6597e7d480 upstream.
+    
+    On 32bit PAE kernels on 64bit hardware with enough physical bits,
+    l1tf_pfn_limit() will overflow unsigned long. This in turn affects
+    max_swapfile_size() and can lead to swapon returning -EINVAL. This has been
+    observed in a 32bit guest with 42 bits physical address size, where
+    max_swapfile_size() overflows exactly to 1 << 32, thus zero, and produces
+    the following warning to dmesg:
+    
+    [    6.396845] Truncating oversized swap area, only using 0k out of 2047996k
+    
+    Fix this by using unsigned long long instead.
+    
+    Fixes: 17dbca119312 ("x86/speculation/l1tf: Add sysfs reporting for l1tf")
+    Fixes: 377eeaa8e11f ("x86/speculation/l1tf: Limit swap file size to MAX_PA/2")
+    Reported-by: Dominique Leuenberger <dimstar@suse.de>
+    Reported-by: Adrian Schroeter <adrian@suse.de>
+    Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Acked-by: Andi Kleen <ak@linux.intel.com>
+    Acked-by: Michal Hocko <mhocko@suse.com>
+    Cc: "H . Peter Anvin" <hpa@zytor.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Dave Hansen <dave.hansen@intel.com>
+    Cc: Michal Hocko <mhocko@kernel.org>
+    Cc: stable@vger.kernel.org
+    Link: https://lkml.kernel.org/r/20180820095835.5298-1-vbabka@suse.cz
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 4b90ff885c6cc88795b678414aaf5d7b0153a5dc
+Author: Vlastimil Babka <vbabka@suse.cz>
+Date:   Tue Aug 14 20:50:47 2018 +0200
+
+    x86/init: fix build with CONFIG_SWAP=n
+    
+    commit 792adb90fa724ce07c0171cbc96b9215af4b1045 upstream.
+    
+    The introduction of generic_max_swapfile_size and arch-specific versions has
+    broken linking on x86 with CONFIG_SWAP=n due to undefined reference to
+    'generic_max_swapfile_size'. Fix it by compiling the x86-specific
+    max_swapfile_size() only with CONFIG_SWAP=y.
+    
+    Reported-by: Tomas Pruzina <pruzinat@gmail.com>
+    Fixes: 377eeaa8e11f ("x86/speculation/l1tf: Limit swap file size to MAX_PA/2")
+    Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+    Cc: stable@vger.kernel.org
+    Signed-off-by: Linus Torvalds <torvalds@linux-foundation.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit df7fd6ccb358bd4aa3abc8a6ff995b1f3da1b0fb
+Author: Vlastimil Babka <vbabka@suse.cz>
+Date:   Thu Jun 21 12:36:29 2018 +0200
+
+    x86/speculation/l1tf: Extend 64bit swap file size limit
+    
+    commit 1a7ed1ba4bba6c075d5ad61bb75e3fbc870840d6 upstream
+    
+    The previous patch has limited swap file size so that large offsets cannot
+    clear bits above MAX_PA/2 in the pte and interfere with L1TF mitigation.
+    
+    It assumed that offsets are encoded starting with bit 12, same as pfn. But
+    on x86_64, offsets are encoded starting with bit 9.
+    
+    Thus the limit can be raised by 3 bits. That means 16TB with 42bit MAX_PA
+    and 256TB with 46bit MAX_PA.
+    
+    Fixes: 377eeaa8e11f ("x86/speculation/l1tf: Limit swap file size to MAX_PA/2")
+    Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking d71af2dbacb5611c1dcdc16fd1d343821d61bd5e ......
+	 orig commit -> 42e4089c7890725fcd329999252dc489b72f2921 ......
+		 42e4089c7890725fcd329999252dc489b72f2921 has problem. Fixes commit -> 6c26fcd2abfe0a56bbd95271fce02df2896cfd24
+commit 8f2adf3d2118cc0822b83a7bb43475f9149a1d26
+Author: Jiri Kosina <jkosina@suse.cz>
+Date:   Sat Jul 14 21:56:13 2018 +0200
+
+    x86/speculation/l1tf: Unbreak !__HAVE_ARCH_PFN_MODIFY_ALLOWED architectures
+    
+    commit 6c26fcd2abfe0a56bbd95271fce02df2896cfd24 upstream.
+    
+    pfn_modify_allowed() and arch_has_pfn_modify_check() are outside of the
+    !__ASSEMBLY__ section in include/asm-generic/pgtable.h, which confuses
+    assembler on archs that don't have __HAVE_ARCH_PFN_MODIFY_ALLOWED (e.g.
+    ia64) and breaks build:
+    
+        include/asm-generic/pgtable.h: Assembler messages:
+        include/asm-generic/pgtable.h:538: Error: Unknown opcode `static inline bool pfn_modify_allowed(unsigned long pfn,pgprot_t prot)'
+        include/asm-generic/pgtable.h:540: Error: Unknown opcode `return true'
+        include/asm-generic/pgtable.h:543: Error: Unknown opcode `static inline bool arch_has_pfn_modify_check(void)'
+        include/asm-generic/pgtable.h:545: Error: Unknown opcode `return false'
+        arch/ia64/kernel/entry.S:69: Error: `mov' does not fit into bundle
+    
+    Move those two static inlines into the !__ASSEMBLY__ section so that they
+    don't confuse the asm build pass.
+    
+    Fixes: 42e4089c7890 ("x86/speculation/l1tf: Disallow non privileged high MMIO PROT_NONE mappings")
+    Signed-off-by: Jiri Kosina <jkosina@suse.cz>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+    [groeck: Context changes]
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+checking 9ac0dc7d949db7afd4116d55fa4fcf6a66d820f0 ......
+	 orig commit -> 87744ab3832b83ba71b931f86f9cfdb000d07da5 ......
+		 87744ab3832b83ba71b931f86f9cfdb000d07da5 has problem. Fixes commit -> 7cf321d118a825c1541b43ca45294126fd474efa
+commit c59fdc4cfbda52ce081c59540762185d765c3369
+Author: Dave Airlie <airlied@redhat.com>
+Date:   Mon Oct 24 15:37:48 2016 +1000
+
+    drm/drivers: add support for using the arch wc mapping API.
+    
+    commit 7cf321d118a825c1541b43ca45294126fd474efa upstream.
+    
+    This fixes a regression in all these drivers since the cache
+    mode tracking was fixed for mixed mappings. It uses the new
+    arch API to add the VRAM range to the PAT mapping tracking
+    tables.
+    
+    Fixes: 87744ab3832 (mm: fix cache mode tracking in vm_insert_mixed())
+    Reviewed-by: Christian König <christian.koenig@amd.com>.
+    Signed-off-by: Dave Airlie <airlied@redhat.com>
+    Cc: Ben Hutchings <ben.hutchings@codethink.co.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 0371d9c4c822fceb290a0b4cd21119534f7bae47 ......
+	 orig commit -> 1745cbc5d0dee0749a6bc0ea8e872c5db0074061 ......
+checking bf0cca01b8736a5e146a980434ba36eb036e37ac ......
+	 orig commit -> 17dbca119312b4e8173d4e25ff64262119fcef38 ......
+		 17dbca119312b4e8173d4e25ff64262119fcef38 has problem. Fixes commit -> cc51e5428ea54f575d49cfcede1d4cb3a72b4ec4
+b0a182f875689647b014bc01d36b340217792852
+9df9516940a61d29aedf4d91b483ca6597e7d480
+56563f53d3066afa9e63d6c997bf67e76a8b05c0
+commit e29c75d4fb491a7b1890293302f7ab40be7ce586
+Author: Andi Kleen <ak@linux.intel.com>
+Date:   Mon Sep 3 10:19:13 2018 -0700
+
+    x86/speculation/l1tf: Increase l1tf memory limit for Nehalem+
+    
+    [upstream cc51e5428ea54f575d49cfcede1d4cb3a72b4ec4 for 4.4.
+    Note there might be still a trivial conflict with the backport
+    for b0a182f875689647b014bc01d36b340217792852, but should
+    be easy to resolve]
+    
+    On Nehalem and newer core CPUs the CPU cache internally uses 44 bits
+    physical address space. The L1TF workaround is limited by this internal
+    cache address width, and needs to have one bit free there for the
+    mitigation to work.
+    
+    Older client systems report only 36bit physical address space so the range
+    check decides that L1TF is not mitigated for a 36bit phys/32GB system with
+    some memory holes.
+    
+    But since these actually have the larger internal cache width this warning
+    is bogus because it would only really be needed if the system had more than
+    43bits of memory.
+    
+    Add a new internal x86_cache_bits field. Normally it is the same as the
+    physical bits field reported by CPUID, but for Nehalem and newerforce it to
+    be at least 44bits.
+    
+    Change the L1TF memory size warning to use the new cache_bits field to
+    avoid bogus warnings and remove the bogus comment about memory size.
+    
+    Fixes: 17dbca119312 ("x86/speculation/l1tf: Add sysfs reporting for l1tf")
+    Reported-by: George Anchev <studio@anchev.net>
+    Reported-by: Christopher Snowhill <kode54@gmail.com>
+    Signed-off-by: Andi Kleen <ak@linux.intel.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Cc: x86@kernel.org
+    Cc: linux-kernel@vger.kernel.org
+    Cc: Michael Hocko <mhocko@suse.com>
+    Cc: vbabka@suse.cz
+    Cc: stable@vger.kernel.org
+    Link: https://lkml.kernel.org/r/20180824170351.34874-1-andi@firstfloor.org
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 7b69cd6fa088e473869512672969e6c490cac1b6
+Author: Vlastimil Babka <vbabka@suse.cz>
+Date:   Thu Aug 23 15:44:18 2018 +0200
+
+    x86/speculation/l1tf: Fix off-by-one error when warning that system has too much RAM
+    
+    commit b0a182f875689647b014bc01d36b340217792852 upstream.
+    
+    Two users have reported [1] that they have an "extremely unlikely" system
+    with more than MAX_PA/2 memory and L1TF mitigation is not effective. In
+    fact it's a CPU with 36bits phys limit (64GB) and 32GB memory, but due to
+    holes in the e820 map, the main region is almost 500MB over the 32GB limit:
+    
+    [    0.000000] BIOS-e820: [mem 0x0000000100000000-0x000000081effffff] usable
+    
+    Suggestions to use 'mem=32G' to enable the L1TF mitigation while losing the
+    500MB revealed, that there's an off-by-one error in the check in
+    l1tf_select_mitigation().
+    
+    l1tf_pfn_limit() returns the last usable pfn (inclusive) and the range
+    check in the mitigation path does not take this into account.
+    
+    Instead of amending the range check, make l1tf_pfn_limit() return the first
+    PFN which is over the limit which is less error prone. Adjust the other
+    users accordingly.
+    
+    [1] https://bugzilla.suse.com/show_bug.cgi?id=1105536
+    
+    Fixes: 17dbca119312 ("x86/speculation/l1tf: Add sysfs reporting for l1tf")
+    Reported-by: George Anchev <studio@anchev.net>
+    Reported-by: Christopher Snowhill <kode54@gmail.com>
+    Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Cc: "H . Peter Anvin" <hpa@zytor.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Andi Kleen <ak@linux.intel.com>
+    Cc: Dave Hansen <dave.hansen@intel.com>
+    Cc: Michal Hocko <mhocko@kernel.org>
+    Cc: stable@vger.kernel.org
+    Link: https://lkml.kernel.org/r/20180823134418.17008-1-vbabka@suse.cz
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 6a56bd7f2ea31d4c86849b8f67d4e2dc1cb5b788
+Author: Vlastimil Babka <vbabka@suse.cz>
+Date:   Mon Aug 20 11:58:35 2018 +0200
+
+    x86/speculation/l1tf: Fix overflow in l1tf_pfn_limit() on 32bit
+    
+    commit 9df9516940a61d29aedf4d91b483ca6597e7d480 upstream.
+    
+    On 32bit PAE kernels on 64bit hardware with enough physical bits,
+    l1tf_pfn_limit() will overflow unsigned long. This in turn affects
+    max_swapfile_size() and can lead to swapon returning -EINVAL. This has been
+    observed in a 32bit guest with 42 bits physical address size, where
+    max_swapfile_size() overflows exactly to 1 << 32, thus zero, and produces
+    the following warning to dmesg:
+    
+    [    6.396845] Truncating oversized swap area, only using 0k out of 2047996k
+    
+    Fix this by using unsigned long long instead.
+    
+    Fixes: 17dbca119312 ("x86/speculation/l1tf: Add sysfs reporting for l1tf")
+    Fixes: 377eeaa8e11f ("x86/speculation/l1tf: Limit swap file size to MAX_PA/2")
+    Reported-by: Dominique Leuenberger <dimstar@suse.de>
+    Reported-by: Adrian Schroeter <adrian@suse.de>
+    Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Acked-by: Andi Kleen <ak@linux.intel.com>
+    Acked-by: Michal Hocko <mhocko@suse.com>
+    Cc: "H . Peter Anvin" <hpa@zytor.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Dave Hansen <dave.hansen@intel.com>
+    Cc: Michal Hocko <mhocko@kernel.org>
+    Cc: stable@vger.kernel.org
+    Link: https://lkml.kernel.org/r/20180820095835.5298-1-vbabka@suse.cz
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit fa86c208d22d8179ef3d295f6084fc87390c8366
+Author: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Date:   Wed Jun 20 16:42:57 2018 -0400
+
+    x86/bugs: Move the l1tf function and define pr_fmt properly
+    
+    commit 56563f53d3066afa9e63d6c997bf67e76a8b05c0 upstream
+    
+    The pr_warn in l1tf_select_mitigation would have used the prior pr_fmt
+    which was defined as "Spectre V2 : ".
+    
+    Move the function to be past SSBD and also define the pr_fmt.
+    
+    Fixes: 17dbca119312 ("x86/speculation/l1tf: Add sysfs reporting for l1tf")
+    Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+commit e29c75d4fb491a7b1890293302f7ab40be7ce586
+Author: Andi Kleen <ak@linux.intel.com>
+Date:   Mon Sep 3 10:19:13 2018 -0700
+
+    x86/speculation/l1tf: Increase l1tf memory limit for Nehalem+
+    
+    [upstream cc51e5428ea54f575d49cfcede1d4cb3a72b4ec4 for 4.4.
+    Note there might be still a trivial conflict with the backport
+    for b0a182f875689647b014bc01d36b340217792852, but should
+    be easy to resolve]
+    
+    On Nehalem and newer core CPUs the CPU cache internally uses 44 bits
+    physical address space. The L1TF workaround is limited by this internal
+    cache address width, and needs to have one bit free there for the
+    mitigation to work.
+    
+    Older client systems report only 36bit physical address space so the range
+    check decides that L1TF is not mitigated for a 36bit phys/32GB system with
+    some memory holes.
+    
+    But since these actually have the larger internal cache width this warning
+    is bogus because it would only really be needed if the system had more than
+    43bits of memory.
+    
+    Add a new internal x86_cache_bits field. Normally it is the same as the
+    physical bits field reported by CPUID, but for Nehalem and newerforce it to
+    be at least 44bits.
+    
+    Change the L1TF memory size warning to use the new cache_bits field to
+    avoid bogus warnings and remove the bogus comment about memory size.
+    
+    Fixes: 17dbca119312 ("x86/speculation/l1tf: Add sysfs reporting for l1tf")
+    Reported-by: George Anchev <studio@anchev.net>
+    Reported-by: Christopher Snowhill <kode54@gmail.com>
+    Signed-off-by: Andi Kleen <ak@linux.intel.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Cc: x86@kernel.org
+    Cc: linux-kernel@vger.kernel.org
+    Cc: Michael Hocko <mhocko@suse.com>
+    Cc: vbabka@suse.cz
+    Cc: stable@vger.kernel.org
+    Link: https://lkml.kernel.org/r/20180824170351.34874-1-andi@firstfloor.org
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 7b69cd6fa088e473869512672969e6c490cac1b6
+Author: Vlastimil Babka <vbabka@suse.cz>
+Date:   Thu Aug 23 15:44:18 2018 +0200
+
+    x86/speculation/l1tf: Fix off-by-one error when warning that system has too much RAM
+    
+    commit b0a182f875689647b014bc01d36b340217792852 upstream.
+    
+    Two users have reported [1] that they have an "extremely unlikely" system
+    with more than MAX_PA/2 memory and L1TF mitigation is not effective. In
+    fact it's a CPU with 36bits phys limit (64GB) and 32GB memory, but due to
+    holes in the e820 map, the main region is almost 500MB over the 32GB limit:
+    
+    [    0.000000] BIOS-e820: [mem 0x0000000100000000-0x000000081effffff] usable
+    
+    Suggestions to use 'mem=32G' to enable the L1TF mitigation while losing the
+    500MB revealed, that there's an off-by-one error in the check in
+    l1tf_select_mitigation().
+    
+    l1tf_pfn_limit() returns the last usable pfn (inclusive) and the range
+    check in the mitigation path does not take this into account.
+    
+    Instead of amending the range check, make l1tf_pfn_limit() return the first
+    PFN which is over the limit which is less error prone. Adjust the other
+    users accordingly.
+    
+    [1] https://bugzilla.suse.com/show_bug.cgi?id=1105536
+    
+    Fixes: 17dbca119312 ("x86/speculation/l1tf: Add sysfs reporting for l1tf")
+    Reported-by: George Anchev <studio@anchev.net>
+    Reported-by: Christopher Snowhill <kode54@gmail.com>
+    Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Cc: "H . Peter Anvin" <hpa@zytor.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Andi Kleen <ak@linux.intel.com>
+    Cc: Dave Hansen <dave.hansen@intel.com>
+    Cc: Michal Hocko <mhocko@kernel.org>
+    Cc: stable@vger.kernel.org
+    Link: https://lkml.kernel.org/r/20180823134418.17008-1-vbabka@suse.cz
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 6a56bd7f2ea31d4c86849b8f67d4e2dc1cb5b788
+Author: Vlastimil Babka <vbabka@suse.cz>
+Date:   Mon Aug 20 11:58:35 2018 +0200
+
+    x86/speculation/l1tf: Fix overflow in l1tf_pfn_limit() on 32bit
+    
+    commit 9df9516940a61d29aedf4d91b483ca6597e7d480 upstream.
+    
+    On 32bit PAE kernels on 64bit hardware with enough physical bits,
+    l1tf_pfn_limit() will overflow unsigned long. This in turn affects
+    max_swapfile_size() and can lead to swapon returning -EINVAL. This has been
+    observed in a 32bit guest with 42 bits physical address size, where
+    max_swapfile_size() overflows exactly to 1 << 32, thus zero, and produces
+    the following warning to dmesg:
+    
+    [    6.396845] Truncating oversized swap area, only using 0k out of 2047996k
+    
+    Fix this by using unsigned long long instead.
+    
+    Fixes: 17dbca119312 ("x86/speculation/l1tf: Add sysfs reporting for l1tf")
+    Fixes: 377eeaa8e11f ("x86/speculation/l1tf: Limit swap file size to MAX_PA/2")
+    Reported-by: Dominique Leuenberger <dimstar@suse.de>
+    Reported-by: Adrian Schroeter <adrian@suse.de>
+    Signed-off-by: Vlastimil Babka <vbabka@suse.cz>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Acked-by: Andi Kleen <ak@linux.intel.com>
+    Acked-by: Michal Hocko <mhocko@suse.com>
+    Cc: "H . Peter Anvin" <hpa@zytor.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Dave Hansen <dave.hansen@intel.com>
+    Cc: Michal Hocko <mhocko@kernel.org>
+    Cc: stable@vger.kernel.org
+    Link: https://lkml.kernel.org/r/20180820095835.5298-1-vbabka@suse.cz
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit fa86c208d22d8179ef3d295f6084fc87390c8366
+Author: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+Date:   Wed Jun 20 16:42:57 2018 -0400
+
+    x86/bugs: Move the l1tf function and define pr_fmt properly
+    
+    commit 56563f53d3066afa9e63d6c997bf67e76a8b05c0 upstream
+    
+    The pr_warn in l1tf_select_mitigation would have used the prior pr_fmt
+    which was defined as "Spectre V2 : ".
+    
+    Move the function to be past SSBD and also define the pr_fmt.
+    
+    Fixes: 17dbca119312 ("x86/speculation/l1tf: Add sysfs reporting for l1tf")
+    Signed-off-by: Konrad Rzeszutek Wilk <konrad.wilk@oracle.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 52dc5c9f8eee1c569974308f0bb7be64ec63565c ......
+	 orig commit -> 10a70416e1f067f6c4efda6ffd8ea96002ac4223 ......
+checking 9ee2d2da676c48a459a99f10f45c71ffca8761a8 ......
+	 orig commit -> 6b28baca9b1f0d4a42b865da7a05b1c81424bd5c ......
+		 6b28baca9b1f0d4a42b865da7a05b1c81424bd5c has problem. Fixes commit -> e14d7dfb41f5807a0c1c26a13f2b8ef16af24935
+commit e3dea38fc8528c9d04acd9a28bcdd7dab3b461fa
+Author: Michal Hocko <mhocko@suse.cz>
+Date:   Wed Jun 27 17:46:50 2018 +0200
+
+    x86/speculation/l1tf: Fix up pte->pfn conversion for PAE
+    
+    commit e14d7dfb41f5807a0c1c26a13f2b8ef16af24935 upstream.
+    
+    Jan has noticed that pte_pfn and co. resp. pfn_pte are incorrect for
+    CONFIG_PAE because phys_addr_t is wider than unsigned long and so the
+    pte_val reps. shift left would get truncated. Fix this up by using proper
+    types.
+    
+    [Just one chunk, again, needed here.  Thanks to Ben and Guenter for
+    finding and fixing this. - gregkh]
+    
+    Fixes: 6b28baca9b1f ("x86/speculation/l1tf: Protect PROT_NONE PTEs against speculation")
+    Reported-by: Jan Beulich <JBeulich@suse.com>
+    Signed-off-by: Michal Hocko <mhocko@suse.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Acked-by: Vlastimil Babka <vbabka@suse.cz>
+    Cc: Guenter Roeck <linux@roeck-us.net>
+    Cc: Ben Hutchings <ben.hutchings@codethink.co.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 09049f022a9b96b0d09d90023d4f0a097a61a767
+Author: Michal Hocko <mhocko@suse.cz>
+Date:   Wed Jun 27 17:46:50 2018 +0200
+
+    x86/speculation/l1tf: Fix up pte->pfn conversion for PAE
+    
+    commit e14d7dfb41f5807a0c1c26a13f2b8ef16af24935 upstream
+    
+    Jan has noticed that pte_pfn and co. resp. pfn_pte are incorrect for
+    CONFIG_PAE because phys_addr_t is wider than unsigned long and so the
+    pte_val reps. shift left would get truncated. Fix this up by using proper
+    types.
+    
+    [dwmw2: Backport to 4.9]
+    
+    Fixes: 6b28baca9b1f ("x86/speculation/l1tf: Protect PROT_NONE PTEs against speculation")
+    Reported-by: Jan Beulich <JBeulich@suse.com>
+    Signed-off-by: Michal Hocko <mhocko@suse.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Acked-by: Vlastimil Babka <vbabka@suse.cz>
+    Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 9bbdab847fc9a0b8cf23fa7354e1210f0b492821 ......
+	 orig commit -> 2f22b4cd45b67b3496f4aa4c7180a1271c6452f6 ......
+checking 614f5e84640e382b9916b6f606328191ed0264b3 ......
+	 orig commit -> bcd11afa7adad8d720e7ba5ef58bdcd9775cf45f ......
+checking 86b0948d7c546feb01cd2d7ac2bfb15476e6e974 ......
+	 orig commit -> eee4818baac0f2b37848fdf90e4b16430dc536ac ......
+checking f487cf69cf1456ceb34857a50474373aae42dd8a ......
+	 orig commit -> ace7fab7a6cdd363a615ec537f2aa94dbc761ee2 ......
+checking 0a5deacaac102f451bf8c1fb9d007047fcd712f6 ......
+	 orig commit -> 00839ee3b299303c6a5e26a0a2485427a3afcbbf ......
+		 00839ee3b299303c6a5e26a0a2485427a3afcbbf has problem. Fixes commit -> ace7fab7a6cdd363a615ec537f2aa94dbc761ee2
+commit f487cf69cf1456ceb34857a50474373aae42dd8a
+Author: Dave Hansen <dave.hansen@linux.intel.com>
+Date:   Wed Aug 10 10:23:25 2016 -0700
+
+    x86/mm: Fix swap entry comment and macro
+    
+    commit ace7fab7a6cdd363a615ec537f2aa94dbc761ee2 upstream
+    
+    A recent patch changed the format of a swap PTE.
+    
+    The comment explaining the format of the swap PTE is wrong about
+    the bits used for the swap type field.  Amusingly, the ASCII art
+    and the patch description are correct, but the comment itself
+    is wrong.
+    
+    As I was looking at this, I also noticed that the
+    SWP_OFFSET_FIRST_BIT has an off-by-one error.  This does not
+    really hurt anything.  It just wasted a bit of space in the PTE,
+    giving us 2^59 bytes of addressable space in our swapfiles
+    instead of 2^60.  But, it doesn't match with the comments, and it
+    wastes a bit of space, so fix it.
+    
+    Signed-off-by: Dave Hansen <dave.hansen@linux.intel.com>
+    Cc: Andrew Morton <akpm@linux-foundation.org>
+    Cc: Andy Lutomirski <luto@kernel.org>
+    Cc: Borislav Petkov <bp@alien8.de>
+    Cc: Brian Gerst <brgerst@gmail.com>
+    Cc: Dave Hansen <dave@sr71.net>
+    Cc: Denys Vlasenko <dvlasenk@redhat.com>
+    Cc: H. Peter Anvin <hpa@zytor.com>
+    Cc: Josh Poimboeuf <jpoimboe@redhat.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Luis R. Rodriguez <mcgrof@suse.com>
+    Cc: Peter Zijlstra <peterz@infradead.org>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Cc: Toshi Kani <toshi.kani@hp.com>
+    Fixes: 00839ee3b299 ("x86/mm: Move swap offset/type up in PTE to work around erratum")
+    Link: http://lkml.kernel.org/r/20160810172325.E56AD7DA@viggo.jf.intel.com
+    Signed-off-by: Ingo Molnar <mingo@kernel.org>
+    Signed-off-by: Guenter Roeck <linux@roeck-us.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 90a231c63cc28d896ab353b027011a949e9884d3 ......
+	 orig commit -> 50896e180c6aa3a9c61a26ced99e15d602666a4c ......
+checking ec5aa64fec7206537442a2f3cb67decabad252f4 ......
+	 orig commit -> 208cbb32558907f68b3b2a081ca2337ac3744794 ......
+		 208cbb32558907f68b3b2a081ca2337ac3744794 has problem. Fixes commit -> 1f59a4581b5ecfe9b4f049a7a2cf904d8352842d
+commit ed9c4055689cab0908fed0214dc0844babb83a6f
+Author: Nick Desaulniers <ndesaulniers@google.com>
+Date:   Mon Aug 27 14:40:09 2018 -0700
+
+    x86/irqflags: Mark native_restore_fl extern inline
+    
+    commit 1f59a4581b5ecfe9b4f049a7a2cf904d8352842d upstream.
+    
+    This should have been marked extern inline in order to pick up the out
+    of line definition in arch/x86/kernel/irqflags.S.
+    
+    Fixes: 208cbb325589 ("x86/irqflags: Provide a declaration for native_save_fl")
+    Reported-by: Ben Hutchings <ben.hutchings@codethink.co.uk>
+    Signed-off-by: Nick Desaulniers <ndesaulniers@google.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Reviewed-by: Juergen Gross <jgross@suse.com>
+    Cc: "H. Peter Anvin" <hpa@zytor.com>
+    Cc: Boris Ostrovsky <boris.ostrovsky@oracle.com>
+    Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+    Cc: stable@vger.kernel.org
+    Link: https://lkml.kernel.org/r/20180827214011.55428-1-ndesaulniers@google.com
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 866234c373a0f34774d5dcb3886a6c982397bbc9 ......
+	 orig commit -> 0ea063306eecf300fcf06d2f5917474b580f666f ......
+checking 7744abbe29a59db367f59b0c9890356732f25a3b ......
+	 orig commit -> fdf82a7856b32d905c39afc85e34364491e46346 ......
+checking 8dbce8a2e9cfc8e026565d75f7cb950393d04159 ......
+	 orig commit -> 5800dc5c19f34e6e03b5adab1282535cb102fafd ......
+		 5800dc5c19f34e6e03b5adab1282535cb102fafd has problem. Fixes commit -> 571d0563c8881595f4ab027aef9ed1c55e3e7b7c
+checking 916a57896e00d4f92318c8ff5a7b8ca07e4e95a7 ......
+	 orig commit -> 1bcfe0564044be578841744faea1c2f46adc8178 ......
+checking 45c679be34ac44ad24bc7abf60193b9f43a83490 ......
+	 orig commit -> 062d0f22a30c39840ea49b72cfcfc1aa4cc538fa ......
+checking d803aa2fe665f2dca0e46cefca982ad5c537ca7e ......
+	 orig commit -> d8f9cc328c8888369880e2527e9186d745f2bbf6 ......
+		 d8f9cc328c8888369880e2527e9186d745f2bbf6 has problem. Fixes commit -> 3dc7c7badb7502ec3e3aa817a8bdd9e53aa54c52
+checking 01b377d3f0d286d071f46c30586cb261c79559f7 ......
+	 orig commit -> 08bb558ac11ab944e0539e78619d7b4c356278bd ......
+checking b9341f5aebd89f46d2cda7dd9c39aabc0a559bdb ......
+	 orig commit -> 119e1ef80ecfe0d1deb6378d4ab41f5b71519de1 ......
+checking a3ababd599e72b9b92420c159564684fcbfa489f ......
+	 orig commit -> 9ea0a46ca2c318fcc449c1e6b62a7230a17888f1 ......
+checking ba744147871e7c6d3b6b60eede06f74a1a7abcd9 ......
+	 orig commit -> 90bad5e05bcdb0308cfa3d3a60f5c0b9c8e2efb3 ......
+checking 6aef4c4a1690b0b371d88babc41a8a314d0fd3f9 ......
+	 orig commit -> 1214fd7b497400d200e3f4e64e2338b303a20949 ......
+checking 277131baccf9c96e01d5ffdb0c6447770b634eae ......
+	 orig commit -> fdcb613d49321b5bf5d5a1bd0fba8e7c241dcc70 ......
+checking 6b1f6243b39c4f49d44bafa9e4639be4f124577f ......
+	 orig commit -> d472b3a6cf63cd31cae1ed61930f07e6cd6671b5 ......
+checking 277b161b1a1d339985b4c24e796e86eae9511382 ......
+	 orig commit -> fedb8da96355f5f64353625bf96dc69423ad1826 ......
+checking a9252a70174362912fee1556f8c3a25d66cd7637 ......
+	 orig commit -> 66509a276c8c1d19ee3f661a41b418d101c57d29 ......
+checking 1e4006421429ab672c62ab25afb3c39e6f4aa94f ......
+	 orig commit -> e01e80634ecdde1dd113ac43b3adad21b47f3957 ......
+checking e424bee248c38266c6057d43f3e350072fc41c5d ......
+	 orig commit -> 32b6170ca59ccf07d0e394561e54b2cd9726038c ......
+checking 215f36e128f2b476cd3bfe91339a5e12b79d010c ......
+	 orig commit -> 3ab2011ea368ec3433ad49e1b9e1c7b70d2e65df ......
+checking 7736fcede789b412ae1c5c2f12f9bef58903319c ......
+	 orig commit -> 5012284700775a4e6e3fbe7eac4c543c4874b559 ......

@@ -1,0 +1,443 @@
+Check from v4.4.108 to v4.4.109
+Commit count: 65
+checking e68d6189c7872b2b3731276bda5f5e0c8d5ba644 ......
+checking 5d67dbef745b60fd5041b2fd7e5833e92a512a54 ......
+	 orig commit -> 5dd0b16cdaff9b94da06074d5888b03235c0bf17 ......
+		 5dd0b16cdaff9b94da06074d5888b03235c0bf17 has problem. Fixes commit -> 58bc4c34d249bf1bc50730a9a209139347cfacfe
+commit c6f1725b9cbd208c469142ebfc5bff476352cc08
+Author: Jann Horn <jannh@google.com>
+Date:   Fri Oct 5 15:52:07 2018 -0700
+
+    mm/vmstat.c: skip NR_TLB_REMOTE_FLUSH* properly
+    
+    commit 58bc4c34d249bf1bc50730a9a209139347cfacfe upstream.
+    
+    5dd0b16cdaff ("mm/vmstat: Make NR_TLB_REMOTE_FLUSH_RECEIVED available even
+    on UP") made the availability of the NR_TLB_REMOTE_FLUSH* counters inside
+    the kernel unconditional to reduce #ifdef soup, but (either to avoid
+    showing dummy zero counters to userspace, or because that code was missed)
+    didn't update the vmstat_array, meaning that all following counters would
+    be shown with incorrect values.
+    
+    This only affects kernel builds with
+    CONFIG_VM_EVENT_COUNTERS=y && CONFIG_DEBUG_TLBFLUSH=y && CONFIG_SMP=n.
+    
+    Link: http://lkml.kernel.org/r/20181001143138.95119-2-jannh@google.com
+    Fixes: 5dd0b16cdaff ("mm/vmstat: Make NR_TLB_REMOTE_FLUSH_RECEIVED available even on UP")
+    Signed-off-by: Jann Horn <jannh@google.com>
+    Reviewed-by: Kees Cook <keescook@chromium.org>
+    Reviewed-by: Andrew Morton <akpm@linux-foundation.org>
+    Acked-by: Michal Hocko <mhocko@suse.com>
+    Acked-by: Roman Gushchin <guro@fb.com>
+    Cc: Davidlohr Bueso <dave@stgolabs.net>
+    Cc: Oleg Nesterov <oleg@redhat.com>
+    Cc: Christoph Lameter <clameter@sgi.com>
+    Cc: Kemi Wang <kemi.wang@intel.com>
+    Cc: Andy Lutomirski <luto@kernel.org>
+    Cc: Ingo Molnar <mingo@kernel.org>
+    Cc: <stable@vger.kernel.org>
+    Signed-off-by: Andrew Morton <akpm@linux-foundation.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 2e3883922530aa25ecc23cc27bab1d3fda779f5a ......
+	 orig commit -> 966031f340185eddd05affcf72b740549f056348 ......
+checking 977614061c3db07abd9b3d8c94088fd866b858a8 ......
+	 orig commit -> 322f8b8b340c824aef891342b0f5795d15e11562 ......
+checking 458ed3179948cb21a514a409ac8582b3988a4d69 ......
+	 orig commit -> 5d62c183f9e9df1deeea0906d099a94e8a43047a ......
+		 5d62c183f9e9df1deeea0906d099a94e8a43047a has problem. Fixes commit -> 80d20d35af1edd632a5e7a3b9c0ab7ceff92769e
+commit 0a022859e2304b21a6cd620c2eb008cc60de0ab8
+Author: Anna-Maria Gleixner <anna-maria@linutronix.de>
+Date:   Tue Jul 31 18:13:58 2018 +0200
+
+    nohz: Fix local_timer_softirq_pending()
+    
+    commit 80d20d35af1edd632a5e7a3b9c0ab7ceff92769e upstream.
+    
+    local_timer_softirq_pending() checks whether the timer softirq is
+    pending with: local_softirq_pending() & TIMER_SOFTIRQ.
+    
+    This is wrong because TIMER_SOFTIRQ is the softirq number and not a
+    bitmask. So the test checks for the wrong bit.
+    
+    Use BIT(TIMER_SOFTIRQ) instead.
+    
+    Fixes: 5d62c183f9e9 ("nohz: Prevent a timer interrupt storm in tick_nohz_stop_sched_tick()")
+    Signed-off-by: Anna-Maria Gleixner <anna-maria@linutronix.de>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Reviewed-by: Paul E. McKenney <paulmck@linux.vnet.ibm.com>
+    Reviewed-by: Daniel Bristot de Oliveira <bristot@redhat.com>
+    Acked-by: Frederic Weisbecker <frederic@kernel.org>
+    Cc: bigeasy@linutronix.de
+    Cc: peterz@infradead.org
+    Cc: stable@vger.kernel.org
+    Link: https://lkml.kernel.org/r/20180731161358.29472-1-anna-maria@linutronix.de
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 46e9398c96af7afa43b118ad8e31f39e8aec1e97 ......
+	 orig commit -> da99706689481717998d1d48edd389f339eea979 ......
+checking 0ceb7a66392df476b61f8e3c84100710588e56bd ......
+	 orig commit -> 07b9f12864d16c3a861aef4817eb1efccbc5d0e6 ......
+checking c359123bfdd20d1136a2cf2833ee02fbd8d985a1 ......
+	 orig commit -> b9096d9f15c142574ebebe8fbb137012bb9d99c2 ......
+checking 955ae55f2d16384f4758ded5285d4a94d7d1bf45 ......
+	 orig commit -> 7f038d256c723dd390d2fca942919573995f4cfd ......
+checking e8cd11a935ddb616acdc81fbf5fd58fd92f271cb ......
+	 orig commit -> 3920bb713038810f25770e7545b79f204685c8f2 ......
+checking 140cfcc8b09396cf15d0a0db4833f9fbae1b34d2 ......
+	 orig commit -> 08933099e6404f588f81c2050bfec7313e06eeaf ......
+checking 232972f7393681cbf1aadc709d8619d8b2704471 ......
+	 orig commit -> 92a18a657fb2e2ffbfa0659af32cc18fd2346516 ......
+checking 24162c1781c1c9c5f2442feff94b456e5e4c2766 ......
+	 orig commit -> c6a36ad383559a60a249aa6016cebf3cb8b6c485 ......
+checking 76f611cbdbb45f8ef76a142d8b764c176c612aa9 ......
+	 orig commit -> 8272d099d05f7ab2776cf56a2ab9f9443be18907 ......
+checking feeae6411a1a38f8fe681e00e92b3ba32da6d7f8 ......
+	 orig commit -> 248a22044366f588d46754c54dfe29ffe4f8b4df ......
+checking e0362688b4faf4d0d03e872c7ed6b9286add381d ......
+	 orig commit -> 544c4605acc5ae4afe7dd5914147947db182f2fb ......
+checking 3f54a6d41d443117cb4e077b2a064b430f9fc7c8 ......
+	 orig commit -> 35b99dffc3f710cafceee6c8c6ac6a98eb2cb4bf ......
+checking 623bfb5818ab7a6a4a1b4f70a46d1766b9cff424 ......
+	 orig commit -> c1a8d0a3accf64a014d605e6806ce05d1c17adf1 ......
+checking 5854ca90c6c6c2ed65355eded45615bf8bcd6fd3 ......
+	 orig commit -> 21b5944350052d2583e82dd59b19a9ba94a007f0 ......
+checking dd1e454c4d7400d2246ac7587c181c3c3f170a5c ......
+	 orig commit -> 84aeb437ab98a2bce3d4b2111c79723aedfceb33 ......
+checking 169a9861c638a9943fd3fb9b72f75cce4eb83021 ......
+	 orig commit -> b4681c2829e24943aadd1a7bb3a30d41d0a20050 ......
+checking 4033c396f80c56b643259876937097728bf5514b ......
+	 orig commit -> 8cb38a602478e9f806571f6920b0a3298aabf042 ......
+checking ca57949d169ec44045177252f61dc74e850641ad ......
+	 orig commit -> 589bf32f09852041fbd3b7ce1a9e703f95c230ba ......
+checking be27b620a861dc2a143b78e81e23f5622d9105da ......
+	 orig commit -> 8f659a03a0ba9289b9aeb9b4470e6fb263d6f483 ......
+		 8f659a03a0ba9289b9aeb9b4470e6fb263d6f483 has problem. Fixes commit -> 20b50d79974ea3192e8c3ab7faf4e536e5f14d8f
+checking 6dfc02ba5149946f8a82a254d275670bcf211acb ......
+	 orig commit -> 748a240c589824e9121befb1cba5341c319885bc ......
+checking 6925223ab320ac76d5c0b0a1b5e577dd6d14ded1 ......
+	 orig commit -> 30791ac41927ebd3e75486f9504b6d2280463bf0 ......
+checking e0bdd21a86c5831d6039a3d46d25cab9e58a7ae4 ......
+	 orig commit -> 513674b5a2c9c7a67501506419da5c3c77ac6f08 ......
+		 513674b5a2c9c7a67501506419da5c3c77ac6f08 has problem. Fixes commit -> e9191ffb65d8e159680ce0ad2224e1acbde6985c
+commit c5371a321a4a3c1f181f4482b3b3ceae06b72879
+Author: Ben Hutchings <ben.hutchings@codethink.co.uk>
+Date:   Mon Jan 22 20:06:42 2018 +0000
+
+    ipv6: Fix getsockopt() for sockets with default IPV6_AUTOFLOWLABEL
+    
+    
+    [ Upstream commit e9191ffb65d8e159680ce0ad2224e1acbde6985c ]
+    
+    Commit 513674b5a2c9 ("net: reevalulate autoflowlabel setting after
+    sysctl setting") removed the initialisation of
+    ipv6_pinfo::autoflowlabel and added a second flag to indicate
+    whether this field or the net namespace default should be used.
+    
+    The getsockopt() handling for this case was not updated, so it
+    currently returns 0 for all sockets for which IPV6_AUTOFLOWLABEL is
+    not explicitly enabled.  Fix it to return the effective value, whether
+    that has been set at the socket or net namespace level.
+    
+    Fixes: 513674b5a2c9 ("net: reevalulate autoflowlabel setting after sysctl ...")
+    Signed-off-by: Ben Hutchings <ben.hutchings@codethink.co.uk>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 06525d5b8ea897c61895bdb086f8a8c9cc182963 ......
+	 orig commit -> aceef61ee56898cfa7b6960fb60b9326c3860441 ......
+checking f778ce6faa0d4c8d7a90b7bd11c3db7fb687c8cc ......
+	 orig commit -> 93c647643b48f0131f02e45da3bd367d80443291 ......
+checking 373b423038a873bee54c8f42375c4bc438e3059a ......
+	 orig commit -> a46182b00290839fa3fa159d54fd3237bd8669f0 ......
+		 a46182b00290839fa3fa159d54fd3237bd8669f0 has problem. Fixes commit -> e7aadb27a5415e8125834b84a74477bfbee4eff5
+ad23b750933ea7bf962678972a286c78a8fa36aa
+commit 47b32f0653d758b5920d98924f164a2d9a02c662
+Author: Eric Dumazet <edumazet@google.com>
+Date:   Thu Feb 1 10:26:57 2018 -0800
+
+    net: igmp: add a missing rcu locking section
+    
+    
+    [ Upstream commit e7aadb27a5415e8125834b84a74477bfbee4eff5 ]
+    
+    Newly added igmpv3_get_srcaddr() needs to be called under rcu lock.
+    
+    Timer callbacks do not ensure this locking.
+    
+    =============================
+    WARNING: suspicious RCU usage
+    4.15.0+ #200 Not tainted
+    -----------------------------
+    ./include/linux/inetdevice.h:216 suspicious rcu_dereference_check() usage!
+    
+    other info that might help us debug this:
+    
+    rcu_scheduler_active = 2, debug_locks = 1
+    3 locks held by syzkaller616973/4074:
+     #0:  (&mm->mmap_sem){++++}, at: [<00000000bfce669e>] __do_page_fault+0x32d/0xc90 arch/x86/mm/fault.c:1355
+     #1:  ((&im->timer)){+.-.}, at: [<00000000619d2f71>] lockdep_copy_map include/linux/lockdep.h:178 [inline]
+     #1:  ((&im->timer)){+.-.}, at: [<00000000619d2f71>] call_timer_fn+0x1c6/0x820 kernel/time/timer.c:1316
+     #2:  (&(&im->lock)->rlock){+.-.}, at: [<000000005f833c5c>] spin_lock_bh include/linux/spinlock.h:315 [inline]
+     #2:  (&(&im->lock)->rlock){+.-.}, at: [<000000005f833c5c>] igmpv3_send_report+0x98/0x5b0 net/ipv4/igmp.c:600
+    
+    stack backtrace:
+    CPU: 0 PID: 4074 Comm: syzkaller616973 Not tainted 4.15.0+ #200
+    Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+    Call Trace:
+     <IRQ>
+     __dump_stack lib/dump_stack.c:17 [inline]
+     dump_stack+0x194/0x257 lib/dump_stack.c:53
+     lockdep_rcu_suspicious+0x123/0x170 kernel/locking/lockdep.c:4592
+     __in_dev_get_rcu include/linux/inetdevice.h:216 [inline]
+     igmpv3_get_srcaddr net/ipv4/igmp.c:329 [inline]
+     igmpv3_newpack+0xeef/0x12e0 net/ipv4/igmp.c:389
+     add_grhead.isra.27+0x235/0x300 net/ipv4/igmp.c:432
+     add_grec+0xbd3/0x1170 net/ipv4/igmp.c:565
+     igmpv3_send_report+0xd5/0x5b0 net/ipv4/igmp.c:605
+     igmp_send_report+0xc43/0x1050 net/ipv4/igmp.c:722
+     igmp_timer_expire+0x322/0x5c0 net/ipv4/igmp.c:831
+     call_timer_fn+0x228/0x820 kernel/time/timer.c:1326
+     expire_timers kernel/time/timer.c:1363 [inline]
+     __run_timers+0x7ee/0xb70 kernel/time/timer.c:1666
+     run_timer_softirq+0x4c/0x70 kernel/time/timer.c:1692
+     __do_softirq+0x2d7/0xb85 kernel/softirq.c:285
+     invoke_softirq kernel/softirq.c:365 [inline]
+     irq_exit+0x1cc/0x200 kernel/softirq.c:405
+     exiting_irq arch/x86/include/asm/apic.h:541 [inline]
+     smp_apic_timer_interrupt+0x16b/0x700 arch/x86/kernel/apic/apic.c:1052
+     apic_timer_interrupt+0xa9/0xb0 arch/x86/entry/entry_64.S:938
+    
+    Fixes: a46182b00290 ("net: igmp: Use correct source address on IGMPv3 reports")
+    Signed-off-by: Eric Dumazet <edumazet@google.com>
+    Reported-by: syzbot <syzkaller@googlegroups.com>
+    
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 6c489ab43ccacb9f26620ded90374c582c466344
+Author: Felix Fietkau <nbd@nbd.name>
+Date:   Fri Jan 19 11:50:46 2018 +0100
+
+    net: igmp: fix source address check for IGMPv3 reports
+    
+    
+    [ Upstream commit ad23b750933ea7bf962678972a286c78a8fa36aa ]
+    
+    Commit "net: igmp: Use correct source address on IGMPv3 reports"
+    introduced a check to validate the source address of locally generated
+    IGMPv3 packets.
+    Instead of checking the local interface address directly, it uses
+    inet_ifa_match(fl4->saddr, ifa), which checks if the address is on the
+    local subnet (or equal to the point-to-point address if used).
+    
+    This breaks for point-to-point interfaces, so check against
+    ifa->ifa_local directly.
+    
+    Cc: Kevin Cernekee <cernekee@chromium.org>
+    Fixes: a46182b00290 ("net: igmp: Use correct source address on IGMPv3 reports")
+    Reported-by: Sebastian Gottschall <s.gottschall@dd-wrt.com>
+    Signed-off-by: Felix Fietkau <nbd@nbd.name>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Tested-by: Florian Wolters <florian@florian-wolters.de>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+commit 47b32f0653d758b5920d98924f164a2d9a02c662
+Author: Eric Dumazet <edumazet@google.com>
+Date:   Thu Feb 1 10:26:57 2018 -0800
+
+    net: igmp: add a missing rcu locking section
+    
+    
+    [ Upstream commit e7aadb27a5415e8125834b84a74477bfbee4eff5 ]
+    
+    Newly added igmpv3_get_srcaddr() needs to be called under rcu lock.
+    
+    Timer callbacks do not ensure this locking.
+    
+    =============================
+    WARNING: suspicious RCU usage
+    4.15.0+ #200 Not tainted
+    -----------------------------
+    ./include/linux/inetdevice.h:216 suspicious rcu_dereference_check() usage!
+    
+    other info that might help us debug this:
+    
+    rcu_scheduler_active = 2, debug_locks = 1
+    3 locks held by syzkaller616973/4074:
+     #0:  (&mm->mmap_sem){++++}, at: [<00000000bfce669e>] __do_page_fault+0x32d/0xc90 arch/x86/mm/fault.c:1355
+     #1:  ((&im->timer)){+.-.}, at: [<00000000619d2f71>] lockdep_copy_map include/linux/lockdep.h:178 [inline]
+     #1:  ((&im->timer)){+.-.}, at: [<00000000619d2f71>] call_timer_fn+0x1c6/0x820 kernel/time/timer.c:1316
+     #2:  (&(&im->lock)->rlock){+.-.}, at: [<000000005f833c5c>] spin_lock_bh include/linux/spinlock.h:315 [inline]
+     #2:  (&(&im->lock)->rlock){+.-.}, at: [<000000005f833c5c>] igmpv3_send_report+0x98/0x5b0 net/ipv4/igmp.c:600
+    
+    stack backtrace:
+    CPU: 0 PID: 4074 Comm: syzkaller616973 Not tainted 4.15.0+ #200
+    Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 01/01/2011
+    Call Trace:
+     <IRQ>
+     __dump_stack lib/dump_stack.c:17 [inline]
+     dump_stack+0x194/0x257 lib/dump_stack.c:53
+     lockdep_rcu_suspicious+0x123/0x170 kernel/locking/lockdep.c:4592
+     __in_dev_get_rcu include/linux/inetdevice.h:216 [inline]
+     igmpv3_get_srcaddr net/ipv4/igmp.c:329 [inline]
+     igmpv3_newpack+0xeef/0x12e0 net/ipv4/igmp.c:389
+     add_grhead.isra.27+0x235/0x300 net/ipv4/igmp.c:432
+     add_grec+0xbd3/0x1170 net/ipv4/igmp.c:565
+     igmpv3_send_report+0xd5/0x5b0 net/ipv4/igmp.c:605
+     igmp_send_report+0xc43/0x1050 net/ipv4/igmp.c:722
+     igmp_timer_expire+0x322/0x5c0 net/ipv4/igmp.c:831
+     call_timer_fn+0x228/0x820 kernel/time/timer.c:1326
+     expire_timers kernel/time/timer.c:1363 [inline]
+     __run_timers+0x7ee/0xb70 kernel/time/timer.c:1666
+     run_timer_softirq+0x4c/0x70 kernel/time/timer.c:1692
+     __do_softirq+0x2d7/0xb85 kernel/softirq.c:285
+     invoke_softirq kernel/softirq.c:365 [inline]
+     irq_exit+0x1cc/0x200 kernel/softirq.c:405
+     exiting_irq arch/x86/include/asm/apic.h:541 [inline]
+     smp_apic_timer_interrupt+0x16b/0x700 arch/x86/kernel/apic/apic.c:1052
+     apic_timer_interrupt+0xa9/0xb0 arch/x86/entry/entry_64.S:938
+    
+    Fixes: a46182b00290 ("net: igmp: Use correct source address on IGMPv3 reports")
+    Signed-off-by: Eric Dumazet <edumazet@google.com>
+    Reported-by: syzbot <syzkaller@googlegroups.com>
+    
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 0a8cb76e11d9f14ada3c13fde306b6900c7975f3 ......
+	 orig commit -> b9b312a7a451e9c098921856e7cfbc201120e1a7 ......
+checking 3d406a18bd94b8c5cb2e46e2d45ad6c1bef8f060 ......
+	 orig commit -> b5476022bbada3764609368f03329ca287528dc8 ......
+checking 1cd09d4b38a26730081780168c0de79d1cd14d71 ......
+	 orig commit -> 3ce120b16cc548472f80cf8644f90eda958cf1b6 ......
+checking 6c4db09c291a19da66512f99c4bcb378a862f9e6 ......
+	 orig commit -> 924c6b900cfdf376b07bccfd80e62b21914f8a5a ......
+checking fd0504525efd2ce2063cd4229baabd3e3a56ecbc ......
+	 orig commit -> 660da7c9228f685b2ebe664f9fd69aaddcc420b5 ......
+		 660da7c9228f685b2ebe664f9fd69aaddcc420b5 has problem. Fixes commit -> 924c6b900cfdf376b07bccfd80e62b21914f8a5a
+c7ad5ad297e644601747d6dbee978bf85e14f7bc
+f34902c5c6c08024371202a680ce69f2d488776d
+commit 6c4db09c291a19da66512f99c4bcb378a862f9e6
+Author: Andy Lutomirski <luto@kernel.org>
+Date:   Sun Oct 8 21:53:05 2017 -0700
+
+    x86/mm/64: Fix reboot interaction with CR4.PCIDE
+    
+    commit 924c6b900cfdf376b07bccfd80e62b21914f8a5a upstream.
+    
+    Trying to reboot via real mode fails with PCID on: long mode cannot
+    be exited while CR4.PCIDE is set.  (No, I have no idea why, but the
+    SDM and actual CPUs are in agreement here.)  The result is a GPF and
+    a hang instead of a reboot.
+    
+    I didn't catch this in testing because neither my computer nor my VM
+    reboots this way.  I can trigger it with reboot=bios, though.
+    
+    Fixes: 660da7c9228f ("x86/mm: Enable CR4.PCIDE on supported systems")
+    Reported-and-tested-by: Steven Rostedt (VMware) <rostedt@goodmis.org>
+    Signed-off-by: Andy Lutomirski <luto@kernel.org>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Cc: Borislav Petkov <bp@alien8.de>
+    Link: https://lkml.kernel.org/r/f1e7d965998018450a7a70c2823873686a8b21c0.1507524746.git.luto@kernel.org
+    Cc: Hugh Dickins <hughd@google.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking dcccd3c266e24ce80ecf592765315c54c222ac33 ......
+	 orig commit -> 0790c9aad84901ca1bdc14746175549c8b5da215 ......
+checking 78043e5b6fb2921d836b31f23e89e52925191153 ......
+	 orig commit -> cba4671af7550e008f7a7835f06df0763825bf3e ......
+		 cba4671af7550e008f7a7835f06df0763825bf3e has problem. Fixes commit -> b8b7abaed7a49b350f8ba659ddc264b04931d581
+commit 416f66509fce36e128ea2d9e62739a21f1a1d04d
+Author: Andy Lutomirski <luto@kernel.org>
+Date:   Sun Sep 17 09:03:50 2017 -0700
+
+    x86/mm/32: Move setup_clear_cpu_cap(X86_FEATURE_PCID) earlier
+    
+    commit b8b7abaed7a49b350f8ba659ddc264b04931d581 upstream.
+    
+    Otherwise we might have the PCID feature bit set during cpu_init().
+    
+    This is just for robustness.  I haven't seen any actual bugs here.
+    
+    Signed-off-by: Andy Lutomirski <luto@kernel.org>
+    Cc: Borislav Petkov <bpetkov@suse.de>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Peter Zijlstra <peterz@infradead.org>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Fixes: cba4671af755 ("x86/mm: Disable PCID on 32-bit kernels")
+    Link: http://lkml.kernel.org/r/b16dae9d6b0db5d9801ddbebbfd83384097c61f3.1505663533.git.luto@kernel.org
+    Signed-off-by: Ingo Molnar <mingo@kernel.org>
+    Signed-off-by: David Woodhouse <dwmw@amazon.co.uk>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking b2e24274d50e0ecdf560ebe06dbed0cc648ad3f9 ......
+	 orig commit -> ce4a4e565f5264909a18c733b864c3f74467f69e ......
+		 ce4a4e565f5264909a18c733b864c3f74467f69e has problem. Fixes commit -> 5dd0b16cdaff9b94da06074d5888b03235c0bf17
+commit 5d67dbef745b60fd5041b2fd7e5833e92a512a54
+Author: Andy Lutomirski <luto@kernel.org>
+Date:   Mon Jun 5 07:40:25 2017 -0700
+
+    mm/vmstat: Make NR_TLB_REMOTE_FLUSH_RECEIVED available even on UP
+    
+    commit 5dd0b16cdaff9b94da06074d5888b03235c0bf17 upstream.
+    
+    This fixes CONFIG_SMP=n, CONFIG_DEBUG_TLBFLUSH=y without introducing
+    further #ifdef soup.  Caught by a Kbuild bot randconfig build.
+    
+    Signed-off-by: Andy Lutomirski <luto@kernel.org>
+    Cc: Borislav Petkov <bp@alien8.de>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Peter Zijlstra <peterz@infradead.org>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Fixes: ce4a4e565f52 ("x86/mm: Remove the UP asm/tlbflush.h code, always use the (formerly) SMP code")
+    Link: http://lkml.kernel.org/r/76da9a3cc4415996f2ad2c905b93414add322021.1496673616.git.luto@kernel.org
+    Signed-off-by: Ingo Molnar <mingo@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 3efba6062a410a2a65fc9d6f53dca63db2602e65 ......
+	 orig commit -> ca6c99c0794875c6d1db6e22f246699691ab7e6b ......
+checking 9f4d1ba1d407e56dac833aa0b11c60f952939e1c ......
+	 orig commit -> ce27374fabf553153c3f53efcaa9bfab9216bd8c ......
+checking 227d6f0e79f809e448d3157fbfd00eb54dcbb54e ......
+	 orig commit -> 29961b59a51f8c6838a26a45e871a7ed6771809b ......
+checking 6ce9d1e6819e53c4de0bf980555c4e07bbedb4ce ......
+	 orig commit -> 9ccee2373f0658f234727700e619df097ba57023 ......
+checking c04ed3a849616f2c67ff016f50935ff1553c6751 ......
+	 orig commit -> 285d5ddcffafa5d5e68c586f4c9eaa8b24a2897d ......
+checking 0ba2ebc9f355c87c13e37ad136e9c4508a8a5029 ......
+	 orig commit -> a36c2638380c0a4676647a1f553b70b20d3ebce1 ......
+checking 5251932b974d23e36bd0a5d1d05fcaa7e94d8302 ......
+	 orig commit -> 15f8c5f2415bfac73f33a14bcd83422bcbfb5298 ......
+checking 3096ced5a93969a7d045ee06a14197a630415af4 ......
+	 orig commit -> 695b78b548d8a26288f041e907ff17758df9e1d5 ......
+checking becb0c6409ad5d07e2a2ea309d13576e9e776355 ......
+	 orig commit -> f55688c45442bc863f40ad678c638785b26cdce6 ......
+checking 9dc9648942b17289fbd3a520dedcde9b2fc27c15 ......
+	 orig commit -> 45d8b80c2ac5d21cd1e2954431fb676bc2b1e099 ......
+checking 25fade614be3c72573eb914933e715cfaedae089 ......
+	 orig commit -> 24f2aaf952ee0b59f31c3a18b8b36c9e3d3c2cf5 ......
+checking c2a62f84d49ff71cd7ffbe898c706ccc39955218 ......
+	 orig commit -> 4397f04575c44e1440ec2e49b6302785c95fd2f8 ......
+checking 0752421016279f5ba7477e715e2e56a22028f93f ......
+	 orig commit -> 6b7e633fe9c24682df550e5311f47fb524701586 ......
+checking 87060303469cc72d86b5b440c7b8fa8eeb8075f6 ......
+	 orig commit -> 4423c18e466afdfb02a36ee8b9f901d144b3c607 ......
+checking b7aac649af1039889ea6653d2c7f855dd530ef40 ......
+	 orig commit -> f41d84dddc66b164ac16acf3f584c276146f1c48 ......
+checking 5a62acc900e9066f86ec7051ee92491d36fe5f81 ......
+	 orig commit -> fae1a3e775cca8c3a9e0eb34443b310871a15a92 ......
+checking c9b5338394f235ef313e2160ed3c245965597db8 ......
+	 orig commit -> d73235d17ba63b53dc0e1051dbc10a1f1be91b71 ......
+checking 0bf0c45449c3ae741efdaa82a12d906184f358aa ......
+	 orig commit -> 5a1314fa697fc65cefaba64cd4699bfc3e6882a6 ......
+checking 46865ecdd0617d86a1aae0869a6e2f495beeec22 ......
+	 orig commit -> bcf3f1752a622f1372d3252d0fea8855d89812e7 ......
+checking 727b641b35dd07d28b2e99c3da413456eb132e5d ......
+	 orig commit -> 5839ee7389e893a31e4e3c9cf17b50d14103c902 ......
+checking 6b08ff879603eb320d20234e0413f5627df5c629 ......
+	 orig commit -> 5a15f289ee87eaf33f13f08a4909ec99d837ec5f ......
+checking af119535435526f4d7f0ad02863a590be641c76f ......
+	 orig commit -> c1cfd9025cc394fd137a01159d74335c5ac978ce ......
+checking e7f1c0da02fbb6e7368e78c86f5d2686c96e628f ......
+	 orig commit -> 85e9b13cbb130a3209f21bd7933933399c389ffe ......
+checking ee54e7a18e56131ff1ebabf7d0724e4e0797a518 ......
+	 orig commit -> 0a423772de2f3d7b00899987884f62f63ae00dcb ......
+checking 381d368c9954309bd2f250bbab39f7bd62d8a457 ......
+	 orig commit -> 15d8374874ded0bec37ef27f8301a6d54032c0e5 ......
+checking 2e234e707f7fed2371d27e174527c65128c1ea10 ......
+	 orig commit -> 9abffc6f2efe46c3564c04312e52e07622d40e51 ......
+checking db09203e325264e8d3b78a74205a0a250fe01b3b ......
+	 orig commit -> bb82e0b4a7e96494f0c1004ce50cec3d7b5fb3d1 ......

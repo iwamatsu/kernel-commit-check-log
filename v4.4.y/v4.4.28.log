@@ -1,0 +1,651 @@
+Check from v4.4.28 to v4.4.29
+Commit count: 52
+checking acd21d848252d8ea06b19066b675391d012b1737 ......
+checking 590a3edaa4ffd6b6894b4f8dcb908db20994b6c1 ......
+	 orig commit -> 9ba63e3cc849cdaf3b675c47cc51fe35419e5117 ......
+checking cccc670b51375081667db9d0d516818c5cddfe02 ......
+	 orig commit -> 11b7e154b132232535befe51c55db048069c8461 ......
+checking 2577121578e1857f6438d182ffa1f34d5c9cc8c8 ......
+	 orig commit -> 0d667f72b2a20bbac72bec0ab11467fc70bb0f1f ......
+checking c60955f44624946f937844c812e1e52a26742249 ......
+	 orig commit -> 432746f8e0b6a82ba832b771afe31abd51af6752 ......
+checking 8d31e5f9949ddbf6b700a71c4a7b68d612df1b9c ......
+	 orig commit -> c97b40e4d15f13a36cd037d598e45cbe9e1e5757 ......
+checking 349eb2cf6d72b29228d4fb673faa26fec49ffd84 ......
+	 orig commit -> d9ea48bc4e7cc297ca1073fa3f90ed80d964b7b4 ......
+checking c869f386bbfdd9e19148b7ab60b8ea4fec676ec8 ......
+	 orig commit -> 2cf9a57811bddb6fa6b0f8d7376da164d5534813 ......
+checking 122b5c3c15b3ff8e5fc06c2ea318603ede85acc7 ......
+	 orig commit -> 8964193f6bfda5c4cf14eedb7e94892c1f1c34f0 ......
+checking 9c72ae999e4f9c1619a154851aedbb35e1ad95f2 ......
+	 orig commit -> 6cd997db911f28f2510b771691270c52b63ed2e6 ......
+checking 8b477849186cbdc701a979460bad298a17f40649 ......
+	 orig commit -> c14f2aac7aa147861793eed9f41f91dd530f0be1 ......
+checking 5266d3d15f832a98e294422541e3c13949d6aabe ......
+	 orig commit -> d53c51f26145657aa7c55fa396f93677e613548d ......
+checking fcf5e5198b447969ed2a56ec335dae3c695a6b46 ......
+	 orig commit -> 548acf19234dbda5a52d5a8e7e205af46e9da840 ......
+checking 90bc49cd66f5cf28f3b1d5bf4621e5569c1b4901 ......
+	 orig commit -> 86c7e6836479c4045a9a81ed5ea76c51d719f9c1 ......
+checking 936ea759b70591231f47b10fd8fde20d8d210c2b ......
+	 orig commit -> 0610735928ee47870e083d5901caa371089216f1 ......
+checking fb911dfec0b0186d64604bbbf62dfdbb42a1aa79 ......
+	 orig commit -> 1335a9516d3d52f157ad87456efdd8dc9ae1747b ......
+	 orig commit -> 33dc85c3c667209c930b2dac5ccbc2a365e06b7a ......
+checking fb257da3e81d53cd373980b317ec0352ad5c151c ......
+	 orig commit -> a3930ed060df4ccf2a06cf0b68738dec3e6ff89a ......
+checking de0b70569c1ec41b2c7d7464c5dac36ebdf1c735 ......
+	 orig commit -> 071133a209354f39d4e5785d5a6a390e03241841 ......
+checking 41201d18e2c40d82bb022b382c417c216c91fbbb ......
+	 orig commit -> 01ad5e7de67b408d9b48b437b06a9938ddf460b5 ......
+checking 41b4b00e6daa22c75bd6a8961fa2aef3370c9d8c ......
+	 orig commit -> 8ae3ea48df0d746b663057cf0b972a18d0777b7b ......
+checking 1ea1d49d1630c1617cd04489faf419b0aeb18bfa ......
+	 orig commit -> ad8529fde9e3601180a839867a8ab041109aebb5 ......
+checking 2b1309856d5b4604bf0aaa403ee674fe6a6880d6 ......
+	 orig commit -> ed4767d612fd2c39e2c4c69eba484c1219dcddb6 ......
+checking 5171c1660e9c0d9ed1a44ada59a45b85eb1f2ef6 ......
+	 orig commit -> 50d2e6dc1f83db0563c7d6603967bf9585ce934b ......
+checking b31602293c200928cf8d90c13738a90392757ac4 ......
+	 orig commit -> b64db1b252e9974a43a51ba083fa7d03e4716167 ......
+checking a5a7f1e5ea0135c5794a80ebe228fbb8d011c01f ......
+	 orig commit -> 6999aeabbb703a81a204cb6f9f8f151759a99ac4 ......
+checking fdf85ceaf04aca4f61cb2b967ad6171151fc1f7f ......
+	 orig commit -> fcff03813a7c612873303037cef5ba0329850c35 ......
+checking 4d0842a484407d6d470e57dff30e414f365af1ad ......
+	 orig commit -> 4d31a2588ae37a5d0f61f4d956454e9504846aeb ......
+checking f2c4508a35a1e4aba0f910ba41c7001bb7801cfe ......
+	 orig commit -> ee26c013cdee0b947e29d6cadfb9ff3341c69ff9 ......
+checking 7629c7ef5291f692949e8ce1630db9a550e6e62f ......
+	 orig commit -> 51fd2df1e882a3c2a3f4b6c9ff243a93c9046dba ......
+checking e6cd4f09b48e762a4e447044632a5bf9e01a4ae8 ......
+	 orig commit -> 04fec21c06e35b169a83e75a84a015ab4606bf5e ......
+checking 9f9818f8c1cf44055634297247620be4755e7af2 ......
+	 orig commit -> a09a4c8dd1ec7f830e1fb9e59eb72bddc965d168 ......
+		 a09a4c8dd1ec7f830e1fb9e59eb72bddc965d168 has problem. Fixes commit -> 988dc4a9a3b66be75b30405a5494faf0dc7cffb6
+bb9bd814ebf04f579be466ba61fc922625508807
+b699d0035836f6712917a41e7ae58d84359b8ff9
+commit b1aaee5a97c9d6557bec13cf22d3db888c91509c
+Author: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+Date:   Tue Apr 9 11:47:20 2019 +0200
+
+    net: fou: do not use guehdr after iptunnel_pull_offloads in gue_udp_recv
+    
+    [ Upstream commit 988dc4a9a3b66be75b30405a5494faf0dc7cffb6 ]
+    
+    gue tunnels run iptunnel_pull_offloads on received skbs. This can
+    determine a possible use-after-free accessing guehdr pointer since
+    the packet will be 'uncloned' running pskb_expand_head if it is a
+    cloned gso skb (e.g if the packet has been sent though a veth device)
+    
+    Fixes: a09a4c8dd1ec ("tunnels: Remove encapsulation offloads on decap")
+    Signed-off-by: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit a04dde4e15d7b10752d64c2b56b3e36deeb4a45c
+Author: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+Date:   Thu Apr 4 16:37:53 2019 +0200
+
+    ipv6: sit: reset ip header pointer in ipip6_rcv
+    
+    [ Upstream commit bb9bd814ebf04f579be466ba61fc922625508807 ]
+    
+    ipip6 tunnels run iptunnel_pull_header on received skbs. This can
+    determine the following use-after-free accessing iph pointer since
+    the packet will be 'uncloned' running pskb_expand_head if it is a
+    cloned gso skb (e.g if the packet has been sent though a veth device)
+    
+    [  706.369655] BUG: KASAN: use-after-free in ipip6_rcv+0x1678/0x16e0 [sit]
+    [  706.449056] Read of size 1 at addr ffffe01b6bd855f5 by task ksoftirqd/1/=
+    [  706.669494] Hardware name: HPE ProLiant m400 Server/ProLiant m400 Server, BIOS U02 08/19/2016
+    [  706.771839] Call trace:
+    [  706.801159]  dump_backtrace+0x0/0x2f8
+    [  706.845079]  show_stack+0x24/0x30
+    [  706.884833]  dump_stack+0xe0/0x11c
+    [  706.925629]  print_address_description+0x68/0x260
+    [  706.982070]  kasan_report+0x178/0x340
+    [  707.025995]  __asan_report_load1_noabort+0x30/0x40
+    [  707.083481]  ipip6_rcv+0x1678/0x16e0 [sit]
+    [  707.132623]  tunnel64_rcv+0xd4/0x200 [tunnel4]
+    [  707.185940]  ip_local_deliver_finish+0x3b8/0x988
+    [  707.241338]  ip_local_deliver+0x144/0x470
+    [  707.289436]  ip_rcv_finish+0x43c/0x14b0
+    [  707.335447]  ip_rcv+0x628/0x1138
+    [  707.374151]  __netif_receive_skb_core+0x1670/0x2600
+    [  707.432680]  __netif_receive_skb+0x28/0x190
+    [  707.482859]  process_backlog+0x1d0/0x610
+    [  707.529913]  net_rx_action+0x37c/0xf68
+    [  707.574882]  __do_softirq+0x288/0x1018
+    [  707.619852]  run_ksoftirqd+0x70/0xa8
+    [  707.662734]  smpboot_thread_fn+0x3a4/0x9e8
+    [  707.711875]  kthread+0x2c8/0x350
+    [  707.750583]  ret_from_fork+0x10/0x18
+    
+    [  707.811302] Allocated by task 16982:
+    [  707.854182]  kasan_kmalloc.part.1+0x40/0x108
+    [  707.905405]  kasan_kmalloc+0xb4/0xc8
+    [  707.948291]  kasan_slab_alloc+0x14/0x20
+    [  707.994309]  __kmalloc_node_track_caller+0x158/0x5e0
+    [  708.053902]  __kmalloc_reserve.isra.8+0x54/0xe0
+    [  708.108280]  __alloc_skb+0xd8/0x400
+    [  708.150139]  sk_stream_alloc_skb+0xa4/0x638
+    [  708.200346]  tcp_sendmsg_locked+0x818/0x2b90
+    [  708.251581]  tcp_sendmsg+0x40/0x60
+    [  708.292376]  inet_sendmsg+0xf0/0x520
+    [  708.335259]  sock_sendmsg+0xac/0xf8
+    [  708.377096]  sock_write_iter+0x1c0/0x2c0
+    [  708.424154]  new_sync_write+0x358/0x4a8
+    [  708.470162]  __vfs_write+0xc4/0xf8
+    [  708.510950]  vfs_write+0x12c/0x3d0
+    [  708.551739]  ksys_write+0xcc/0x178
+    [  708.592533]  __arm64_sys_write+0x70/0xa0
+    [  708.639593]  el0_svc_handler+0x13c/0x298
+    [  708.686646]  el0_svc+0x8/0xc
+    
+    [  708.739019] Freed by task 17:
+    [  708.774597]  __kasan_slab_free+0x114/0x228
+    [  708.823736]  kasan_slab_free+0x10/0x18
+    [  708.868703]  kfree+0x100/0x3d8
+    [  708.905320]  skb_free_head+0x7c/0x98
+    [  708.948204]  skb_release_data+0x320/0x490
+    [  708.996301]  pskb_expand_head+0x60c/0x970
+    [  709.044399]  __iptunnel_pull_header+0x3b8/0x5d0
+    [  709.098770]  ipip6_rcv+0x41c/0x16e0 [sit]
+    [  709.146873]  tunnel64_rcv+0xd4/0x200 [tunnel4]
+    [  709.200195]  ip_local_deliver_finish+0x3b8/0x988
+    [  709.255596]  ip_local_deliver+0x144/0x470
+    [  709.303692]  ip_rcv_finish+0x43c/0x14b0
+    [  709.349705]  ip_rcv+0x628/0x1138
+    [  709.388413]  __netif_receive_skb_core+0x1670/0x2600
+    [  709.446943]  __netif_receive_skb+0x28/0x190
+    [  709.497120]  process_backlog+0x1d0/0x610
+    [  709.544169]  net_rx_action+0x37c/0xf68
+    [  709.589131]  __do_softirq+0x288/0x1018
+    
+    [  709.651938] The buggy address belongs to the object at ffffe01b6bd85580
+                    which belongs to the cache kmalloc-1024 of size 1024
+    [  709.804356] The buggy address is located 117 bytes inside of
+                    1024-byte region [ffffe01b6bd85580, ffffe01b6bd85980)
+    [  709.946340] The buggy address belongs to the page:
+    [  710.003824] page:ffff7ff806daf600 count:1 mapcount:0 mapping:ffffe01c4001f600 index:0x0
+    [  710.099914] flags: 0xfffff8000000100(slab)
+    [  710.149059] raw: 0fffff8000000100 dead000000000100 dead000000000200 ffffe01c4001f600
+    [  710.242011] raw: 0000000000000000 0000000000380038 00000001ffffffff 0000000000000000
+    [  710.334966] page dumped because: kasan: bad access detected
+    
+    Fix it resetting iph pointer after iptunnel_pull_header
+    
+    Fixes: a09a4c8dd1ec ("tunnels: Remove encapsulation offloads on decap")
+    Tested-by: Jianlin Shi <jishi@redhat.com>
+    Signed-off-by: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 0b12830665116f90ed795a1a54e2fced083c1a59
+Author: David S. Miller <davem@davemloft.net>
+Date:   Tue Jun 6 11:34:06 2017 -0400
+
+    Revert "sit: reload iphdr in ipip6_rcv"
+    
+    commit f4eb17e1efe538d4da7d574bedb00a8dafcc26b7 upstream.
+    
+    This reverts commit b699d0035836f6712917a41e7ae58d84359b8ff9.
+    
+    As per Eric Dumazet, the pskb_may_pull() is a NOP in this
+    particular case, so the 'iph' reload is unnecessary.
+    
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Cc: Dmitry Tunin <hanipouspilot@gmail.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 466d844cc205ff3b97c202ec9fb57632080811ab
+Author: Haishuang Yan <yanhaishuang@cmss.chinamobile.com>
+Date:   Sun Jun 4 14:43:43 2017 +0800
+
+    sit: reload iphdr in ipip6_rcv
+    
+    
+    [ Upstream commit b699d0035836f6712917a41e7ae58d84359b8ff9 ]
+    
+    Since iptunnel_pull_header() can call pskb_may_pull(),
+    we must reload any pointer that was related to skb->head.
+    
+    Fixes: a09a4c8dd1ec ("tunnels: Remove encapsulation offloads on decap")
+    Signed-off-by: Haishuang Yan <yanhaishuang@cmss.chinamobile.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <alexander.levin@microsoft.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+commit b1aaee5a97c9d6557bec13cf22d3db888c91509c
+Author: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+Date:   Tue Apr 9 11:47:20 2019 +0200
+
+    net: fou: do not use guehdr after iptunnel_pull_offloads in gue_udp_recv
+    
+    [ Upstream commit 988dc4a9a3b66be75b30405a5494faf0dc7cffb6 ]
+    
+    gue tunnels run iptunnel_pull_offloads on received skbs. This can
+    determine a possible use-after-free accessing guehdr pointer since
+    the packet will be 'uncloned' running pskb_expand_head if it is a
+    cloned gso skb (e.g if the packet has been sent though a veth device)
+    
+    Fixes: a09a4c8dd1ec ("tunnels: Remove encapsulation offloads on decap")
+    Signed-off-by: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit a04dde4e15d7b10752d64c2b56b3e36deeb4a45c
+Author: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+Date:   Thu Apr 4 16:37:53 2019 +0200
+
+    ipv6: sit: reset ip header pointer in ipip6_rcv
+    
+    [ Upstream commit bb9bd814ebf04f579be466ba61fc922625508807 ]
+    
+    ipip6 tunnels run iptunnel_pull_header on received skbs. This can
+    determine the following use-after-free accessing iph pointer since
+    the packet will be 'uncloned' running pskb_expand_head if it is a
+    cloned gso skb (e.g if the packet has been sent though a veth device)
+    
+    [  706.369655] BUG: KASAN: use-after-free in ipip6_rcv+0x1678/0x16e0 [sit]
+    [  706.449056] Read of size 1 at addr ffffe01b6bd855f5 by task ksoftirqd/1/=
+    [  706.669494] Hardware name: HPE ProLiant m400 Server/ProLiant m400 Server, BIOS U02 08/19/2016
+    [  706.771839] Call trace:
+    [  706.801159]  dump_backtrace+0x0/0x2f8
+    [  706.845079]  show_stack+0x24/0x30
+    [  706.884833]  dump_stack+0xe0/0x11c
+    [  706.925629]  print_address_description+0x68/0x260
+    [  706.982070]  kasan_report+0x178/0x340
+    [  707.025995]  __asan_report_load1_noabort+0x30/0x40
+    [  707.083481]  ipip6_rcv+0x1678/0x16e0 [sit]
+    [  707.132623]  tunnel64_rcv+0xd4/0x200 [tunnel4]
+    [  707.185940]  ip_local_deliver_finish+0x3b8/0x988
+    [  707.241338]  ip_local_deliver+0x144/0x470
+    [  707.289436]  ip_rcv_finish+0x43c/0x14b0
+    [  707.335447]  ip_rcv+0x628/0x1138
+    [  707.374151]  __netif_receive_skb_core+0x1670/0x2600
+    [  707.432680]  __netif_receive_skb+0x28/0x190
+    [  707.482859]  process_backlog+0x1d0/0x610
+    [  707.529913]  net_rx_action+0x37c/0xf68
+    [  707.574882]  __do_softirq+0x288/0x1018
+    [  707.619852]  run_ksoftirqd+0x70/0xa8
+    [  707.662734]  smpboot_thread_fn+0x3a4/0x9e8
+    [  707.711875]  kthread+0x2c8/0x350
+    [  707.750583]  ret_from_fork+0x10/0x18
+    
+    [  707.811302] Allocated by task 16982:
+    [  707.854182]  kasan_kmalloc.part.1+0x40/0x108
+    [  707.905405]  kasan_kmalloc+0xb4/0xc8
+    [  707.948291]  kasan_slab_alloc+0x14/0x20
+    [  707.994309]  __kmalloc_node_track_caller+0x158/0x5e0
+    [  708.053902]  __kmalloc_reserve.isra.8+0x54/0xe0
+    [  708.108280]  __alloc_skb+0xd8/0x400
+    [  708.150139]  sk_stream_alloc_skb+0xa4/0x638
+    [  708.200346]  tcp_sendmsg_locked+0x818/0x2b90
+    [  708.251581]  tcp_sendmsg+0x40/0x60
+    [  708.292376]  inet_sendmsg+0xf0/0x520
+    [  708.335259]  sock_sendmsg+0xac/0xf8
+    [  708.377096]  sock_write_iter+0x1c0/0x2c0
+    [  708.424154]  new_sync_write+0x358/0x4a8
+    [  708.470162]  __vfs_write+0xc4/0xf8
+    [  708.510950]  vfs_write+0x12c/0x3d0
+    [  708.551739]  ksys_write+0xcc/0x178
+    [  708.592533]  __arm64_sys_write+0x70/0xa0
+    [  708.639593]  el0_svc_handler+0x13c/0x298
+    [  708.686646]  el0_svc+0x8/0xc
+    
+    [  708.739019] Freed by task 17:
+    [  708.774597]  __kasan_slab_free+0x114/0x228
+    [  708.823736]  kasan_slab_free+0x10/0x18
+    [  708.868703]  kfree+0x100/0x3d8
+    [  708.905320]  skb_free_head+0x7c/0x98
+    [  708.948204]  skb_release_data+0x320/0x490
+    [  708.996301]  pskb_expand_head+0x60c/0x970
+    [  709.044399]  __iptunnel_pull_header+0x3b8/0x5d0
+    [  709.098770]  ipip6_rcv+0x41c/0x16e0 [sit]
+    [  709.146873]  tunnel64_rcv+0xd4/0x200 [tunnel4]
+    [  709.200195]  ip_local_deliver_finish+0x3b8/0x988
+    [  709.255596]  ip_local_deliver+0x144/0x470
+    [  709.303692]  ip_rcv_finish+0x43c/0x14b0
+    [  709.349705]  ip_rcv+0x628/0x1138
+    [  709.388413]  __netif_receive_skb_core+0x1670/0x2600
+    [  709.446943]  __netif_receive_skb+0x28/0x190
+    [  709.497120]  process_backlog+0x1d0/0x610
+    [  709.544169]  net_rx_action+0x37c/0xf68
+    [  709.589131]  __do_softirq+0x288/0x1018
+    
+    [  709.651938] The buggy address belongs to the object at ffffe01b6bd85580
+                    which belongs to the cache kmalloc-1024 of size 1024
+    [  709.804356] The buggy address is located 117 bytes inside of
+                    1024-byte region [ffffe01b6bd85580, ffffe01b6bd85980)
+    [  709.946340] The buggy address belongs to the page:
+    [  710.003824] page:ffff7ff806daf600 count:1 mapcount:0 mapping:ffffe01c4001f600 index:0x0
+    [  710.099914] flags: 0xfffff8000000100(slab)
+    [  710.149059] raw: 0fffff8000000100 dead000000000100 dead000000000200 ffffe01c4001f600
+    [  710.242011] raw: 0000000000000000 0000000000380038 00000001ffffffff 0000000000000000
+    [  710.334966] page dumped because: kasan: bad access detected
+    
+    Fix it resetting iph pointer after iptunnel_pull_header
+    
+    Fixes: a09a4c8dd1ec ("tunnels: Remove encapsulation offloads on decap")
+    Tested-by: Jianlin Shi <jishi@redhat.com>
+    Signed-off-by: Lorenzo Bianconi <lorenzo.bianconi@redhat.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking 5699b3431e0b14736867484b8669ead2d40f575e ......
+	 orig commit -> fac8e0f579695a3ecbc4d3cac369139d7f819971 ......
+		 fac8e0f579695a3ecbc4d3cac369139d7f819971 has problem. Fixes commit -> c3483384ee511ee2af40b4076366cd82a6a47b86
+commit 02bc5312bb66a828f21d85af14425fd45eec08f8
+Author: Alexander Duyck <aduyck@mirantis.com>
+Date:   Tue Mar 29 14:55:22 2016 -0700
+
+    gro: Allow tunnel stacking in the case of FOU/GUE
+    
+    [ Upstream commit c3483384ee511ee2af40b4076366cd82a6a47b86 ]
+    
+    This patch should fix the issues seen with a recent fix to prevent
+    tunnel-in-tunnel frames from being generated with GRO.  The fix itself is
+    correct for now as long as we do not add any devices that support
+    NETIF_F_GSO_GRE_CSUM.  When such a device is added it could have the
+    potential to mess things up due to the fact that the outer transport header
+    points to the outer UDP header and not the GRE header as would be expected.
+    
+    Fixes: fac8e0f579695 ("tunnels: Don't apply GRO to multiple layers of encapsulation.")
+    Signed-off-by: Alexander Duyck <aduyck@mirantis.com>
+    Signed-off-by: David S. Miller <davem@davemloft.net>
+    Signed-off-by: Sasha Levin <sashal@kernel.org>
+checking 419cabdcc4818dd06a1827e5e84df7738900a458 ......
+	 orig commit -> b8cba75bdf6a48ea4811bbefb11a94a5c7281b68 ......
+checking 57c9cfdb61ea270936fab76da99a742c6ef0b86f ......
+	 orig commit -> 073931017b49d9458aa351605b43a7e34598caef ......
+		 073931017b49d9458aa351605b43a7e34598caef has problem. Fixes commit -> b5accbb0dfae36d8d36cd882096943c98d5ede15
+19ec8e48582670c021e998b9deb88e39a842ff45
+a3bb2d5587521eea6dab2d05326abb0afb460abd
+914cea93dd89f00b41c1d8ff93f17be47356a36a
+9bcf66c72d726322441ec82962994e69157613e4
+84969465ddc4f8aeb3b993123b571aa01c5f2683
+a992f2d38e4ce17b8c7d1f7f67b2de0eebdea069
+6883cd7f68245e43e91e5ee583b7550abf14523f
+c925dc162f770578ff4a65ec9b08270382dba9e6
+b7f8a09f8097db776b8d160862540e4fc1f51296
+8ba358756aa08414fa9e65a1a41d28304ed6fd7f
+commit aa75b56eb5406294a7eb6f0d57059d1cff5fd846
+Author: Jan Kara <jack@suse.cz>
+Date:   Thu Jun 22 15:31:07 2017 +0200
+
+    btrfs: Don't clear SGID when inheriting ACLs
+    
+    commit b7f8a09f8097db776b8d160862540e4fc1f51296 upstream.
+    
+    When new directory 'DIR1' is created in a directory 'DIR0' with SGID bit
+    set, DIR1 is expected to have SGID bit set (and owning group equal to
+    the owning group of 'DIR0'). However when 'DIR0' also has some default
+    ACLs that 'DIR1' inherits, setting these ACLs will result in SGID bit on
+    'DIR1' to get cleared if user is not member of the owning group.
+    
+    Fix the problem by moving posix_acl_update_mode() out of
+    __btrfs_set_acl() into btrfs_set_acl(). That way the function will not be
+    called when inheriting ACLs which is what we want as it prevents SGID
+    bit clearing and the mode has been properly set by posix_acl_create()
+    anyway.
+    
+    Fixes: 073931017b49d9458aa351605b43a7e34598caef
+    CC: stable@vger.kernel.org
+    CC: linux-btrfs@vger.kernel.org
+    CC: David Sterba <dsterba@suse.com>
+    Signed-off-by: Jan Kara <jack@suse.cz>
+    Signed-off-by: David Sterba <dsterba@suse.com>
+    Signed-off-by: Nikolay Borisov <nborisov@suse.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit e22c8378505e1354b4346c7ecccb446b7c505deb
+Author: Jan Kara <jack@suse.cz>
+Date:   Thu Jun 22 09:32:49 2017 +0200
+
+    reiserfs: Don't clear SGID when inheriting ACLs
+    
+    commit 6883cd7f68245e43e91e5ee583b7550abf14523f upstream.
+    
+    When new directory 'DIR1' is created in a directory 'DIR0' with SGID bit
+    set, DIR1 is expected to have SGID bit set (and owning group equal to
+    the owning group of 'DIR0'). However when 'DIR0' also has some default
+    ACLs that 'DIR1' inherits, setting these ACLs will result in SGID bit on
+    'DIR1' to get cleared if user is not member of the owning group.
+    
+    Fix the problem by moving posix_acl_update_mode() out of
+    __reiserfs_set_acl() into reiserfs_set_acl(). That way the function will
+    not be called when inheriting ACLs which is what we want as it prevents
+    SGID bit clearing and the mode has been properly set by
+    posix_acl_create() anyway.
+    
+    Fixes: 073931017b49d9458aa351605b43a7e34598caef
+    CC: reiserfs-devel@vger.kernel.org
+    Signed-off-by: Jan Kara <jack@suse.cz>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 8e8224de0e1848a5905ebda018969e2ce72258ca
+Author: Jan Kara <jack@suse.cz>
+Date:   Wed Jun 21 14:34:15 2017 +0200
+
+    ext2: Don't clear SGID when inheriting ACLs
+    
+    commit a992f2d38e4ce17b8c7d1f7f67b2de0eebdea069 upstream.
+    
+    When new directory 'DIR1' is created in a directory 'DIR0' with SGID bit
+    set, DIR1 is expected to have SGID bit set (and owning group equal to
+    the owning group of 'DIR0'). However when 'DIR0' also has some default
+    ACLs that 'DIR1' inherits, setting these ACLs will result in SGID bit on
+    'DIR1' to get cleared if user is not member of the owning group.
+    
+    Fix the problem by creating __ext2_set_acl() function that does not call
+    posix_acl_update_mode() and use it when inheriting ACLs. That prevents
+    SGID bit clearing and the mode has been properly set by
+    posix_acl_create() anyway.
+    
+    Fixes: 073931017b49d9458aa351605b43a7e34598caef
+    CC: stable@vger.kernel.org
+    CC: linux-ext4@vger.kernel.org
+    Signed-off-by: Jan Kara <jack@suse.cz>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 4f22f0793ccedb43a8fd47c20943a777228b2265
+Author: Jan Kara <jack@suse.cz>
+Date:   Sun Jul 30 23:33:01 2017 -0400
+
+    ext4: Don't clear SGID when inheriting ACLs
+    
+    commit a3bb2d5587521eea6dab2d05326abb0afb460abd upstream.
+    
+    When new directory 'DIR1' is created in a directory 'DIR0' with SGID bit
+    set, DIR1 is expected to have SGID bit set (and owning group equal to
+    the owning group of 'DIR0'). However when 'DIR0' also has some default
+    ACLs that 'DIR1' inherits, setting these ACLs will result in SGID bit on
+    'DIR1' to get cleared if user is not member of the owning group.
+    
+    Fix the problem by moving posix_acl_update_mode() out of
+    __ext4_set_acl() into ext4_set_acl(). That way the function will not be
+    called when inheriting ACLs which is what we want as it prevents SGID
+    bit clearing and the mode has been properly set by posix_acl_create()
+    anyway.
+    
+    Fixes: 073931017b49d9458aa351605b43a7e34598caef
+    Signed-off-by: Theodore Ts'o <tytso@mit.edu>
+    Signed-off-by: Jan Kara <jack@suse.cz>
+    Reviewed-by: Andreas Gruenbacher <agruenba@redhat.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit fca8859982fb0e591c9baa10f1ba7c405dd5a120
+Author: Jaegeuk Kim <jaegeuk@kernel.org>
+Date:   Tue Jul 11 14:56:49 2017 -0700
+
+    f2fs: Don't clear SGID when inheriting ACLs
+    
+    commit c925dc162f770578ff4a65ec9b08270382dba9e6 upstream.
+    
+    This patch copies commit b7f8a09f80:
+    "btrfs: Don't clear SGID when inheriting ACLs" written by Jan.
+    
+    Fixes: 073931017b49d9458aa351605b43a7e34598caef
+    Signed-off-by: Jan Kara <jack@suse.cz>
+    Reviewed-by: Chao Yu <yuchao0@huawei.com>
+    Reviewed-by: Jan Kara <jack@suse.cz>
+    Signed-off-by: Jaegeuk Kim <jaegeuk@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+commit aa75b56eb5406294a7eb6f0d57059d1cff5fd846
+Author: Jan Kara <jack@suse.cz>
+Date:   Thu Jun 22 15:31:07 2017 +0200
+
+    btrfs: Don't clear SGID when inheriting ACLs
+    
+    commit b7f8a09f8097db776b8d160862540e4fc1f51296 upstream.
+    
+    When new directory 'DIR1' is created in a directory 'DIR0' with SGID bit
+    set, DIR1 is expected to have SGID bit set (and owning group equal to
+    the owning group of 'DIR0'). However when 'DIR0' also has some default
+    ACLs that 'DIR1' inherits, setting these ACLs will result in SGID bit on
+    'DIR1' to get cleared if user is not member of the owning group.
+    
+    Fix the problem by moving posix_acl_update_mode() out of
+    __btrfs_set_acl() into btrfs_set_acl(). That way the function will not be
+    called when inheriting ACLs which is what we want as it prevents SGID
+    bit clearing and the mode has been properly set by posix_acl_create()
+    anyway.
+    
+    Fixes: 073931017b49d9458aa351605b43a7e34598caef
+    CC: stable@vger.kernel.org
+    CC: linux-btrfs@vger.kernel.org
+    CC: David Sterba <dsterba@suse.com>
+    Signed-off-by: Jan Kara <jack@suse.cz>
+    Signed-off-by: David Sterba <dsterba@suse.com>
+    Signed-off-by: Nikolay Borisov <nborisov@suse.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit e22c8378505e1354b4346c7ecccb446b7c505deb
+Author: Jan Kara <jack@suse.cz>
+Date:   Thu Jun 22 09:32:49 2017 +0200
+
+    reiserfs: Don't clear SGID when inheriting ACLs
+    
+    commit 6883cd7f68245e43e91e5ee583b7550abf14523f upstream.
+    
+    When new directory 'DIR1' is created in a directory 'DIR0' with SGID bit
+    set, DIR1 is expected to have SGID bit set (and owning group equal to
+    the owning group of 'DIR0'). However when 'DIR0' also has some default
+    ACLs that 'DIR1' inherits, setting these ACLs will result in SGID bit on
+    'DIR1' to get cleared if user is not member of the owning group.
+    
+    Fix the problem by moving posix_acl_update_mode() out of
+    __reiserfs_set_acl() into reiserfs_set_acl(). That way the function will
+    not be called when inheriting ACLs which is what we want as it prevents
+    SGID bit clearing and the mode has been properly set by
+    posix_acl_create() anyway.
+    
+    Fixes: 073931017b49d9458aa351605b43a7e34598caef
+    CC: reiserfs-devel@vger.kernel.org
+    Signed-off-by: Jan Kara <jack@suse.cz>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 8e8224de0e1848a5905ebda018969e2ce72258ca
+Author: Jan Kara <jack@suse.cz>
+Date:   Wed Jun 21 14:34:15 2017 +0200
+
+    ext2: Don't clear SGID when inheriting ACLs
+    
+    commit a992f2d38e4ce17b8c7d1f7f67b2de0eebdea069 upstream.
+    
+    When new directory 'DIR1' is created in a directory 'DIR0' with SGID bit
+    set, DIR1 is expected to have SGID bit set (and owning group equal to
+    the owning group of 'DIR0'). However when 'DIR0' also has some default
+    ACLs that 'DIR1' inherits, setting these ACLs will result in SGID bit on
+    'DIR1' to get cleared if user is not member of the owning group.
+    
+    Fix the problem by creating __ext2_set_acl() function that does not call
+    posix_acl_update_mode() and use it when inheriting ACLs. That prevents
+    SGID bit clearing and the mode has been properly set by
+    posix_acl_create() anyway.
+    
+    Fixes: 073931017b49d9458aa351605b43a7e34598caef
+    CC: stable@vger.kernel.org
+    CC: linux-ext4@vger.kernel.org
+    Signed-off-by: Jan Kara <jack@suse.cz>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit 4f22f0793ccedb43a8fd47c20943a777228b2265
+Author: Jan Kara <jack@suse.cz>
+Date:   Sun Jul 30 23:33:01 2017 -0400
+
+    ext4: Don't clear SGID when inheriting ACLs
+    
+    commit a3bb2d5587521eea6dab2d05326abb0afb460abd upstream.
+    
+    When new directory 'DIR1' is created in a directory 'DIR0' with SGID bit
+    set, DIR1 is expected to have SGID bit set (and owning group equal to
+    the owning group of 'DIR0'). However when 'DIR0' also has some default
+    ACLs that 'DIR1' inherits, setting these ACLs will result in SGID bit on
+    'DIR1' to get cleared if user is not member of the owning group.
+    
+    Fix the problem by moving posix_acl_update_mode() out of
+    __ext4_set_acl() into ext4_set_acl(). That way the function will not be
+    called when inheriting ACLs which is what we want as it prevents SGID
+    bit clearing and the mode has been properly set by posix_acl_create()
+    anyway.
+    
+    Fixes: 073931017b49d9458aa351605b43a7e34598caef
+    Signed-off-by: Theodore Ts'o <tytso@mit.edu>
+    Signed-off-by: Jan Kara <jack@suse.cz>
+    Reviewed-by: Andreas Gruenbacher <agruenba@redhat.com>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+
+commit fca8859982fb0e591c9baa10f1ba7c405dd5a120
+Author: Jaegeuk Kim <jaegeuk@kernel.org>
+Date:   Tue Jul 11 14:56:49 2017 -0700
+
+    f2fs: Don't clear SGID when inheriting ACLs
+    
+    commit c925dc162f770578ff4a65ec9b08270382dba9e6 upstream.
+    
+    This patch copies commit b7f8a09f80:
+    "btrfs: Don't clear SGID when inheriting ACLs" written by Jan.
+    
+    Fixes: 073931017b49d9458aa351605b43a7e34598caef
+    Signed-off-by: Jan Kara <jack@suse.cz>
+    Reviewed-by: Chao Yu <yuchao0@huawei.com>
+    Reviewed-by: Jan Kara <jack@suse.cz>
+    Signed-off-by: Jaegeuk Kim <jaegeuk@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking b82a7f93b4e60d8689d8f4e687ef58ed2098739f ......
+	 orig commit -> ded89912156b1a47d940a0c954c43afbabd0c42c ......
+checking b5784d4209810937eebdd66d792d9ee02c886c5f ......
+	 orig commit -> 2247bb335ab9c40058484cac36ea74ee652f3b7b ......
+checking 89758797f1c267e1e0fbc87c56dce2b13d673d0b ......
+	 orig commit -> ca5732c53bf66ad755284786897e0dd10330de87 ......
+checking be1cd22fe136705b0624dfb73ee7e159a2a425eb ......
+	 orig commit -> d721b02fd00bf133580f431b82ef37f3b746dfb2 ......
+checking cbadb9d9de33960d1d735944adac6de4123378ef ......
+	 orig commit -> 23f889bdf6ee5cfff012d8b09f6bec920c691696 ......
+checking a768ae1daea31b549e2401caca543adb9f225ef5 ......
+	 orig commit -> 4e4d3814a9bb4d71cd3ff0701d8d7041edefd8f0 ......
+checking 03cebefe8926d836d736e31d3f8259cd94e7814b ......
+	 orig commit -> 9a035a40f7f3f6708b79224b86c5777a3334f7ea ......
+checking edd2b5fd028edd47db5da2601e043644e499a44c ......
+	 orig commit -> 51ab70bed997f64f091a639dbe22b629725a7faf ......
+checking 78f2cffcdbade80073fe7049676e71e521afa0fc ......
+	 orig commit -> 02cfb5fccb0f9f968f0e208d89d9769aa16267bc ......
+checking 5d980100fb5fe8ac0de4d472321570546898dd90 ......
+	 orig commit -> 427920292b00474d978d632bc03a8e4e50029af3 ......
+checking a92829480b1856b054efe4430354c4627344d8f9 ......
+	 orig commit -> 884031f0aacf57dad1575f96714efc80de9b19cc ......
+checking d88e951b67a99c9b33f85f2b094457b87227bf30 ......
+	 orig commit -> dc8184aa8621ee8048652496884d9f40d4bb407f ......
+checking 5307cd52b7aacb68dc955544bab9c76e971449b0 ......
+	 orig commit -> 140c94da3c3338c0ff4cc127cf9bec87905ca83c ......
+checking aed5d16300597a60c51ac28a1e40dd8953fd2801 ......
+	 orig commit -> 3a9d993ee9809c217f4322623a9b78c8d17fdd1f ......
+checking 67c35d5d664ffd46728c34bd2acbce3a83f3ebd8 ......
+	 orig commit -> 324082586cc5918e3230f0b2f326656c653201eb ......
+checking aead680bd82fdf09d569636b01855307fe6346d5 ......
+	 orig commit -> e96ec90f496603c48e0945f8bdeb4cdf3088cbba ......
+checking 2aedf0e301a3ac2305bd9e6b7112bd858e37abb0 ......
+	 orig commit -> c4795ca642b8bd76b5b6ffba41ba909543273d43 ......
+checking 7a9ddd2f1f4ba34cffb6121a6c360d426310f08c ......
+	 orig commit -> 56a76c0123d6cb034975901c80fce2627338ef9e ......

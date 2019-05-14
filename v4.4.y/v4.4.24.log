@@ -1,0 +1,205 @@
+Check from v4.4.24 to v4.4.25
+Commit count: 22
+checking 6c789d9eddab3bff59e89aa6f2723b1ff652fed9 ......
+checking 8866a28836924a0bfa84f1cbf574eb5138b7dec4 ......
+	 orig commit -> 72fd50e14e46dc0edf360631bdece87c2f066a97 ......
+checking c0201ae6796a830fa7eb0cb537239102bedcbcc5 ......
+	 orig commit -> d4816edfe706497a8525480c1685ceb9871bc118 ......
+checking 0040b7466cbd6d7a7f84d0eed86e328da21c0e27 ......
+	 orig commit -> e71b9dff0634edb127f449e076e883ef24a8c76c ......
+checking 5769cba883d655555e951fa5b7321e7604b78384 ......
+	 orig commit -> af48d7bc3756a0cd882d65bff14ab39746ba57fe ......
+checking 847547dd82519ac38c632f035f0420a7948319da ......
+	 orig commit -> ca88696e8b73a9fa2b1de445747e9235c3a7bd50 ......
+checking 7d19a914dcb6a25861173473f312fb52c546eea7 ......
+	 orig commit -> 061492cfad9f11dbc32df741a7164f307b69b6e6 ......
+checking 63f9190b09dd9980e50ea01c81eb5a06b798d9e2 ......
+	 orig commit -> 72b4f6a5e903b071f2a7c4eb1418cbe4eefdc344 ......
+checking eba90a4c76b91db06c307035c06b20dbcb5fa487 ......
+	 orig commit -> db91aa793ff984ac048e199ea1c54202543952fe ......
+checking 09634475c76af9841dbd209f66cc34cc50877176 ......
+	 orig commit -> 917db484dc6a69969d317b3e57add4208a8d9d42 ......
+		 917db484dc6a69969d317b3e57add4208a8d9d42 has problem. Fixes commit -> 23446cb66c073b827779e5eb3dec301623299b32
+commit c234231da4e0565d89259da73c8a5e417fe5bba5
+Author: Dan Williams <dan.j.williams@intel.com>
+Date:   Wed Oct 12 11:01:48 2016 -0700
+
+    x86/e820: Don't merge consecutive E820_PRAM ranges
+    
+    commit 23446cb66c073b827779e5eb3dec301623299b32 upstream.
+    
+    Commit:
+    
+      917db484dc6a ("x86/boot: Fix kdump, cleanup aborted E820_PRAM max_pfn manipulation")
+    
+    ... fixed up the broken manipulations of max_pfn in the presence of
+    E820_PRAM ranges.
+    
+    However, it also broke the sanitize_e820_map() support for not merging
+    E820_PRAM ranges.
+    
+    Re-introduce the enabling to keep resource boundaries between
+    consecutive defined ranges. Otherwise, for example, an environment that
+    boots with memmap=2G!8G,2G!10G will end up with a single 4G /dev/pmem0
+    device instead of a /dev/pmem0 and /dev/pmem1 device 2G in size.
+    
+    Reported-by: Dave Chinner <david@fromorbit.com>
+    Signed-off-by: Dan Williams <dan.j.williams@intel.com>
+    Cc: Andy Lutomirski <luto@kernel.org>
+    Cc: Borislav Petkov <bp@alien8.de>
+    Cc: Brian Gerst <brgerst@gmail.com>
+    Cc: Denys Vlasenko <dvlasenk@redhat.com>
+    Cc: H. Peter Anvin <hpa@zytor.com>
+    Cc: Jeff Moyer <jmoyer@redhat.com>
+    Cc: Josh Poimboeuf <jpoimboe@redhat.com>
+    Cc: Linus Torvalds <torvalds@linux-foundation.org>
+    Cc: Peter Zijlstra <peterz@infradead.org>
+    Cc: Thomas Gleixner <tglx@linutronix.de>
+    Cc: Zhang Yi <yizhan@redhat.com>
+    Cc: linux-nvdimm@lists.01.org
+    Fixes: 917db484dc6a ("x86/boot: Fix kdump, cleanup aborted E820_PRAM max_pfn manipulation")
+    Link: http://lkml.kernel.org/r/147629530854.10618.10383744751594021268.stgit@dwillia2-desk3.amr.corp.intel.com
+    Signed-off-by: Ingo Molnar <mingo@kernel.org>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+checking eb825842eb01ac84cdb9dba71195752bf2094345 ......
+	 orig commit -> ac0e89bb4744d3882ccd275f2416d9ce22f4e1e7 ......
+checking d450527ad04ad180636679aeb3161ec58079f1ba ......
+	 orig commit -> 91e4f1b6073dd680d86cdb7e42d7cccca9db39d8 ......
+checking 418fdccd410e34e358368b5439a20dd08d75c3c2 ......
+	 orig commit -> fa73c3b25bd8d0d393dc6109a1dba3c2aef0451e ......
+checking 5a4a45686a87f29aadf462c605df5f9361b56310 ......
+	 orig commit -> 88003fb10f1fc606e1704611c62ceae95fd1d7da ......
+checking 0114e3e52730b76e0976a43ef496d4925eda1893 ......
+	 orig commit -> 9a6dc644512fd083400a96ac4a035ac154fe6b8d ......
+checking 5303b53ef3b0bf7953f503558e9354ed185374eb ......
+	 orig commit -> 2c2469bc03d569c49119db2cccb5cb3f0c6a5b33 ......
+checking 9de8720a92b7189efb6f10655e6c09d0a931875f ......
+	 orig commit -> 8dcc5ff8fcaf778bb57ab4448fedca9e381d088f ......
+checking a2afa5f1a3c9b1226451ae05440a2dd344cf34f8 ......
+	 orig commit -> 8da08ca03b73593d5299893bf29fc08569c3fb5f ......
+checking c143a28cb65cfd43219327a5bc2bed083cd972eb ......
+	 orig commit -> eb1a74b7bea17eea31915c4f76385cefe69d9795 ......
+checking 4be05b0a7e03fab078fe31e41d22c9af27d337d8 ......
+	 orig commit -> db68577966abc1aeae4ec597b3dcfa0d56e92041 ......
+checking 78c7b55b362e868e529ab6579134708fcf5539dd ......
+	 orig commit -> 58bfea9532552d422bde7afa207e1a0f08dffa7d ......
+checking 9b57d91c03054030f30be75c6e19c65b5f108ef3 ......
+	 orig commit -> 6bd58f09e1d8cc6c50a824c00bf0d617919986a1 ......
+		 6bd58f09e1d8cc6c50a824c00bf0d617919986a1 has problem. Fixes commit -> 9c1645727b8fa90d07256fdfcc45bf831242a3ab
+commit e01b04be3eb00456d65278cfa56cfd8103872bfb
+Author: Thomas Gleixner <tglx@linutronix.de>
+Date:   Thu Dec 8 20:49:32 2016 +0000
+
+    timekeeping_Force_unsigned_clocksource_to_nanoseconds_conversion
+    
+    commit 9c1645727b8fa90d07256fdfcc45bf831242a3ab upstream.
+    
+    The clocksource delta to nanoseconds conversion is using signed math, but
+    the delta is unsigned. This makes the conversion space smaller than
+    necessary and in case of a multiplication overflow the conversion can
+    become negative. The conversion is done with scaled math:
+    
+        s64 nsec_delta = ((s64)clkdelta * clk->mult) >> clk->shift;
+    
+    Shifting a signed integer right obvioulsy preserves the sign, which has
+    interesting consequences:
+    
+     - Time jumps backwards
+    
+     - __iter_div_u64_rem() which is used in one of the calling code pathes
+       will take forever to piecewise calculate the seconds/nanoseconds part.
+    
+    This has been reported by several people with different scenarios:
+    
+    David observed that when stopping a VM with a debugger:
+    
+     "It was essentially the stopped by debugger case.  I forget exactly why,
+      but the guest was being explicitly stopped from outside, it wasn't just
+      scheduling lag.  I think it was something in the vicinity of 10 minutes
+      stopped."
+    
+     When lifting the stop the machine went dead.
+    
+    The stopped by debugger case is not really interesting, but nevertheless it
+    would be a good thing not to die completely.
+    
+    But this was also observed on a live system by Liav:
+    
+     "When the OS is too overloaded, delta will get a high enough value for the
+      msb of the sum delta * tkr->mult + tkr->xtime_nsec to be set, and so
+      after the shift the nsec variable will gain a value similar to
+      0xffffffffff000000."
+    
+    Unfortunately this has been reintroduced recently with commit 6bd58f09e1d8
+    ("time: Add cycles to nanoseconds translation"). It had been fixed a year
+    ago already in commit 35a4933a8959 ("time: Avoid signed overflow in
+    timekeeping_get_ns()").
+    
+    Though it's not surprising that the issue has been reintroduced because the
+    function itself and the whole call chain uses s64 for the result and the
+    propagation of it. The change in this recent commit is subtle:
+    
+       s64 nsec;
+    
+    -  nsec = (d * m + n) >> s:
+    +  nsec = d * m + n;
+    +  nsec >>= s;
+    
+    d being type of cycle_t adds another level of obfuscation.
+    
+    This wouldn't have happened if the previous change to unsigned computation
+    would have made the 'nsec' variable u64 right away and a follow up patch
+    had cleaned up the whole call chain.
+    
+    There have been patches submitted which basically did a revert of the above
+    patch leaving everything else unchanged as signed. Back to square one. This
+    spawned a admittedly pointless discussion about potential users which rely
+    on the unsigned behaviour until someone pointed out that it had been fixed
+    before. The changelogs of said patches added further confusion as they made
+    finally false claims about the consequences for eventual users which expect
+    signed results.
+    
+    Despite delta being cycle_t, aka. u64, it's very well possible to hand in
+    a signed negative value and the signed computation will happily return the
+    correct result. But nobody actually sat down and analyzed the code which
+    was added as user after the propably unintended signed conversion.
+    
+    Though in sensitive code like this it's better to analyze it proper and
+    make sure that nothing relies on this than hunting the subtle wreckage half
+    a year later. After analyzing all call chains it stands that no caller can
+    hand in a negative value (which actually would work due to the s64 cast)
+    and rely on the signed math to do the right thing.
+    
+    Change the conversion function to unsigned math. The conversion of all call
+    chains is done in a follow up patch.
+    
+    This solves the starvation issue, which was caused by the negative result,
+    but it does not solve the underlying problem. It merily procrastinates
+    it. When the timekeeper update is deferred long enough that the unsigned
+    multiplication overflows, then time going backwards is observable again.
+    
+    It does neither solve the issue of clocksources with a small counter width
+    which will wrap around possibly several times and cause random time stamps
+    to be generated. But those are usually not found on systems used for
+    virtualization, so this is likely a non issue.
+    
+    I took the liberty to claim authorship for this simply because
+    analyzing all callsites and writing the changelog took substantially
+    more time than just making the simple s/s64/u64/ change and ignore the
+    rest.
+    
+    Fixes: 6bd58f09e1d8 ("time: Add cycles to nanoseconds translation")
+    Reported-by: David Gibson <david@gibson.dropbear.id.au>
+    Reported-by: Liav Rehana <liavr@mellanox.com>
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Reviewed-by: David Gibson <david@gibson.dropbear.id.au>
+    Acked-by: Peter Zijlstra (Intel) <peterz@infradead.org>
+    Cc: Parit Bhargava <prarit@redhat.com>
+    Cc: Laurent Vivier <lvivier@redhat.com>
+    Cc: "Christopher S. Hall" <christopher.s.hall@intel.com>
+    Cc: Chris Metcalf <cmetcalf@mellanox.com>
+    Cc: Richard Cochran <richardcochran@gmail.com>
+    Cc: John Stultz <john.stultz@linaro.org>
+    Link: http://lkml.kernel.org/r/20161208204228.688545601@linutronix.de
+    Signed-off-by: Thomas Gleixner <tglx@linutronix.de>
+    Signed-off-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
