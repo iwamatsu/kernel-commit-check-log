@@ -25,7 +25,10 @@
         "orig commit": "10970e1b4be9c74fce8ab6e3c34a7d718f063f2c"
     },
     "492647b22f997a4ad1b7db790a55c3c3b80fec4b": {
-        "orig commit": "cf43a757fd49442bc38f76088b70c2299eed2c2f"
+        "orig commit": "cf43a757fd49442bc38f76088b70c2299eed2c2f",
+        "fix commit": {
+            "98af37d624ed8c83f1953b1b6b2f6866011fc064": "not apply"
+        }
     },
     "7212e37cbdf99f48e4a6c689a42f4bda1ae69001": {
         "orig commit": "f331e766c4be33f4338574f3c9f7f77e98ab4571"
