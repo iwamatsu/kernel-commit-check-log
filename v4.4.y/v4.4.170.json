@@ -89,7 +89,10 @@
         "orig commit": "c201e3808e0e4be9b98d192802085a9f491bd80c"
     },
     "88206b0e304275c64d98bc26c798ee2299bba8c3": {
-        "orig commit": "1e434b703248580b7aaaf8a115d93e682f57d29f"
+        "orig commit": "1e434b703248580b7aaaf8a115d93e682f57d29f",
+        "fix commit": {
+            "b25af2ff7c07bd19af74e3f64ff82e2880d13d81": "applied"
+        }
     },
     "c7c77cdf7b494ab4a6e92013c7fc5281d0207a86": {
         "orig commit": "5564597d51c8ff5b88d95c76255e18b13b760879"
@@ -180,7 +183,10 @@
         "orig commit": "0b84304ef5da92add8dc75a1b07879c5374cdb05"
     },
     "f8de5a38cc3bb75db98669ffbc243175f32946a3": {
-        "orig commit": "3a0ed3e9619738067214871e9cb826fa23b2ddb9"
+        "orig commit": "3a0ed3e9619738067214871e9cb826fa23b2ddb9",
+        "fix commit": {
+            "f75359f3ac855940c5718af10ba089b8977bf339": "applied"
+        }
     },
     "770b0ad5ffe420a116ecd9458528451ce2be775f": {
         "orig commit": "8e1da73acded4751a93d4166458a7e640f37d26c"
