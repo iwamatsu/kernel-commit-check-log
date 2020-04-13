@@ -114,7 +114,7 @@
     "9d51378a6893ea0ccb2ddcbabf5e336a80ebed87": {
         "orig commit": "5a86d68bcf02f2d1e9a5897dd482079fd5f75e7f",
         "fix commit": {
-            "dddaf89e2fbc69b15e82a96ccd174c70f65bf3d5": "not apply"
+            "dddaf89e2fbc69b15e82a96ccd174c70f65bf3d5": "can ignore/fix warning"
         }
     },
     "bb7b6c49cc344f5f7a27c499a0c9d1efc106b6d2": {
@@ -150,7 +150,7 @@
     "38b17eee7074490c15128b596a35c837d9d94c60": {
         "orig commit": "d189dd70e2556181732598956d808ea53cc8774e",
         "fix commit": {
-            "669e859b5ea7c6f4fce0149d3907c64e550c294b": "not apply"
+            "669e859b5ea7c6f4fce0149d3907c64e550c294b": "can ignore/btrfs"
         }
     },
     "720b86a53a1024996708121abfd7bc490d68768f": {
