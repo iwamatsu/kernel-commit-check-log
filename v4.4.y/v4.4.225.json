@@ -57,7 +57,7 @@
     "0df31581d133da692ba1d63832f71f4f36eddc6e": {
         "orig commit": "54652eb12c1b72e9602d09cb2821d5760939190f",
         "fix commit": {
-            "a622b40035d16196bf19b2b33b854862595245fc": "not apply"
+            "a622b40035d16196bf19b2b33b854862595245fc": "not applyi / i2ip"
         }
     },
     "df9fdbc23b7facbbaab468e7f3d8b7e6a10aaee1": {
@@ -171,7 +171,7 @@
     "328ff670b09bd078fa463aa65c7609ae152d8927": {
         "orig commit": "163f1e93e995048b894c5fc86a6034d16beed740",
         "fix commit": {
-            "552636be7afc86531d1931b5104d7002850d3af7": "not apply"
+            "552636be7afc86531d1931b5104d7002850d3af7": "can apply, but not bugfix"
         }
     },
     "46522c641eb5212172d7f0b34c56c42e89692fa3": {
@@ -204,7 +204,7 @@
     "b30282c3bcc7542fe3faf9f5e1a0980c3c28a507": {
         "orig commit": "53de3b080d5eae31d0de219617155dcc34e7d698",
         "fix commit": {
-            "8433856947217ebb5697a8ff9c4c9cad4639a2cf": "not apply"
+            "8433856947217ebb5697a8ff9c4c9cad4639a2cf": "can apply, but need update CRYPTO_NOLOAD"
         }
     },
     "3c74e59f30ccfb4937a9814631cc828f64427de3": {
