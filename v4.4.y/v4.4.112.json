@@ -81,9 +81,9 @@
     "9a7fad4c0e215fb1c256fee27c45f9f8bc4364c5": {
         "orig commit": "b2157399cc9898260d6031c5bfe45fe137c1fbe7",
         "fix commit": {
-            "9d5564ddcf2a0f5ba3fa1c3a1f8a1b59ad309553": "not apply",
-            "979d63d50c0c0f7bc537bf821e056cc9fe5abd38": "not apply",
-            "c93552c443ebc63b14e26e46d2e76941c88e0d71": "not apply",
+            "9d5564ddcf2a0f5ba3fa1c3a1f8a1b59ad309553": "not apply / bpf ",
+            "979d63d50c0c0f7bc537bf821e056cc9fe5abd38": "not apply / bpf ",
+            "c93552c443ebc63b14e26e46d2e76941c88e0d71": "not apply / bpf ",
             "bbeb6e4323dad9b5e0ee9f60c223dd532e2403b1": "applied"
         }
     },
@@ -252,7 +252,7 @@
     "8d383ff7deaa3c3b5e2c2b604b20f5844c1f74e0": {
         "orig commit": "0cb5b30698fdc8f6b4646012e3acb4ddce430788",
         "fix commit": {
-            "0e0ab73c9a0243736bcd779b30b717e23ba9a56d": "not apply"
+            "0e0ab73c9a0243736bcd779b30b717e23ba9a56d": "not apply / KVM"
         }
     },
     "0753661d5b17251a0a02a7b6b1ae596f3e9cd784": {
