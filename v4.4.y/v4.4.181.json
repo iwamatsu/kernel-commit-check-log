@@ -504,7 +504,7 @@
     "0fa88718cdc50d42a6f9191792d8eaede77bd293": {
         "orig commit": "0c713cbab6200b0ab6473b50435e450a6e1de85d",
         "fix commit": {
-            "ba0b084ac309283db6e329785c1dc4f45fdbd379": "not apply"
+            "ba0b084ac309283db6e329785c1dc4f45fdbd379": "not apply/for btrfs"
         }
     },
     "2f5ac0bd2ef747c7f370f79dd9fe55a44cfd924e": {
@@ -531,7 +531,7 @@
     "7d64186e791045aaa22074a37ed4f23e172dc0e1": {
         "orig commit": "c2d1b3aae33605a61cbab445d8ae1c708ccd2698",
         "fix commit": {
-            "8103d10b71610aa65a65d6611cd3ad3f3bd7beeb": "not apply"
+            "8103d10b71610aa65a65d6611cd3ad3f3bd7beeb": "not apply/for btrfs"
         }
     },
     "57e84e4c073d414843292841c199f50208bfc05e": {
