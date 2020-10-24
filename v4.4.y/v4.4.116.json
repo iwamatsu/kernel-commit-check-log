@@ -1,5 +1,5 @@
 {
-"status": "",
+"status": "checked",
     "0f48bd7cf032bb4cb9f433de0fef694e15fb93ef": {},
     "a94d7722b39206e96e639cd5cf2cf037c69d5ce8": {
         "orig commit": "7b6586562708d2b3a04fe49f217ddbadbbbb0546"
@@ -305,7 +305,7 @@
     "c3892946315effa323954134c2f8aeda51e9e68b": {
         "orig commit": "aa8a5e0062ac940f7659394f4817c948dc8c0667",
         "fix commit": {
-            "9dfbf78e4114fcaf4ef61c49885c3ab5bad40d0b": "not apply"
+            "9dfbf78e4114fcaf4ef61c49885c3ab5bad40d0b": "not apply/ create patch"
         }
     },
     "973439da1137a066f6b3f478c930edff1879dee2": {
