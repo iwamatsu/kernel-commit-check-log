@@ -544,8 +544,8 @@
     "500ec98998c2e70f33497efa93abc4c4f286de6b": {
         "orig commit": "b6f91fc183f758461b9462cc93e673adbbf95c2d",
         "fix commit": {
-            "ce4f17d076f02b0c97416115948314dfb95aa85a": "not apply",
-            "08f3dddb715cc62fa13a6bb7a95c856519d910df": "not apply"
+            "ce4f17d076f02b0c97416115948314dfb95aa85a": "can ignore, fix doc",
+            "08f3dddb715cc62fa13a6bb7a95c856519d910df": "can ignore, not bug fix"
         }
     },
     "bd947731971412a032806ef75de590ec7f1b0aba": {
